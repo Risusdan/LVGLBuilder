@@ -272,7 +272,7 @@ QJsonArray LVGLObject::jsonStyles() const
 				if (!defaultStyle || (defaultStyle->body.shadow.color.full != objStyle.body.shadow.color.full))
 					shadow.insert("color", QVariant(lvgl.toColor(objStyle.body.shadow.color)).toString());
 				if (!defaultStyle || (defaultStyle->body.shadow.width != objStyle.body.shadow.width))
-					shadow.insert("width", objStyle.body.border.width);
+					shadow.insert("width", objStyle.body.shadow.width);
 				if (!defaultStyle || (defaultStyle->body.shadow.type != objStyle.body.shadow.type))
 					shadow.insert("type", objStyle.body.shadow.type);
 				if (!shadow.isEmpty())

@@ -1,4 +1,5 @@
 #include <QtTest>
+#include <QJsonArray>
 
 #include "LVGLCore.h"
 #include "LVGLObject.h"
@@ -17,6 +18,7 @@ class TestLVGLObject : public QObject {
   void testCodeNameSanitizesSpaces();
   void testCodeNameSanitizesSpecialChars();
   void testCodeNameSanitizesLeadingDigit();
+  void testJsonStylesShadowWidthUsesCorrectField();
 };
 
 void TestLVGLObject::testCodeNameSanitizesSpaces() {
@@ -52,6 +54,32 @@ void TestLVGLObject::testCodeNameSanitizesLeadingDigit() {
     lvgl.addObject(obj);
     QVERIFY(!obj->codeName().isEmpty());
     QVERIFY(!obj->codeName().at(0).isDigit());
+}
+
+void TestLVGLObject::testJsonStylesShadowWidthUsesCorrectField() {
+    const LVGLWidget *btnWidget = lvgl.widget("lv_btn");
+    QVERIFY(btnWidget != nullptr);
+    auto *obj = new LVGLObject(btnWidget, "shadow_test", lv_scr_act());
+    lvgl.addObject(obj);
+
+    // Get style and set shadow.width to a known value, border.width to a different one
+    lv_style_t *s = obj->style(0); // LV_BTN_STYLE_REL
+    s->body.shadow.width = 10;
+    s->body.border.width = 99; // sentinel — if serialized, this is the bug
+    btnWidget->setStyle(obj->obj(), 0, s);
+
+    // Serialize
+    QJsonArray styles = obj->jsonStyles();
+    QVERIFY(styles.size() > 0);
+
+    // Find the shadow object in the first style
+    QJsonObject firstStyle = styles[0].toObject();
+    QJsonObject body = firstStyle["body"].toObject();
+    QJsonObject shadow = body["shadow"].toObject();
+
+    // The serialized width must be 10 (shadow.width), NOT 99 (border.width)
+    QVERIFY(shadow.contains("width"));
+    QCOMPARE(shadow["width"].toInt(), 10);
 }
 
 QTEST_MAIN(TestLVGLObject)
