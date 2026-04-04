@@ -9,15 +9,14 @@ LVGLBuilder is a Qt-based GUI builder for LVGL (Light and Versatile Graphics Lib
 ## Build Commands
 
 ```bash
-qmake LVGLBuilder.pro
-make                # macOS/Linux
-mingw32-make        # Windows (MinGW)
-jom                 # Windows (MSVC)
+cmake -B build
+cmake --build build
+ctest --test-dir build    # run tests
 ```
 
-Requires Qt 6 with Core, Gui, and Widgets modules. No longer compatible with Qt 5.
+Requires Qt 6 with Core, Gui, Widgets, and Test modules. No longer compatible with Qt 5.
 
-There is no test suite.
+Tests use QTest, run with `ctest --test-dir build`.
 
 ## Architecture
 
@@ -56,7 +55,7 @@ Property editing: User selects widget -> LVGLPropertyModel populates inspector -
 
 1. Create a new LVGLWidget subclass in `widgets/` implementing `newObject()`, property declarations, and style definitions.
 2. Register it in LVGLCore's constructor where other widgets are registered.
-3. Add source files to `LVGLBuilder.pro`.
+3. Add source files to `CMakeLists.txt` and `tests/CMakeLists.txt`.
 
 ### Project File Format
 
