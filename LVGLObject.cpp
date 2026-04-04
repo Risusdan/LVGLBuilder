@@ -335,7 +335,7 @@ QJsonArray LVGLObject::jsonStyles() const
 			if (!defaultStyle || (defaultStyle->line.width != objStyle.line.width))
 				line.insert("width", objStyle.line.width);
 			if (!defaultStyle || (defaultStyle->line.opa != objStyle.line.opa))
-				line.insert("opa", objStyle.image.opa);
+				line.insert("opa", objStyle.line.opa);
 			if (!line.isEmpty())
 				style.insert("line", line);
 		}

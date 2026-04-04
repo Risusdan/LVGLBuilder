@@ -19,6 +19,7 @@ class TestLVGLObject : public QObject {
   void testCodeNameSanitizesSpecialChars();
   void testCodeNameSanitizesLeadingDigit();
   void testJsonStylesShadowWidthUsesCorrectField();
+  void testJsonStylesLineOpaUsesCorrectField();
 };
 
 void TestLVGLObject::testCodeNameSanitizesSpaces() {
@@ -80,6 +81,27 @@ void TestLVGLObject::testJsonStylesShadowWidthUsesCorrectField() {
     // The serialized width must be 10 (shadow.width), NOT 99 (border.width)
     QVERIFY(shadow.contains("width"));
     QCOMPARE(shadow["width"].toInt(), 10);
+}
+
+void TestLVGLObject::testJsonStylesLineOpaUsesCorrectField() {
+    const LVGLWidget *lineWidget = lvgl.widget("lv_line");
+    QVERIFY(lineWidget != nullptr);
+    auto *obj = new LVGLObject(lineWidget, "line_opa_test", lv_scr_act());
+    lvgl.addObject(obj);
+
+    lv_style_t *s = obj->style(0);
+    s->line.opa = 128;
+    s->image.opa = 77; // sentinel — if serialized, this is the bug
+    lineWidget->setStyle(obj->obj(), 0, s);
+
+    QJsonArray styles = obj->jsonStyles();
+    QVERIFY(styles.size() > 0);
+
+    QJsonObject firstStyle = styles[0].toObject();
+    QJsonObject line = firstStyle["line"].toObject();
+
+    QVERIFY(line.contains("opa"));
+    QCOMPARE(line["opa"].toInt(), 128);
 }
 
 QTEST_MAIN(TestLVGLObject)
