@@ -12,6 +12,7 @@ class LVGLObject;
 class LVGLItem;
 class LVGLObjectModel;
 class LVGLPropertyModel;
+class SelectionManager;
 class QTimer;
 class QThread;
 
@@ -46,6 +47,7 @@ class LVGLSimulator : public QGraphicsView {
 
   LVGLItem *item() const;
   CanvasActions *canvasActions() const;
+  SelectionManager *selectionManager() const;
 
   void moveObject(LVGLObject *obj, int dx, int dy);
   void addObject(LVGLObject *obj);
@@ -81,14 +83,12 @@ class LVGLSimulator : public QGraphicsView {
   void update();
 
  private:
-  LVGLObject *selectObject(QList<LVGLObject *> objs, bool doubleClick) const;
-  QList<LVGLObject *> objectsUnderCoords(QPoint pos, bool includeLocked) const;
+  void onSelectionChanged(LVGLObject *obj);
   void generateCodeObject(QTextStream &stream, LVGLObject *o);
-  // void parseJson(QJsonObject object, LVGLObject *parent = nullptr);
 
   LVGLScene *m_scene;
   CanvasActions *m_canvasActions;
-  LVGLObject *m_selectedObject;
+  SelectionManager *m_selectionManager;
   bool m_mouseEnabled;
   LVGLItem *m_item;
   LVGLObjectModel *m_objectModel;

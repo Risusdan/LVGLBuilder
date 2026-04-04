@@ -24,6 +24,7 @@
 #include "LVGLObjectModel.h"
 #include "LVGLProject.h"
 #include "LVGLPropertyModel.h"
+#include "SelectionManager.h"
 #include "properties/LVGLPropertyGeometry.h"
 #include "widgets/LVGLWidget.h"
 
@@ -74,15 +75,14 @@ LVGLSimulator::LVGLSimulator(QWidget *parent)
     : QGraphicsView(parent),
       m_scene(new LVGLScene),
       m_canvasActions(new CanvasActions(this)),
-      m_selectedObject(nullptr),
+      m_selectionManager(new SelectionManager(this)),
       m_mouseEnabled(false),
       m_item(new LVGLItem),
       m_objectModel(nullptr),
       m_dragging(false) {
-  // setMinimumSize(LV_HOR_RES_MAX, LV_VER_RES_MAX);
-  // setMaximumSize(LV_HOR_RES_MAX, LV_VER_RES_MAX);
-
   connect(m_item, &LVGLItem::geometryChanged, this, &LVGLSimulator::update);
+  connect(m_selectionManager, &SelectionManager::selectionChanged, this,
+          &LVGLSimulator::onSelectionChanged);
 
   setAcceptDrops(true);
 
@@ -109,16 +109,16 @@ LVGLSimulator::~LVGLSimulator() {
   delete m_thread;
 }
 
-void LVGLSimulator::setSelectedObject(LVGLObject *obj) {
-  if (m_selectedObject == obj) return;
-  if (obj && obj->isLocked()) return;
-
-  m_selectedObject = obj;
+void LVGLSimulator::onSelectionChanged(LVGLObject *obj) {
   m_item->setObject(obj);
   if (m_objectModel) m_objectModel->setCurrentObject(obj);
-
-  emit objectSelected(m_selectedObject);
+  m_scene->setSelected(obj);
+  emit objectSelected(obj);
   update();
+}
+
+void LVGLSimulator::setSelectedObject(LVGLObject *obj) {
+  m_selectionManager->select(obj);
 }
 
 void LVGLSimulator::setZoomLevel(int level) {
@@ -130,7 +130,7 @@ void LVGLSimulator::setZoomLevel(int level) {
   setTransform(transform);
 }
 
-void LVGLSimulator::clear() { setSelectedObject(nullptr); }
+void LVGLSimulator::clear() { m_selectionManager->clearSelection(); }
 
 void LVGLSimulator::setMouseEnable(bool enable) { m_mouseEnabled = enable; }
 
@@ -144,7 +144,8 @@ void LVGLSimulator::mousePressEvent(QMouseEvent *event) {
     lvgl.sendMouseEvent(pos.x(), pos.y(), event->buttons() & Qt::LeftButton);
   } else {
     if (event->button() == Qt::RightButton) {
-      auto obj = selectObject(objectsUnderCoords(pos, true), false);
+      auto obj = m_selectionManager->selectObject(
+          m_selectionManager->objectsUnderCoords(pos, true), false);
       QAction *sel = nullptr;
       QAction *scolor = nullptr;
       if (obj) {
@@ -161,9 +162,11 @@ void LVGLSimulator::mousePressEvent(QMouseEvent *event) {
           obj->setLocked(false);
         } else if ((sel == lock) && !locked) {
           obj->setLocked(true);
-          if (obj == m_selectedObject) setSelectedObject(nullptr);
+          if (obj == m_selectionManager->selectedObject())
+            setSelectedObject(nullptr);
         } else if (sel == remove) {
-          if (obj == m_selectedObject) setSelectedObject(nullptr);
+          if (obj == m_selectionManager->selectedObject())
+            setSelectedObject(nullptr);
           if (m_objectModel) m_objectModel->beginRemoveObject(obj);
           m_canvasActions->deleteObject(obj);
           if (m_objectModel) m_objectModel->endRemoveObject();
@@ -186,7 +189,8 @@ void LVGLSimulator::mousePressEvent(QMouseEvent *event) {
       }
     } else if (event->button() == Qt::LeftButton) {
       if (!m_item->isManipolating()) {
-        auto obj = selectObject(objectsUnderCoords(pos, false), false);
+        auto obj = m_selectionManager->selectObject(
+            m_selectionManager->objectsUnderCoords(pos, false), false);
         setSelectedObject(obj);
         if (obj && obj->isMovable()) {
           m_dragging = true;
@@ -202,7 +206,8 @@ void LVGLSimulator::mousePressEvent(QMouseEvent *event) {
 void LVGLSimulator::mouseDoubleClickEvent(QMouseEvent *event) {
   if (!m_item->isManipolating() && !m_mouseEnabled) {
     const QPoint pos = mapToScene(event->position().toPoint()).toPoint();
-    auto obj = selectObject(objectsUnderCoords(pos, false), true);
+    auto obj = m_selectionManager->selectObject(
+        m_selectionManager->objectsUnderCoords(pos, false), true);
     if (obj == nullptr)
       setSelectedObject(nullptr);
     else if (!obj->isLocked())
@@ -224,11 +229,13 @@ void LVGLSimulator::mouseMoveEvent(QMouseEvent *event) {
   if (m_mouseEnabled) {
     const QPoint pos = mapToScene(event->position().toPoint()).toPoint();
     lvgl.sendMouseEvent(pos.x(), pos.y(), event->buttons() & Qt::LeftButton);
-  } else if (m_dragging && m_selectedObject && m_selectedObject->isMovable()) {
+  } else if (m_dragging && m_selectionManager->selectedObject() &&
+             m_selectionManager->selectedObject()->isMovable()) {
     const QPoint pos = mapToScene(event->position().toPoint()).toPoint();
     QPoint delta = pos - m_dragStartPos;
     QPoint newPos = m_dragObjStartPos + delta;
-    m_canvasActions->moveObjectTo(m_selectedObject, newPos, lvgl.size());
+    m_canvasActions->moveObjectTo(m_selectionManager->selectedObject(), newPos,
+                                  lvgl.size());
     m_item->updateGeometry();
     update();
     return;
@@ -252,7 +259,8 @@ void LVGLSimulator::dropEvent(QDropEvent *event) {
 
     // check if moved into another widget
     QPoint pos = mapToScene(event->position().toPoint()).toPoint();
-    auto parent = selectObject(objectsUnderCoords(pos, true), false);
+    auto parent = m_selectionManager->selectObject(
+        m_selectionManager->objectsUnderCoords(pos, true), false);
 
     LVGLObject *newObj = m_canvasActions->createObject(
         widgetClass, parent, m_parent, pos, lvgl.size());
@@ -267,7 +275,8 @@ void LVGLSimulator::dragMoveEvent(QDragMoveEvent *event) {
   if (m_mouseEnabled) return;
 
   const QPoint pos = mapToScene(event->position().toPoint()).toPoint();
-  auto sel = selectObject(objectsUnderCoords(pos, true), false);
+  auto sel = m_selectionManager->selectObject(
+      m_selectionManager->objectsUnderCoords(pos, true), false);
   m_scene->setHoverObject(sel);
 
   event->acceptProposedAction();
@@ -281,33 +290,6 @@ void LVGLSimulator::dragEnterEvent(QDragEnterEvent *event) {
 
 void LVGLSimulator::update() {
   m_scene->invalidate(m_scene->sceneRect(), QGraphicsScene::BackgroundLayer);
-}
-
-LVGLObject *LVGLSimulator::selectObject(QList<LVGLObject *> objs,
-                                        bool doubleClick) const {
-  if (objs.empty()) return nullptr;
-
-  if (objs.size() > 0) {
-    if (doubleClick) {
-      for (LVGLObject *obj : objs) {
-        if (obj->widgetType() == LVGLWidget::Label) return obj;
-      }
-    }
-    return objs.last();
-  }
-  return nullptr;
-}
-
-QList<LVGLObject *> LVGLSimulator::objectsUnderCoords(
-    QPoint pos, bool includeLocked) const {
-  QList<LVGLObject *> ret;
-  QRect screen = QRect(QPoint(0, 0), lvgl.size()).adjusted(-50, -50, 50, 50);
-  for (LVGLObject *o : lvgl.allObjects()) {
-    if (!includeLocked && o->isLocked()) continue;
-    QRect geo = o->geometry();
-    if (screen.contains(geo) && geo.contains(pos)) ret << o;
-  }
-  return ret;
 }
 
 void LVGLSimulator::setObjectModel(LVGLObjectModel *objectModel) {
@@ -326,6 +308,10 @@ void LVGLSimulator::setobjParent(lv_obj_t *parent) {
 LVGLItem *LVGLSimulator::item() const { return m_item; }
 
 CanvasActions *LVGLSimulator::canvasActions() const { return m_canvasActions; }
+
+SelectionManager *LVGLSimulator::selectionManager() const {
+  return m_selectionManager;
+}
 
 void LVGLSimulator::moveObject(LVGLObject *obj, int dx, int dy) {
   m_canvasActions->moveObject(obj, dx, dy, lvgl.size());
@@ -355,7 +341,9 @@ void LVGLSimulator::removeObject(LVGLObject *obj) {
   if (m_objectModel) m_objectModel->endRemoveObject();
 }
 
-LVGLObject *LVGLSimulator::selectedObject() const { return m_selectedObject; }
+LVGLObject *LVGLSimulator::selectedObject() const {
+  return m_selectionManager->selectedObject();
+}
 
 LVGLKeyPressEventFilter::LVGLKeyPressEventFilter(LVGLSimulator *sim,
                                                  QObject *parent)

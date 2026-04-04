@@ -111,6 +111,7 @@ set(APP_SOURCES
     LVGLProject.cpp
     LVGLProperty.cpp
     LVGLPropertyModel.cpp
+    SelectionManager.cpp
     LVGLSimulator.cpp
     LVGLStyle.cpp
     LVGLStyleModel.cpp

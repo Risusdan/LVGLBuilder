@@ -27,6 +27,7 @@ set(APP_SOURCES_NO_MAIN
     ${CMAKE_SOURCE_DIR}/LVGLProject.cpp
     ${CMAKE_SOURCE_DIR}/LVGLProperty.cpp
     ${CMAKE_SOURCE_DIR}/LVGLPropertyModel.cpp
+    ${CMAKE_SOURCE_DIR}/SelectionManager.cpp
     ${CMAKE_SOURCE_DIR}/LVGLSimulator.cpp
     ${CMAKE_SOURCE_DIR}/LVGLStyle.cpp
     ${CMAKE_SOURCE_DIR}/LVGLStyleModel.cpp
@@ -133,3 +134,4 @@ add_lvgl_test(tst_properties tst_properties/tst_properties.cpp)
 add_lvgl_test(tst_lvglcore tst_lvglcore/tst_lvglcore.cpp)
 add_lvgl_test(tst_projectmanager tst_projectmanager/tst_projectmanager.cpp)
 add_lvgl_test(tst_canvasactions tst_canvasactions/tst_canvasactions.cpp)
+add_lvgl_test(tst_selectionmanager tst_selectionmanager/tst_selectionmanager.cpp)
