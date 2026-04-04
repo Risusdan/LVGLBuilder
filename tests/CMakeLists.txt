@@ -120,3 +120,4 @@ endfunction()
 # ---------------------------------------------------------------------------
 # add_lvgl_test(tst_example tst_example.cpp)
 add_lvgl_test(tst_lvglproject tst_lvglproject/tst_lvglproject.cpp)
+add_lvgl_test(tst_properties tst_properties/tst_properties.cpp)
