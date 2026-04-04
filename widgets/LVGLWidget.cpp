@@ -2,36 +2,9 @@
 
 #include "properties/LVGLPropertyGeometry.h"
 #include "LVGLObject.h"
-
-class LVGLPropertyName : public LVGLPropertyString
-{
-public:
-	inline QString name() const override { return "Name"; }
-
-protected:
-	inline QString get(LVGLObject *obj) const override { return obj->name(); }
-	inline void set(LVGLObject *obj, QString string) override { obj->setName(string); }
-};
-
-class LVGLPropertyAccessible : public LVGLPropertyBool
-{
-public:
-	inline LVGLPropertyAccessible() : LVGLPropertyBool("Accessible") {}
-
-protected:
-	inline bool get(LVGLObject *obj) const override { return obj->isAccessible(); }
-	inline void set(LVGLObject *obj, bool statue) override { obj->setAccessible(statue); }
-};
-
-class LVGLPropertyLocked : public LVGLPropertyBool
-{
-public:
-	inline LVGLPropertyLocked() : LVGLPropertyBool("Locked") {}
-
-protected:
-	inline bool get(LVGLObject *obj) const override { return obj->isLocked(); }
-	inline void set(LVGLObject *obj, bool statue) override { obj->setLocked(statue); }
-};
+#include "properties/LVGLPropertyName.h"
+#include "properties/LVGLPropertyAccessible.h"
+#include "properties/LVGLPropertyLocked.h"
 
 
 LVGLWidget::LVGLWidget()

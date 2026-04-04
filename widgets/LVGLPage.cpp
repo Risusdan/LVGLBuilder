@@ -3,77 +3,12 @@
 #include <QIcon>
 
 #include "LVGLObject.h"
+#include "properties/LVGLPropertyPageScrollbars.h"
+#include "properties/LVGLPropertyPageWidth.h"
+#include "properties/LVGLPropertyPageHeight.h"
+#include "properties/LVGLPropertyPageEdgeFlash.h"
+#include "properties/LVGLPropertyPageScrollPropagation.h"
 
-class LVGLPropertyPageScrollbars : public LVGLPropertyEnum
-{
-public:
-	LVGLPropertyPageScrollbars()
-		: LVGLPropertyEnum(QStringList() << "Off" << "On" << "Drag" << "Auto")
-		, m_values({"LV_SB_MODE_OFF", "LV_SB_MODE_ON", "LV_SB_MODE_DRAG", "LV_SB_MODE_AUTO"})
-	{}
-
-	QString name() const { return "Scrollbars"; }
-
-	QStringList function(LVGLObject *obj) const {
-		return QStringList() << QString("lv_page_set_sb_mode(%1, %2);").arg(obj->codeName()).arg(m_values.at(get(obj)));
-	}
-
-protected:
-	int get(LVGLObject *obj) const { return lv_page_get_sb_mode(obj->obj()) & 0x03; }
-	void set(LVGLObject *obj, int index) { lv_page_set_sb_mode(obj->obj(), index & 0xff); }
-
-	QStringList m_values;
-};
-
-class LVGLPropertyPageWidth : public LVGLPropertyCoord
-{
-public:
-	inline LVGLPropertyPageWidth(LVGLProperty *p = nullptr) : LVGLPropertyCoord(Qt::Horizontal, p) {}
-	inline QString name() const override { return "Scroll width"; }
-
-	inline lv_coord_t get(LVGLObject *obj) const override { return lv_page_get_scrl_width(obj->obj()); }
-	inline void set(LVGLObject *obj, lv_coord_t value) override { lv_page_set_scrl_width(obj->obj(), value); }
-
-};
-
-class LVGLPropertyPageHeight : public LVGLPropertyCoord
-{
-public:
-	inline LVGLPropertyPageHeight(LVGLProperty *p = nullptr) : LVGLPropertyCoord(Qt::Vertical, p) {}
-	inline QString name() const override { return "Scroll height"; }
-
-	inline lv_coord_t get(LVGLObject *obj) const override { return lv_page_get_scrl_height(obj->obj()); }
-	inline void set(LVGLObject *obj, lv_coord_t value) override { lv_page_set_scrl_height(obj->obj(), value); }
-
-};
-
-class LVGLPropertyPageEdgeFlash : public LVGLPropertyBool
-{
-public:
-	QString name() const { return "Edge flash"; }
-
-	QStringList function(LVGLObject *obj) const {
-		return QStringList() << QString("lv_page_set_edge_flash(%1, %2);").arg(obj->codeName()).arg(QVariant(get(obj)).toString());
-	}
-
-protected:
-	bool get(LVGLObject *obj) const { return lv_page_get_edge_flash(obj->obj()); }
-	void set(LVGLObject *obj, bool boolean) { lv_page_set_edge_flash(obj->obj(), boolean); }
-};
-
-class LVGLPropertyPageScrollPropagation : public LVGLPropertyBool
-{
-public:
-	QString name() const { return "Scroll propagation"; }
-
-	QStringList function(LVGLObject *obj) const {
-		return QStringList() << QString("lv_page_set_scroll_propagation(%1, %2);").arg(obj->codeName()).arg(QVariant(get(obj)).toString());
-	}
-
-protected:
-	bool get(LVGLObject *obj) const { return lv_page_get_scroll_propagation(obj->obj()); }
-	void set(LVGLObject *obj, bool boolean) { lv_page_set_scroll_propagation(obj->obj(), boolean); }
-};
 
 LVGLPage::LVGLPage()
 {

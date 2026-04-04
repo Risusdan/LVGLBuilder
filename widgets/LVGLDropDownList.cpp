@@ -3,84 +3,14 @@
 #include <QIcon>
 
 #include "LVGLObject.h"
+#include "properties/LVGLPropertyDDListAlign.h"
+#include "properties/LVGLPropertyDDListFixedWidth.h"
+#include "properties/LVGLPropertyDDListFixedHeight.h"
+#include "properties/LVGLPropertyDDListScrollbars.h"
+#include "properties/LVGLPropertyDDListAnimationTime.h"
+#include "properties/LVGLPropertyDDListDrawArrow.h"
+#include "properties/LVGLPropertyDDListStayOpen.h"
 
-class LVGLPropertyDDListAlign : public LVGLPropertyEnum
-{
-public:
-	LVGLPropertyDDListAlign() : LVGLPropertyEnum(QStringList() << "Left" << "Center" << "Right") {}
-	QString name() const { return "Align"; }
-
-protected:
-	int get(LVGLObject *obj) const { return lv_ddlist_get_align(obj->obj()); }
-	void set(LVGLObject *obj, int index) { lv_ddlist_set_align(obj->obj(), index & 0xff); }
-};
-
-class LVGLPropertyDDListFixedWidth : public LVGLPropertyCoord
-{
-public:
-	inline LVGLPropertyDDListFixedWidth(LVGLProperty *p = nullptr) : LVGLPropertyCoord(Qt::Vertical, p) {}
-	inline QString name() const override { return "Fixed width"; }
-
-protected:
-	inline lv_coord_t get(LVGLObject *obj) const override { return lv_obj_get_width(obj->obj()); }
-	inline void set(LVGLObject *obj, lv_coord_t value) override { lv_ddlist_set_fix_width(obj->obj(), value); }
-
-};
-
-class LVGLPropertyDDListFixedHeight : public LVGLPropertyCoord
-{
-public:
-	inline LVGLPropertyDDListFixedHeight(LVGLProperty *p = nullptr) : LVGLPropertyCoord(Qt::Vertical, p) {}
-	inline QString name() const override { return "Fixed height"; }
-
-protected:
-	inline lv_coord_t get(LVGLObject *obj) const override { return lv_ddlist_get_fix_height(obj->obj()); }
-	inline void set(LVGLObject *obj, lv_coord_t value) override { lv_ddlist_set_fix_height(obj->obj(), value); }
-
-};
-
-class LVGLPropertyDDListScrollbars : public LVGLPropertyEnum
-{
-public:
-	LVGLPropertyDDListScrollbars() : LVGLPropertyEnum(QStringList() << "Off"  << "On" << "Drag" << "Auto") {}
-	QString name() const { return "Scrollbars"; }
-
-protected:
-	int get(LVGLObject *obj) const { return lv_ddlist_get_sb_mode(obj->obj()) & 0x3; }
-	void set(LVGLObject *obj, int index) { lv_ddlist_set_sb_mode(obj->obj(), index & 0x3); }
-};
-
-class LVGLPropertyDDListAnimationTime : public LVGLPropertyInt
-{
-public:
-	LVGLPropertyDDListAnimationTime() : LVGLPropertyInt(0, UINT16_MAX, " ms") {}
-
-	QString name() const { return "Animation time"; }
-
-protected:
-	int get(LVGLObject *obj) const { return lv_ddlist_get_anim_time(obj->obj()); }
-	void set(LVGLObject *obj, int value) { lv_ddlist_set_anim_time(obj->obj(), static_cast<uint16_t>(value)); }
-};
-
-class LVGLPropertyDDListDrawArrow : public LVGLPropertyBool
-{
-public:
-	QString name() const { return "Decoration arrow"; }
-
-protected:
-	bool get(LVGLObject *obj) const { return lv_ddlist_get_draw_arrow(obj->obj()); }
-	void set(LVGLObject *obj, bool statue) { lv_ddlist_set_draw_arrow(obj->obj(), statue); }
-};
-
-class LVGLPropertyDDListStayOpen : public LVGLPropertyBool
-{
-public:
-	QString name() const { return "Stay open"; }
-
-protected:
-	bool get(LVGLObject *obj) const { return lv_ddlist_get_stay_open(obj->obj()); }
-	void set(LVGLObject *obj, bool statue) { lv_ddlist_set_stay_open(obj->obj(), statue); }
-};
 
 LVGLDropDownList::LVGLDropDownList()
 {

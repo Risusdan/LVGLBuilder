@@ -3,48 +3,10 @@
 #include <QIcon>
 #include "LVGLObject.h"
 #include "properties/LVGLPropertyList.h"
+#include "properties/LVGLPropertyListSingleMode.h"
+#include "properties/LVGLPropertyListScrollPropagation.h"
+#include "properties/LVGLPropertyListEdgeFlash.h"
 
-class LVGLPropertyListSingleMode : public LVGLPropertyBool
-{
-public:
-	QString name() const { return "Single mode"; }
-
-	QStringList function(LVGLObject *obj) const {
-		return QStringList() << QString("lv_list_set_single_mode(%1, %2);").arg(obj->codeName()).arg(QVariant(get(obj)).toString());
-	}
-
-protected:
-	bool get(LVGLObject *obj) const { return lv_list_get_single_mode(obj->obj()); }
-	void set(LVGLObject *obj, bool boolean) { lv_list_set_single_mode(obj->obj(), boolean); }
-};
-
-class LVGLPropertyListScrollPropagation : public LVGLPropertyBool
-{
-public:
-	QString name() const { return "Scroll propagation"; }
-
-	QStringList function(LVGLObject *obj) const {
-		return QStringList() << QString("lv_list_set_scroll_propagation(%1, %2);").arg(obj->codeName()).arg(QVariant(get(obj)).toString());
-	}
-
-protected:
-	bool get(LVGLObject *obj) const { return lv_list_get_scroll_propagation(obj->obj()); }
-	void set(LVGLObject *obj, bool boolean) { lv_list_set_scroll_propagation(obj->obj(), boolean); }
-};
-
-class LVGLPropertyListEdgeFlash : public LVGLPropertyBool
-{
-public:
-	QString name() const { return "Edge flash"; }
-
-	QStringList function(LVGLObject *obj) const {
-		return QStringList() << QString("lv_list_set_edge_flash(%1, %2);").arg(obj->codeName()).arg(QVariant(get(obj)).toString());
-	}
-
-protected:
-	bool get(LVGLObject *obj) const { return lv_list_get_edge_flash(obj->obj()); }
-	void set(LVGLObject *obj, bool boolean) { lv_list_set_edge_flash(obj->obj(), boolean); }
-};
 
 LVGLList::LVGLList()
 {

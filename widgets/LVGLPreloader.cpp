@@ -2,58 +2,11 @@
 
 #include <QIcon>
 #include "LVGLObject.h"
+#include "properties/LVGLPropertyPreloadArcLen.h"
+#include "properties/LVGLPropertyPreloadSpinTime.h"
+#include "properties/LVGLPropertyPreloadType.h"
+#include "properties/LVGLPropertyPreloadDir.h"
 
-class LVGLPropertyPreloadArcLen : public LVGLPropertyInt
-{
-public:
-	LVGLPropertyPreloadArcLen() : LVGLPropertyInt(0, 360) {}
-
-	QString name() const { return "Arc length"; }
-
-protected:
-	int get(LVGLObject *obj) const { return lv_preload_get_arc_length(obj->obj()); }
-	void set(LVGLObject *obj, int value) { lv_preload_set_arc_length(obj->obj(), static_cast<lv_anim_value_t>(value)); }
-};
-
-class LVGLPropertyPreloadSpinTime : public LVGLPropertyInt
-{
-public:
-	LVGLPropertyPreloadSpinTime() : LVGLPropertyInt(0, UINT16_MAX) {}
-
-	QString name() const { return "Spin time"; }
-
-protected:
-	int get(LVGLObject *obj) const { return lv_preload_get_spin_time(obj->obj()); }
-	void set(LVGLObject *obj, int value) { lv_preload_set_spin_time(obj->obj(), static_cast<uint16_t>(value)); }
-};
-
-class LVGLPropertyPreloadType : public LVGLPropertyEnum
-{
-public:
-	LVGLPropertyPreloadType()
-		: LVGLPropertyEnum(QStringList() << "Spinning arc" << "Fill and spin arc")
-	{}
-
-	QString name() const { return "Spin type"; }
-
-protected:
-	int get(LVGLObject *obj) const { return lv_preload_get_type(obj->obj()); }
-	void set(LVGLObject *obj, int index) { lv_preload_set_type(obj->obj(), index & 0xff); }
-};
-
-class LVGLPropertyPreloadDir : public LVGLPropertyEnum
-{
-public:
-	LVGLPropertyPreloadDir()
-		: LVGLPropertyEnum(QStringList() << "Forward" << "Backward")
-	{}
-
-	QString name() const { return "Spin direction"; }
-
-protected:
-	int get(LVGLObject *obj) const { return lv_preload_get_dir(obj->obj()); }
-	void set(LVGLObject *obj, int index) { lv_preload_set_dir(obj->obj(), index & 0xff); }
-};
 
 LVGLPreloader::LVGLPreloader()
 {

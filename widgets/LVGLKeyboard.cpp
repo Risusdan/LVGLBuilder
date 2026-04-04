@@ -3,41 +3,8 @@
 #include <QIcon>
 #include "LVGLObject.h"
 #include "properties/LVGLPropertyAssignTextArea.h"
-
-class LVGLPropertyKBMode : public LVGLPropertyEnum
-{
-public:
-	LVGLPropertyKBMode()
-		: LVGLPropertyEnum({"Text", "Number", "Text Upper"})
-		, m_values({"LV_KB_MODE_TEXT", "LV_KB_MODE_NUM", "LV_KB_MODE_TEXT_UPPER"})
-	{}
-
-	QString name() const { return "Mode"; }
-
-	QStringList function(LVGLObject *obj) const {
-		return QStringList() << QString("lv_kb_set_mode(%1, %2);").arg(obj->codeName()).arg(m_values.at(get(obj)));
-	}
-
-protected:
-	int get(LVGLObject *obj) const { return lv_kb_get_mode(obj->obj()); }
-	void set(LVGLObject *obj, int index) { lv_kb_set_mode(obj->obj(), index & 0xff); }
-
-	QStringList m_values;
-};
-
-class LVGLPropertyLBCursorManager : public LVGLPropertyBool
-{
-public:
-	QString name() const { return "Cursor Manager"; }
-
-	QStringList function(LVGLObject *obj) const {
-		return QStringList() << QString("lv_kb_set_cursor_manage(%1, %2);").arg(obj->codeName()).arg(QVariant(get(obj)).toString());
-	}
-
-protected:
-	bool get(LVGLObject *obj) const { return lv_kb_get_cursor_manage(obj->obj()); }
-	void set(LVGLObject *obj, bool statue) { lv_kb_set_cursor_manage(obj->obj(), statue); }
-};
+#include "properties/LVGLPropertyKBMode.h"
+#include "properties/LVGLPropertyLBCursorManager.h"
 
 
 LVGLKeyboard::LVGLKeyboard()
