@@ -19,11 +19,11 @@ const char *LVGLCore::DEFAULT_MONTHS[12] = {
 LVGLCore::LVGLCore(QObject *parent)
     : QObject(parent),
       m_imageManager(new LVGLImageManager(this)),
-      m_fontManager(new LVGLFontManager(this)) {
+      m_fontManager(new LVGLFontManager(this)),
+      m_widgetRegistry(new LVGLWidgetRegistry(this)) {
 }
 
 LVGLCore::~LVGLCore() {
-  qDeleteAll(m_widgets);
 }
 
 void LVGLCore::init(int width, int height) {
@@ -61,34 +61,34 @@ void LVGLCore::init(int width, int height) {
 
   m_fontManager->initBuiltinFonts();
 
-  addWidget(new LVGLArc);
-  addWidget(new LVGLBar);
-  addWidget(new LVGLButton);
-  addWidget(new LVGLButtonMatrix);
-  addWidget(new LVGLCalendar);
-  addWidget(new LVGLCanvas);
-  addWidget(new LVGLChart);
-  addWidget(new LVGLCheckBox);
-  addWidget(new LVGLColorPicker);
-  addWidget(new LVGLContainer);
-  addWidget(new LVGLDropDownList);
-  addWidget(new LVGLGauge);
-  addWidget(new LVGLImage);
-  addWidget(new LVGLImageButton);
-  addWidget(new LVGLImageSlider);
-  addWidget(new LVGLKeyboard);
-  addWidget(new LVGLLabel);
-  addWidget(new LVGLLED);
-  addWidget(new LVGLLine);
-  addWidget(new LVGLLineMeter);
-  addWidget(new LVGLMessageBox);
-  addWidget(new LVGLList);
-  addWidget(new LVGLPage);
-  addWidget(new LVGLPreloader);
-  addWidget(new LVGLSlider);
-  addWidget(new LVGLSwitch);
-  addWidget(new LVGLTabview);
-  addWidget(new LVGLTextArea);
+  registerWidget(new LVGLArc);
+  registerWidget(new LVGLBar);
+  registerWidget(new LVGLButton);
+  registerWidget(new LVGLButtonMatrix);
+  registerWidget(new LVGLCalendar);
+  registerWidget(new LVGLCanvas);
+  registerWidget(new LVGLChart);
+  registerWidget(new LVGLCheckBox);
+  registerWidget(new LVGLColorPicker);
+  registerWidget(new LVGLContainer);
+  registerWidget(new LVGLDropDownList);
+  registerWidget(new LVGLGauge);
+  registerWidget(new LVGLImage);
+  registerWidget(new LVGLImageButton);
+  registerWidget(new LVGLImageSlider);
+  registerWidget(new LVGLKeyboard);
+  registerWidget(new LVGLLabel);
+  registerWidget(new LVGLLED);
+  registerWidget(new LVGLLine);
+  registerWidget(new LVGLLineMeter);
+  registerWidget(new LVGLMessageBox);
+  registerWidget(new LVGLList);
+  registerWidget(new LVGLPage);
+  registerWidget(new LVGLPreloader);
+  registerWidget(new LVGLSlider);
+  registerWidget(new LVGLSwitch);
+  registerWidget(new LVGLTabview);
+  registerWidget(new LVGLTextArea);
 
   setScreenColor(Qt::white);
   changeResolution({width, height});
@@ -625,12 +625,11 @@ bool LVGLCore::screenColorChanged() const {
 }
 
 QList<const LVGLWidget *> LVGLCore::widgets() const {
-  return m_widgets.values();
+  return m_widgetRegistry->widgets();
 }
 
 const LVGLWidget *LVGLCore::widget(const QString &name) const {
-  if (m_widgets.contains(name)) return m_widgets[name];
-  return nullptr;
+  return m_widgetRegistry->widget(name);
 }
 
 void LVGLCore::tick() {
@@ -638,7 +637,7 @@ void LVGLCore::tick() {
   lv_tick_inc(20);
 }
 
-void LVGLCore::addWidget(LVGLWidget *w) {
+void LVGLCore::registerWidget(LVGLWidget *w) {
   auto size = w->minimumSize();
   if (size.width() > width() || size.height() > height())
     changeResolution(
@@ -662,7 +661,7 @@ void LVGLCore::addWidget(LVGLWidget *w) {
   lv_tick_inc(LV_DISP_DEF_REFR_PERIOD);
   lv_task_handler();
 
-  m_widgets.insert(w->className(), w);
+  m_widgetRegistry->addWidget(w);
 }
 
 void LVGLCore::flushHandler(lv_disp_drv_t *disp, const lv_area_t *area,
