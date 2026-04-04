@@ -1,11 +1,8 @@
 #include "LVGLCore.h"
 
-#include <ft2build.h>
-
 #include <QDebug>
 #include <QJsonObject>
 #include <QPainter>
-#include FT_FREETYPE_H
 
 #include "LVGLFontData.h"
 #include "LVGLObject.h"
@@ -22,15 +19,11 @@ const char *LVGLCore::DEFAULT_MONTHS[12] = {
 LVGLCore::LVGLCore(QObject *parent)
     : QObject(parent),
       m_imageManager(new LVGLImageManager(this)),
-      m_defaultFont(nullptr) {
-  FT_Init_FreeType(&m_ft);
+      m_fontManager(new LVGLFontManager(this)) {
 }
 
 LVGLCore::~LVGLCore() {
-  FT_Done_FreeType(m_ft);
-
   qDeleteAll(m_widgets);
-  qDeleteAll(m_fonts);
 }
 
 void LVGLCore::init(int width, int height) {
@@ -66,35 +59,7 @@ void LVGLCore::init(int width, int height) {
 
   lv_style_copy(&m_screenStyle, &lv_style_scr);
 
-#if LV_FONT_ROBOTO_12
-  m_fonts << new LVGLFontData("Roboto 12", "lv_font_roboto_12", 12,
-                              &lv_font_roboto_12);
-#endif
-#if LV_FONT_ROBOTO_16
-  m_fonts << new LVGLFontData("Roboto 16", "lv_font_roboto_16", 16,
-                              &lv_font_roboto_16);
-#endif
-#if LV_FONT_ROBOTO_22
-  m_fonts << new LVGLFontData("Roboto 22", "lv_font_roboto_22", 22,
-                              &lv_font_roboto_22);
-#endif
-#if LV_FONT_ROBOTO_28
-  m_fonts << new LVGLFontData("Roboto 28", "lv_font_roboto_28", 28,
-                              &lv_font_roboto_28);
-#endif
-#if LV_FONT_UNSCII_8
-  m_fonts << new LVGLFontData("UNSCII 8", "lv_font_unscii_8", 8,
-                              &lv_font_unscii_8);
-#endif
-
-  // search for default font name
-  for (const LVGLFontData *f : m_fonts) {
-    if (f->font() == LV_FONT_DEFAULT) {
-      m_defaultFont = f;
-      break;
-    }
-  }
-  Q_ASSERT(m_defaultFont != nullptr);
+  m_fontManager->initBuiltinFonts();
 
   addWidget(new LVGLArc);
   addWidget(new LVGLBar);
@@ -571,84 +536,47 @@ lv_color_t LVGLCore::colorFromJson(QJsonObject obj) const {
 }
 
 LVGLFontData *LVGLCore::addFont(const QString &fileName, uint8_t size) {
-  LVGLFontData *font = LVGLFontData::parse(fileName, size, 4, 0x0020, 0x007f);
-  if (font) m_fonts << font;
-  return font;
+  return m_fontManager->addFont(fileName, size);
 }
 
-void LVGLCore::addFont(LVGLFontData *font) {
-  if (font) m_fonts << font;
-}
+void LVGLCore::addFont(LVGLFontData *font) { m_fontManager->addFont(font); }
 
 bool LVGLCore::removeFont(LVGLFontData *font) {
-  return m_fonts.removeOne(font);
+  return m_fontManager->removeFont(font);
 }
 
-QStringList LVGLCore::fontNames() const {
-  QStringList ret;
-  for (const LVGLFontData *f : m_fonts) ret << f->name();
-  return ret;
-}
+QStringList LVGLCore::fontNames() const { return m_fontManager->fontNames(); }
 
 QStringList LVGLCore::fontCodeNames() const {
-  QStringList ret;
-  for (const LVGLFontData *f : m_fonts) ret << f->codeName();
-  return ret;
+  return m_fontManager->fontCodeNames();
 }
 
 const lv_font_t *LVGLCore::font(int index) const {
-  if ((index > 0) && (index < m_fonts.size())) return m_fonts.at(index)->font();
-  return m_defaultFont->font();
+  return m_fontManager->font(index);
 }
 
 const lv_font_t *LVGLCore::font(const QString &name,
                                 Qt::CaseSensitivity cs) const {
-  for (const LVGLFontData *font : m_fonts) {
-    if (name.compare(font->name(), cs) == 0) return font->font();
-  }
-  return m_defaultFont->font();
+  return m_fontManager->font(name, cs);
 }
 
 int LVGLCore::indexOfFont(const lv_font_t *font) const {
-  int index = 0;
-  for (auto it = m_fonts.begin(); it != m_fonts.end(); ++it, ++index) {
-    if ((*it)->font() == font) return index;
-  }
-  return -1;
+  return m_fontManager->indexOfFont(font);
 }
 
 QString LVGLCore::fontName(const lv_font_t *font) const {
-  for (const LVGLFontData *f : m_fonts) {
-    if (f->font() == font) return f->name();
-  }
-  return m_defaultFont->name();
+  return m_fontManager->fontName(font);
 }
 
 QString LVGLCore::fontCodeName(const lv_font_t *font) const {
-  for (const LVGLFontData *f : m_fonts) {
-    if (f->font() == font) return f->codeName();
-  }
-  return m_defaultFont->codeName();
+  return m_fontManager->fontCodeName(font);
 }
 
 QList<const LVGLFontData *> LVGLCore::customFonts() const {
-  QList<const LVGLFontData *> ret;
-  for (const LVGLFontData *font : m_fonts) {
-    if (font->isCustomFont()) ret << font;
-  }
-  return ret;
+  return m_fontManager->customFonts();
 }
 
-void LVGLCore::removeCustomFonts() {
-  for (auto it = m_fonts.begin(); it != m_fonts.end();) {
-    if ((*it)->isCustomFont()) {
-      delete *it;
-      it = m_fonts.erase(it);
-    } else {
-      ++it;
-    }
-  }
-}
+void LVGLCore::removeCustomFonts() { m_fontManager->removeCustomFonts(); }
 
 QString LVGLCore::baseStyleName(const lv_style_t *style) const {
   if (style == &lv_style_scr)

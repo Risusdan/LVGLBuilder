@@ -72,7 +72,7 @@ LVGLProject *LVGLProject::load(const QString &fileName)
 	QJsonArray fontArr = doc["fonts"].toArray();
 	for (int i = 0; i < fontArr.size(); ++i) {
 		QJsonObject object = fontArr[i].toObject();
-		lvgl.addFont(LVGLFontData::parse(object));
+		lvgl.addFont(LVGLFontData::parse(lvgl.fontManager()->ftLibrary(), object));
 	}
 
 	if (lvglObj.contains("screen color"))

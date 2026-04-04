@@ -5,14 +5,16 @@
 #include <QString>
 #include <QJsonObject>
 
+struct FT_LibraryRec_;
+
 class LVGLFontData
 {
 public:
 	LVGLFontData(const QString &name, const QString &codeName, uint8_t size, const lv_font_t *font);
 	~LVGLFontData();
 
-	static LVGLFontData *parse(const QString &fileName, uint8_t size, uint8_t bpp, uint32_t unicodeFirst, uint32_t unicodeLast);
-	static LVGLFontData *parse(QJsonObject object);
+	static LVGLFontData *parse(FT_LibraryRec_ *ft, const QString &fileName, uint8_t size, uint8_t bpp, uint32_t unicodeFirst, uint32_t unicodeLast);
+	static LVGLFontData *parse(FT_LibraryRec_ *ft, QJsonObject object);
 
 	const lv_font_t *font() const;
 	QString name() const;

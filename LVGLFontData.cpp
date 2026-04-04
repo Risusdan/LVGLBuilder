@@ -3,7 +3,6 @@
 #include <QDebug>
 #include <QFile>
 #include <QtMath>
-#include "LVGLCore.h"
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
@@ -30,10 +29,10 @@ LVGLFontData::~LVGLFontData()
 	}
 }
 
-LVGLFontData *LVGLFontData::parse(const QString &fileName, uint8_t size, uint8_t bpp, uint32_t unicodeFirst, uint32_t unicodeLast)
+LVGLFontData *LVGLFontData::parse(FT_LibraryRec_ *ft, const QString &fileName, uint8_t size, uint8_t bpp, uint32_t unicodeFirst, uint32_t unicodeLast)
 {
 	FT_Face face;
-	int error = FT_New_Face(lvgl.m_ft, qPrintable(fileName), 0, &face);
+	int error = FT_New_Face(ft, qPrintable(fileName), 0, &face);
 	if (error == FT_Err_Unknown_File_Format) {
 		qCritical() << "LVGLFontData: Unkown file format";
 		return nullptr;
@@ -166,7 +165,7 @@ LVGLFontData *LVGLFontData::parse(const QString &fileName, uint8_t size, uint8_t
 	return  ret;
 }
 
-LVGLFontData *LVGLFontData::parse(QJsonObject object)
+LVGLFontData *LVGLFontData::parse(FT_LibraryRec_ *ft, QJsonObject object)
 {
 	if (!object.contains("fileName") || !object.contains("bpp") ||
 		 !object.contains("start") || !object.contains("end"))
@@ -175,7 +174,7 @@ LVGLFontData *LVGLFontData::parse(QJsonObject object)
 	const uint8_t bpp = static_cast<uint8_t>(object["bpp"].toInt());
 	const uint32_t start = static_cast<uint32_t>(object["start"].toInt());
 	const uint32_t end = static_cast<uint32_t>(object["end"].toInt());
-	return parse(object["fileName"].toString(), size, bpp, start, end);
+	return parse(ft, object["fileName"].toString(), size, bpp, start, end);
 }
 
 const lv_font_t *LVGLFontData::font() const
