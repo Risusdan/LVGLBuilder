@@ -1,2 +1,6 @@
 
 *.user
+.qmake.stash
+Makefile
+build/
+*.app/
