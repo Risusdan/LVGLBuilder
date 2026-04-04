@@ -20,6 +20,7 @@ class TestLVGLObject : public QObject {
   void testCodeNameSanitizesLeadingDigit();
   void testJsonStylesShadowWidthUsesCorrectField();
   void testJsonStylesLineOpaUsesCorrectField();
+  void testCodeStyleLineSpaceComparison();
 };
 
 void TestLVGLObject::testCodeNameSanitizesSpaces() {
@@ -102,6 +103,36 @@ void TestLVGLObject::testJsonStylesLineOpaUsesCorrectField() {
 
     QVERIFY(line.contains("opa"));
     QCOMPARE(line["opa"].toInt(), 128);
+}
+
+void TestLVGLObject::testCodeStyleLineSpaceComparison() {
+    // Use dropdown list: it has Text editable style at index 0 AND
+    // a non-null defaultStyle (lv_style_pretty) with line_space=2, letter_space=0.
+    const LVGLWidget *ddWidget = lvgl.widget("lv_ddlist");
+    QVERIFY(ddWidget != nullptr);
+    auto *obj = new LVGLObject(ddWidget, "linespace_test", lv_scr_act());
+    lvgl.addObject(obj);
+
+    // Get style for LV_DDLIST_STYLE_BG (index 0)
+    lv_style_t *s = obj->style(0);
+
+    // Set line_space to a non-default value so it SHOULD appear in generated code
+    s->text.line_space = 42;
+    // Set letter_space to the default line_space value (2) so the buggy comparison
+    // (defaultStyle->text.line_space != objStyle.text.letter_space) evaluates to
+    // (2 != 2) = false, causing line_space to be wrongly skipped.
+    s->text.letter_space = 2;
+    ddWidget->setStyle(obj->obj(), 0, s);
+
+    QStringList code = obj->codeStyle("mystyle", 0);
+
+    // line_space was changed to 42, so it must appear in generated code
+    bool hasLineSpace = false;
+    for (const QString &line : code) {
+        if (line.contains("text.line_space"))
+            hasLineSpace = true;
+    }
+    QVERIFY2(hasLineSpace, "codeStyle() should emit line_space when it differs from default");
 }
 
 QTEST_MAIN(TestLVGLObject)

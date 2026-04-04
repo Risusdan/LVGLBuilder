@@ -426,7 +426,7 @@ QStringList LVGLObject::codeStyle(QString styleVar, int type) const
 			ret << styleVar + ".text.font = &" + lvgl.fontCodeName(objStyle.text.font) + ";";
 		if (!defaultStyle || (defaultStyle->text.letter_space != objStyle.text.letter_space))
 			ret << styleVar + ".text.letter_space = " + QString::number(objStyle.text.letter_space) + ";";
-		if (!defaultStyle || (defaultStyle->text.line_space != objStyle.text.letter_space))
+		if (!defaultStyle || (defaultStyle->text.line_space != objStyle.text.line_space))
 			ret << styleVar + ".text.line_space = " + QString::number(objStyle.text.line_space) + ";";
 		if (!defaultStyle || (defaultStyle->text.opa != objStyle.text.opa))
 			ret << styleVar + ".text.opa = " + QString::number(objStyle.text.opa) + ";";
