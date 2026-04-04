@@ -36,7 +36,7 @@ LVGLScene::LVGLScene(QObject *parent)
 void LVGLScene::drawBackground(QPainter *painter, const QRectF &rect) {
   lvgl.poll();
   painter->save();
-  painter->drawPixmap(sceneRect(), lvgl.framebuffer(), rect);
+  painter->drawPixmap(rect, lvgl.framebuffer(), rect);
   if (m_selected != nullptr) {
     painter->setPen(Qt::red);
     painter->setBrush(Qt::NoBrush);
