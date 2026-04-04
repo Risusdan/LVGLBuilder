@@ -11,6 +11,7 @@
 #include <QTimer>
 
 #include "LVGLImageData.h"
+#include "LVGLImageManager.h"
 #include "widgets/LVGLWidget.h"
 
 class LVGLObject;
@@ -34,6 +35,8 @@ class LVGLCore : public QObject {
   int width() const;
   int height() const;
   QSize size() const;
+
+  LVGLImageManager *imageManager() const { return m_imageManager; }
 
   LVGLImageData *addImage(QImage image, QString name);
   LVGLImageData *addImage(QString fileName, QString name = QString());
@@ -119,9 +122,8 @@ class LVGLCore : public QObject {
 
   QTimer m_timer;
   QElapsedTimer m_time;
-  QHash<QString, LVGLImageData *> m_images;
+  LVGLImageManager *m_imageManager;
   QHash<QString, const LVGLWidget *> m_widgets;
-  LVGLImageData *m_default;
   QList<LVGLObject *> m_objects;
   QList<LVGLFontData *> m_fonts;
   lv_style_t m_screenStyle;

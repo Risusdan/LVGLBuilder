@@ -19,14 +19,16 @@ const char *LVGLCore::DEFAULT_MONTHS[12] = {
     "January", "February", "March",     "April",   "May",      "June",
     "July",    "August",   "September", "October", "November", "December"};
 
-LVGLCore::LVGLCore(QObject *parent) : QObject(parent), m_defaultFont(nullptr) {
+LVGLCore::LVGLCore(QObject *parent)
+    : QObject(parent),
+      m_imageManager(new LVGLImageManager(this)),
+      m_defaultFont(nullptr) {
   FT_Init_FreeType(&m_ft);
 }
 
 LVGLCore::~LVGLCore() {
   FT_Done_FreeType(m_ft);
 
-  qDeleteAll(m_images);
   qDeleteAll(m_widgets);
   qDeleteAll(m_fonts);
 }
@@ -60,7 +62,7 @@ void LVGLCore::init(int width, int height) {
   lv_indev_drv_register(&indev_drv);
 
   QImage pix(":/images/littlevgl_logo.png");
-  m_default = lvgl.addImage(pix, "default");
+  m_imageManager->addImage(pix, "default");
 
   lv_style_copy(&m_screenStyle, &lv_style_scr);
 
@@ -194,88 +196,46 @@ QSize LVGLCore::size() const {
 }
 
 LVGLImageData *LVGLCore::addImage(QImage image, QString name) {
-  if (image.isNull()) return nullptr;
-  LVGLImageData *img = new LVGLImageData(image, "", name);
-  m_images.insert(name, img);
-  return img;
+  return m_imageManager->addImage(image, name);
 }
 
 LVGLImageData *LVGLCore::addImage(QString fileName, QString name) {
-  QImage image(fileName);
-  if (image.isNull()) return nullptr;
-
-  if (name.isEmpty()) {
-    // create sorted list by type
-    QList<int> numbers;
-    for (LVGLImageData *o : m_images) {
-      if (o->fileName().isEmpty()) continue;
-      const int index = o->name().lastIndexOf('_');
-      const int num = o->name().mid(index + 1).toInt();
-      auto ind = std::lower_bound(numbers.begin(), numbers.end(), num);
-      numbers.insert(ind, num);
-    }
-
-    // find next free id
-    int id = 1;
-    for (int num : numbers) {
-      if (num == id)
-        id++;
-      else
-        break;
-    }
-    name = QString("img_%1").arg(id);
-  }
-
-  LVGLImageData *img = new LVGLImageData(image, fileName, name);
-  m_images.insert(name, img);
-  return img;
+  return m_imageManager->addImage(fileName, name);
 }
 
 void LVGLCore::addImage(LVGLImageData *image) {
-  m_images.insert(image->name(), image);
+  m_imageManager->addImage(image);
 }
 
-QStringList LVGLCore::imageNames() const { return m_images.keys(); }
+QStringList LVGLCore::imageNames() const {
+  return m_imageManager->imageNames();
+}
 
-QList<LVGLImageData *> LVGLCore::images() const { return m_images.values(); }
+QList<LVGLImageData *> LVGLCore::images() const {
+  return m_imageManager->images();
+}
 
 lv_img_dsc_t *LVGLCore::image(QString name) {
-  LVGLImageData *img = m_images.value(name, nullptr);
-  if (img) return img->img_des();
-  return nullptr;
+  return m_imageManager->image(name);
 }
 
-lv_img_dsc_t *LVGLCore::defaultImage() const { return m_default->img_des(); }
+lv_img_dsc_t *LVGLCore::defaultImage() const {
+  return m_imageManager->defaultImage();
+}
 
 QString LVGLCore::nameByImage(const lv_img_dsc_t *img_dsc) const {
-  for (LVGLImageData *img : m_images) {
-    if (img->img_des() == img_dsc) return img->name();
-  }
-  return "";
+  return m_imageManager->nameByImage(img_dsc);
 }
 
 LVGLImageData *LVGLCore::imageByDesc(const lv_img_dsc_t *img_dsc) const {
-  for (LVGLImageData *img : m_images) {
-    if (img->img_des() == img_dsc) return img;
-  }
-  return nullptr;
+  return m_imageManager->imageByDesc(img_dsc);
 }
 
 bool LVGLCore::removeImage(LVGLImageData *img) {
-  for (auto it = m_images.begin(); it != m_images.end(); ++it) {
-    if (it.value() == img) {
-      m_images.remove(it.key());
-      delete img;
-      return true;
-    }
-  }
-  return false;
+  return m_imageManager->removeImage(img);
 }
 
-void LVGLCore::removeAllImages() {
-  qDeleteAll(m_images);
-  m_images.clear();
-}
+void LVGLCore::removeAllImages() { m_imageManager->removeAllImages(); }
 
 QStringList LVGLCore::symbolNames() const {
   return QStringList() << "LV_SYMBOL_AUDIO"
