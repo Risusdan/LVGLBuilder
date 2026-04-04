@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LVGLBuilder 架構審計報告</title>
+<style>
+  :root {
+    --color-high: #e74c3c;
+    --color-medium: #f39c12;
+    --color-low: #27ae60;
+    --color-bar: #4682b4;
+    --color-bg: #ffffff;
+    --color-code-bg: #f5f5f5;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans TC", sans-serif;
+    font-size: 16px;
+    line-height: 1.7;
+    color: #2c3e50;
+    background: var(--color-bg);
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 24px;
+  }
+
+  h1 { font-size: 28px; margin-bottom: 8px; color: #1a1a2e; }
+  h2 { font-size: 22px; margin-top: 48px; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid #ddd; color: #1a1a2e; }
+  h3 { font-size: 18px; margin-top: 24px; margin-bottom: 12px; color: #34495e; }
+  p { margin-bottom: 14px; }
+  ul, ol { margin-bottom: 14px; padding-left: 24px; }
+  li { margin-bottom: 6px; }
+
+  /* Severity badges */
+  .badge {
+    display: inline-block;
+    padding: 2px 12px;
+    border-radius: 12px;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    vertical-align: middle;
+    margin-left: 8px;
+  }
+  .badge-high { background: var(--color-high); }
+  .badge-medium { background: var(--color-medium); }
+  .badge-low { background: var(--color-low); }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    font-size: 15px;
+  }
+  th, td {
+    border: 1px solid #ddd;
+    padding: 10px 14px;
+    text-align: left;
+  }
+  th {
+    background: #f0f0f0;
+    font-weight: 600;
+  }
+  tr:nth-child(even) { background: #fafafa; }
+
+  /* Code blocks */
+  .code-block {
+    background: var(--color-code-bg);
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 16px;
+    margin-bottom: 20px;
+    overflow-x: auto;
+  }
+  .code-block .code-header {
+    font-size: 13px;
+    font-style: italic;
+    color: #888;
+    margin-bottom: 8px;
+  }
+  pre {
+    margin: 0;
+    font-family: "SF Mono", "Fira Code", "Fira Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    white-space: pre;
+    overflow-x: auto;
+  }
+  code {
+    font-family: "SF Mono", "Fira Code", "Fira Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace;
+    font-size: 14px;
+    background: #eee;
+    padding: 1px 5px;
+    border-radius: 3px;
+  }
+
+  /* Bar chart */
+  .bar-chart { margin-bottom: 24px; }
+  .bar-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+  .bar-label {
+    width: 180px;
+    flex-shrink: 0;
+    font-size: 14px;
+    font-family: monospace;
+    text-align: right;
+    padding-right: 12px;
+  }
+  .bar-track {
+    flex: 1;
+    background: #eee;
+    border-radius: 4px;
+    height: 28px;
+    position: relative;
+  }
+  .bar-fill {
+    background: var(--color-bar);
+    height: 100%;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 8px;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    min-width: 48px;
+  }
+
+  /* Diagram containers */
+  .diagram {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 24px;
+    margin: 20px 0;
+    background: #fafcff;
+  }
+  .diagram-title {
+    text-align: center;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: #555;
+  }
+
+  /* God class before/after diagram */
+  .before-after {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 16px;
+    align-items: start;
+  }
+  .before-box {
+    border: 3px solid var(--color-high);
+    border-radius: 8px;
+    padding: 16px;
+    background: #fff5f5;
+  }
+  .before-box .box-title {
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 10px;
+    color: var(--color-high);
+    font-size: 15px;
+  }
+  .before-box .responsibility {
+    background: #fce4e4;
+    border: 1px solid #f5c6c6;
+    border-radius: 4px;
+    padding: 4px 8px;
+    margin-bottom: 4px;
+    font-size: 13px;
+    text-align: center;
+  }
+  .arrow-col {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+    color: #999;
+    padding-top: 60px;
+  }
+  .after-col { display: flex; flex-direction: column; gap: 8px; }
+  .after-service {
+    border: 2px solid var(--color-bar);
+    border-radius: 6px;
+    padding: 8px 12px;
+    background: #f0f6ff;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: #2c5282;
+  }
+  .after-facade {
+    border: 2px solid var(--color-low);
+    border-radius: 6px;
+    padding: 8px 12px;
+    background: #f0fff4;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: #276749;
+  }
+  .after-facade .arrow-hint {
+    font-weight: 400;
+    font-size: 12px;
+    color: #888;
+  }
+
+  /* Spider web diagram */
+  .spider-center {
+    grid-column: 2 / 5;
+    grid-row: 1;
+    border: 3px solid #2c3e50;
+    border-radius: 8px;
+    padding: 14px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 16px;
+    background: #fff;
+    margin-bottom: 12px;
+  }
+  .spider-group {
+    margin-bottom: 8px;
+  }
+  .spider-group-title {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    display: inline-block;
+    color: #fff;
+  }
+  .spider-item {
+    border: 2px solid;
+    border-radius: 4px;
+    padding: 3px 8px;
+    margin-bottom: 3px;
+    font-size: 11px;
+    font-family: monospace;
+    background: #fff;
+  }
+  .sg-core .spider-group-title { background: var(--color-high); }
+  .sg-core .spider-item { border-color: var(--color-high); }
+  .sg-models .spider-group-title { background: #e67e22; }
+  .sg-models .spider-item { border-color: #e67e22; }
+  .sg-properties .spider-group-title { background: #d4a017; }
+  .sg-properties .spider-item { border-color: #d4a017; }
+  .sg-data .spider-group-title { background: var(--color-low); }
+  .sg-data .spider-item { border-color: var(--color-low); }
+  .sg-widgets .spider-group-title { background: var(--color-bar); }
+  .sg-widgets .spider-item { border-color: var(--color-bar); }
+
+  .dep-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+  }
+  .dep-grid-wide {
+    grid-column: 1 / -1;
+    text-align: center;
+    margin-bottom: 8px;
+  }
+
+  /* Summary table highlights */
+  .current-state { color: var(--color-high); font-weight: 600; }
+  .future-state { color: var(--color-low); font-weight: 600; }
+
+  /* Risk list */
+  .risk-item {
+    background: #fff5f5;
+    border-left: 4px solid var(--color-high);
+    padding: 10px 16px;
+    margin-bottom: 8px;
+    border-radius: 0 6px 6px 0;
+  }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    .bar-label { width: 120px; font-size: 12px; }
+    .before-after { grid-template-columns: 1fr; }
+    .arrow-col { padding-top: 0; }
+    .dep-grid { grid-template-columns: 1fr; }
+  }
+
+  /* Print */
+  @media print {
+    body { padding: 20px; font-size: 12px; }
+    h2 { page-break-before: auto; }
+    .diagram, .code-block, table { page-break-inside: avoid; }
+    .bar-fill { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .badge { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Section 1: Title -->
+<h1>LVGLBuilder 架構審計報告</h1>
+
+
+<!-- Section 2: Executive Summary -->
+<h2>執行摘要</h2>
+<p>
+  本報告對 LVGLBuilder 專案進行架構層級的技術審計。該專案包含約 130 個原始碼檔案、約 14,000 行程式碼（不含 vendored 的 LVGL 與 FreeType 函式庫），目前<strong>零測試覆蓋率</strong>。審計共識別出 <strong>7 項架構問題</strong>（3 項高嚴重度、3 項中嚴重度、1 項低嚴重度）。核心結論是：在加入新功能之前，必須先進行架構重構；否則每次新增功能都會使技術債加倍累積，最終導致專案難以維護與擴展。
+</p>
+
+<!-- Section 3: Project Overview -->
+<h2>專案概覽</h2>
+
+<h3>關鍵指標</h3>
+<table>
+  <tr><th>指標</th><th>數值</th></tr>
+  <tr><td>原始碼檔案數</td><td>130</td></tr>
+  <tr><td>程式碼總行數（不含 vendored）</td><td>~14,000</td></tr>
+  <tr><td>自動化測試數量</td><td>0</td></tr>
+  <tr><td>Widget 類型數量</td><td>29</td></tr>
+</table>
+
+<h3>檔案大小排行（前 7 名）</h3>
+<div class="bar-chart">
+  <div class="bar-row">
+    <div class="bar-label">LVGLCore.cpp</div>
+    <div class="bar-track"><div class="bar-fill" style="width:100%">818</div></div>
+  </div>
+  <div class="bar-row">
+    <div class="bar-label">LVGLObject.cpp</div>
+    <div class="bar-track"><div class="bar-fill" style="width:93.6%">766</div></div>
+  </div>
+  <div class="bar-row">
+    <div class="bar-label">MainWindow.cpp</div>
+    <div class="bar-track"><div class="bar-fill" style="width:62.1%">508</div></div>
+  </div>
+  <div class="bar-row">
+    <div class="bar-label">LVGLSimulator.cpp</div>
+    <div class="bar-track"><div class="bar-fill" style="width:54.2%">443</div></div>
+  </div>
+  <div class="bar-row">
+    <div class="bar-label">LVGLProperty.cpp</div>
+    <div class="bar-track"><div class="bar-fill" style="width:51.2%">419</div></div>
+  </div>
+  <div class="bar-row">
+    <div class="bar-label">LVGLFontData.cpp</div>
+    <div class="bar-track"><div class="bar-fill" style="width:41.8%">342</div></div>
+  </div>
+  <div class="bar-row">
+    <div class="bar-label">LVGLProject.cpp</div>
+    <div class="bar-track"><div class="bar-fill" style="width:36.9%">302</div></div>
+  </div>
+</div>
+
+<!-- Section 4: Problem 1 -->
+<h2>問題 1：上帝類別（God Class）<span class="badge badge-high">高</span></h2>
+
+<h3>問題描述</h3>
+<p>
+  <code>LVGLCore</code> 是一個 818 行的單一類別，卻承擔了 8 項截然不同的職責：顯示驅動管理、圖片資源管理、字型管理、Widget 類型註冊、物件實例追蹤、顏色轉換、輸入處理、以及座標工具函式。用 C/C++ 的概念來說：想像一個單一的 <code>.c</code> 檔案，透過一個全域 <code>struct</code> 同時管理螢幕緩衝區、字型快取、圖片快取、Widget 工廠、以及物件註冊表。任何一個子系統的修改都可能影響其他子系統。
+</p>
+
+<h3>程式碼證據</h3>
+<div class="code-block">
+  <div class="code-header">LVGLCore.h:120-138 — 8 個不同的資料領域集中在同一個類別</div>
+<pre>// LVGLCore.h — 8 distinct data domains in one class
+QHash&lt;QString, LVGLImageData *&gt; m_images;      // Image management
+QHash&lt;QString, const LVGLWidget *&gt; m_widgets;   // Widget registry
+QList&lt;LVGLObject *&gt; m_objects;                  // Object tracking
+QList&lt;LVGLFontData *&gt; m_fonts;                  // Font management
+lv_style_t m_screenStyle;                       // Style management
+std::vector&lt;lv_color_t&gt; m_dispFrameBuf;         // Display buffer
+lv_indev_data_t m_inputData;                    // Input handling
+struct FT_LibraryRec_ *m_ft;                    // FreeType library</pre>
+</div>
+
+<h3>影響</h3>
+<ul>
+  <li>無法修改圖片管理而不冒著破壞字型管理或顯示渲染的風險</li>
+  <li><code>init()</code> 函式（LVGLCore.cpp:34-130）必須一次初始化所有子系統 — 沒有辦法只啟動其中一個服務</li>
+  <li>新進開發者必須理解 818 行程式碼後，才能安全地修改任何部分</li>
+</ul>
+
+<h3>建議解決方案</h3>
+<ul>
+  <li><strong>方案 A：</strong>將每個職責提取為獨立類別（LVGLDisplay、LVGLImageManager、LVGLFontManager、LVGLWidgetRegistry、LVGLObjectManager）。LVGLCore 變成一個薄門面（facade），將請求委派給各服務。</li>
+  <li><strong>方案 B：</strong>至少將兩個最大的領域（圖片管理與字型管理）提取為獨立類別，可減少 LVGLCore 約 40% 的程式碼。</li>
+</ul>
+
+<div class="diagram">
+  <div class="diagram-title">分解示意圖：現狀 vs. 重構後</div>
+  <div class="before-after">
+    <div class="before-box">
+      <div class="box-title">現狀：LVGLCore（818 行）</div>
+      <div class="responsibility">顯示驅動</div>
+      <div class="responsibility">圖片管理</div>
+      <div class="responsibility">字型管理</div>
+      <div class="responsibility">Widget 註冊</div>
+      <div class="responsibility">物件追蹤</div>
+      <div class="responsibility">顏色轉換</div>
+      <div class="responsibility">輸入處理</div>
+      <div class="responsibility">座標工具</div>
+    </div>
+    <div class="arrow-col">&rarr;</div>
+    <div class="after-col">
+      <div class="after-facade">
+        LVGLCore（facade）
+        <div class="arrow-hint">&darr; 委派至各服務 &darr;</div>
+      </div>
+      <div class="after-service">LVGLDisplay</div>
+      <div class="after-service">LVGLImageManager</div>
+      <div class="after-service">LVGLFontManager</div>
+      <div class="after-service">LVGLWidgetRegistry</div>
+      <div class="after-service">LVGLObjectManager</div>
+    </div>
+  </div>
+</div>
+
+<!-- Section 5: Problem 2 -->
+<h2>問題 2：全域單例耦合（Global Singleton Coupling）<span class="badge badge-high">高</span></h2>
+
+<h3>問題描述</h3>
+<p>
+  整個應用程式依賴於一個單一全域變數 <code>extern LVGLCore lvgl;</code>（LVGLCore.h:142）。這等同於 C 語言中的一個巨大 <code>extern struct</code> — 任何包含該標頭檔的檔案都可以讀寫全域狀態。共有 <strong>24 個原始碼檔案</strong>直接呼叫 <code>lvgl.someMethod()</code>。
+</p>
+
+<h3>程式碼證據</h3>
+<div class="code-block">
+  <div class="code-header">LVGLCore.h:142 — 全域變數宣告</div>
+<pre>extern LVGLCore lvgl;</pre>
+</div>
+
+<div class="code-block">
+  <div class="code-header">LVGLProject.cpp:98 — 專案儲存依賴全域狀態</div>
+<pre>for (LVGLObject *o : lvgl.allObjects()) {
+    if (o-&gt;parent() == nullptr)
+        widgetArr.append(o-&gt;toJson());
+}</pre>
+</div>
+
+<div class="code-block">
+  <div class="code-header">LVGLSimulator.cpp:320-329 — UI 渲染依賴全域狀態</div>
+<pre>QList&lt;LVGLObject *&gt; LVGLSimulator::objectsUnderCoords(
+    QPoint pos, bool includeLocked) const {
+  QList&lt;LVGLObject *&gt; ret;
+  QRect screen = QRect(QPoint(0, 0), lvgl.size()).adjusted(-50, -50, 50, 50);
+  for (LVGLObject *o : lvgl.allObjects()) {
+    if (!includeLocked &amp;&amp; o-&gt;isLocked()) continue;
+    QRect geo = o-&gt;geometry();
+    if (screen.contains(geo) &amp;&amp; geo.contains(pos)) ret &lt;&lt; o;
+  }
+  return ret;
+}</pre>
+</div>
+
+<h3>影響</h3>
+<ul>
+  <li>無法測試 <code>LVGLProject::save()</code> 而不初始化整個 LVGL 顯示子系統、FreeType 和所有 Widget 類型</li>
+  <li>24 個檔案中的任何一個 bug 都可能破壞全域狀態，導致不相關的檔案出錯</li>
+  <li>不可能執行兩個獨立的實例（例如多文件編輯）</li>
+</ul>
+
+<h3>依賴蜘蛛網圖</h3>
+<div class="diagram">
+  <div class="diagram-title">24 個檔案直接依賴 <code>lvgl</code> 全域變數</div>
+  <div class="dep-grid">
+    <div class="dep-grid-wide">
+      <div class="spider-center" style="display:inline-block; padding:14px 32px; border:3px solid #2c3e50; border-radius:8px; font-weight:700; font-size:16px;">
+        <code>lvgl</code> 全域變數
+      </div>
+    </div>
+
+    <div class="spider-group sg-core">
+      <div class="spider-group-title">Core</div>
+      <div class="spider-item">LVGLCore.cpp</div>
+      <div class="spider-item">LVGLObject.cpp</div>
+      <div class="spider-item">LVGLSimulator.cpp</div>
+      <div class="spider-item">MainWindow.cpp</div>
+      <div class="spider-item">LVGLProject.cpp</div>
+    </div>
+
+    <div class="spider-group sg-models">
+      <div class="spider-group-title">Models</div>
+      <div class="spider-item">LVGLObjectModel.cpp</div>
+      <div class="spider-item">LVGLWidgetModel.cpp</div>
+      <div class="spider-item">LVGLStyleModel.cpp</div>
+    </div>
+
+    <div class="spider-group sg-properties">
+      <div class="spider-group-title">Properties</div>
+      <div class="spider-item">LVGLPropertyColor.cpp</div>
+      <div class="spider-item">LVGLPropertyImage.cpp</div>
+      <div class="spider-item">LVGLPropertyList.cpp</div>
+      <div class="spider-item">LVGLPropertyPoints.cpp</div>
+      <div class="spider-item">LVGLPropertySeries.cpp</div>
+      <div class="spider-item">LVGLPropertyAssignTextArea.cpp</div>
+    </div>
+
+    <div class="spider-group sg-data">
+      <div class="spider-group-title">Data</div>
+      <div class="spider-item">LVGLImageData.cpp</div>
+      <div class="spider-item">LVGLFontData.cpp</div>
+      <div class="spider-item">LVGLStyle.cpp</div>
+      <div class="spider-item">LVGLProperty.cpp</div>
+      <div class="spider-item">LVGLItem.cpp</div>
+      <div class="spider-item">LVGLDialog.cpp</div>
+    </div>
+
+    <div class="spider-group sg-widgets">
+      <div class="spider-group-title">Widgets</div>
+      <div class="spider-item">LVGLImage.cpp</div>
+      <div class="spider-item">LVGLImageSlider.cpp</div>
+      <div class="spider-item">LVGLImageButton.cpp</div>
+      <div class="spider-item">LVGLTabview.cpp</div>
+    </div>
+
+    <div></div>
+  </div>
+</div>
+
+<h3>建議解決方案</h3>
+<ul>
+  <li><strong>方案 A：</strong>依賴注入 — 各元件透過建構函式參數接收所需的服務。例如：<code>ProjectManager(LVGLImageManager*, LVGLFontManager*, LVGLObjectManager*)</code>。</li>
+  <li><strong>方案 B：</strong>至少將 LVGLCore 作為明確參數傳遞給使用它的函式。</li>
+</ul>
+
+<!-- Section 6: Problem 3 -->
+<h2>問題 3：零測試覆蓋、無法測試<span class="badge badge-high">高</span></h2>
+
+<h3>問題描述</h3>
+<p>
+  零自動化測試。每次修改都只能透過 GUI 手動驗證。架構設計使得加入單元測試幾乎不可能：每個核心類別都依賴全域 <code>lvgl</code> 單例，而該單例需要完整的系統初始化才能使用。
+</p>
+
+<h3>程式碼證據</h3>
+<div class="code-block">
+  <div class="code-header">LVGLCore.cpp:34-63 — 測試任何功能都需要執行所有初始化</div>
+<pre>void LVGLCore::init(int width, int height) {
+    lv_init();                          // 1. Initialize LVGL library
+    m_dispFrameBuf.resize(n);           // 2. Allocate framebuffers
+    lv_disp_drv_register(&amp;m_dispDrv);   // 3. Register display driver
+    lv_indev_drv_register(&amp;indev_drv);  // 4. Register input driver
+    m_default = lvgl.addImage(...);     // 5. Load default image
+    m_fonts &lt;&lt; new LVGLFontData(...);   // 6. Load all fonts
+    addWidget(new LVGLArc);            // 7. Register 29 widget types
+    addWidget(new LVGLBar);
+    // ... 27 more registrations
+}</pre>
+</div>
+
+<h3>影響</h3>
+<ul>
+  <li>14,000 行程式碼、零測試 = 每次修復 bug 都冒著引入回歸問題的風險</li>
+  <li>手動測試每次變更需要數分鐘；自動化測試只需數秒</li>
+  <li>在沒有安全網的情況下重構風險極高</li>
+  <li>無法自動驗證 JSON 序列化、屬性邏輯或程式碼產生的正確性</li>
+</ul>
+
+<h3>建議解決方案</h3>
+<ul>
+  <li><strong>方案 A：</strong>先分解 LVGLCore（問題 1），然後為每個提取出的服務撰寫獨立的單元測試。</li>
+  <li><strong>方案 B：</strong>加入整合測試，初始化完整系統後測試 JSON 往返（round-trip）和屬性 get/set 的正確性。</li>
+</ul>
+
+<!-- Section 7: Problem 4 -->
+<h2>問題 4：UI 與業務邏輯混雜<span class="badge badge-medium">中</span></h2>
+
+<h3>問題描述</h3>
+<p>
+  <code>LVGLSimulator::mousePressEvent()</code> 在同一個事件處理器中包含了 Widget 選取、選單建構、物件刪除、重新排序、以及顏色對話框管理。用 C 的概念來說：一個 <code>onMouseClick()</code> 回呼函式同時處理碰撞偵測、選單顯示、物件刪除和設定。
+</p>
+
+<h3>程式碼證據</h3>
+<div class="code-block">
+  <div class="code-header">LVGLSimulator.cpp:139-194</div>
+<pre>void LVGLSimulator::mousePressEvent(QMouseEvent *event) {
+    if (event-&gt;button() == Qt::RightButton) {
+        auto obj = selectObject(...);        // Hit testing
+        QMenu menu(obj-&gt;name(), this);       // UI: build menu
+        QAction *remove = menu.addAction("Remove");
+        sel = menu.exec(...);                // UI: show menu
+        if (sel == remove) {
+            lvgl.removeObject(obj);          // Business logic: delete
+        } else if (sel == mfore) {
+            lv_obj_move_foreground(obj-&gt;obj()); // Business logic: reorder
+        }
+    }
+}</pre>
+</div>
+
+<p>
+  同樣地，<code>MainWindow::loadProject()</code>（MainWindow.cpp:263-280）混合了檔案 I/O、錯誤對話框、視窗標題更新、解析度變更和 UI 狀態管理。
+</p>
+
+<h3>影響</h3>
+<ul>
+  <li>無法在不啟動 Qt GUI 的情況下測試物件選取或刪除邏輯</li>
+  <li>修改選單需要理解物件操作的程式碼</li>
+  <li>新增操作意味著修改已經很複雜的函式</li>
+</ul>
+
+<h3>建議解決方案</h3>
+<ul>
+  <li><strong>方案 A：</strong>提取 <code>CanvasActions</code>（建立/刪除/移動/重排序）和 <code>SelectionManager</code>。事件處理器變成輕量的分派器。</li>
+  <li><strong>方案 B：</strong>將每個事件處理器中的業務邏輯提取為獨立的私有方法。</li>
+</ul>
+
+<!-- Section 8: Problem 5 -->
+<h2>問題 5：手動記憶體管理風險<span class="badge badge-medium">中</span></h2>
+
+<h3>問題描述</h3>
+<p>
+  整個程式碼中使用原始的 <code>new</code>/<code>delete</code>，多層指標鏈，沒有 RAII 或智慧指標。在 <code>LVGLFontData::parse()</code> 中，5 次連續的堆積配置 — 如果中途任何一次失敗，之前已配置的緩衝區就會洩漏。
+</p>
+
+<h3>程式碼證據</h3>
+<div class="code-block">
+  <div class="code-header">LVGLFontData.cpp:56-155 — 5 次連續原始配置，失敗時無清理機制</div>
+<pre>// 5 sequential raw allocations with no cleanup on failure:
+lv_font_fmt_txt_glyph_dsc_t *glyph_dsc =
+    new lv_font_fmt_txt_glyph_dsc_t[glyphs + 1];  // Alloc 1
+uint8_t *gylph_bitmap_buf =
+    new uint8_t[gylph_bitmap.size()];               // Alloc 2
+lv_font_fmt_txt_cmap_t *cmap =
+    new lv_font_fmt_txt_cmap_t[1];                   // Alloc 3
+lv_font_fmt_txt_dsc_t *font_dsc =
+    new lv_font_fmt_txt_dsc_t;                       // Alloc 4
+lv_font_t *font = new lv_font_t;                    // Alloc 5
+
+// Destructor must manually match all allocations:
+~LVGLFontData() {
+    delete [] fdsc-&gt;glyph_bitmap;
+    delete [] fdsc-&gt;glyph_dsc;
+    delete [] fdsc-&gt;cmaps;
+    delete fdsc;
+    delete m_font;
+}</pre>
+</div>
+
+<h3>影響</h3>
+<ul>
+  <li>如果 <code>FT_Load_Char()</code> 在解析過程中失敗，已配置的緩衝區會洩漏</li>
+  <li><code>delete</code> 與 <code>delete[]</code> 不匹配是未定義行為</li>
+  <li>每位新進開發者都必須追蹤完整的配置鏈才能理解所有權關係</li>
+</ul>
+
+<h3>建議解決方案</h3>
+<ul>
+  <li><strong>方案 A：</strong>使用 <code>std::unique_ptr</code> 搭配自訂刪除器。將相關的配置組合成 RAII 包裝結構。</li>
+  <li><strong>方案 B：</strong>至少使用 <code>goto cleanup</code> 模式（C 語言中常見的做法），確保每個離開路徑都能釋放所有配置。</li>
+</ul>
+
+<!-- Section 9: Problem 6 -->
+<h2>問題 6：Widget 定義的重複程式碼<span class="badge badge-medium">中</span></h2>
+
+<h3>問題描述</h3>
+<p>
+  超過 20 個 Widget 檔案各自定義了結構幾乎相同的內嵌屬性類別。模式為：繼承 <code>LVGLPropertyEnum</code>，定義 <code>name()</code>、<code>function()</code>、<code>get()</code>、<code>set()</code> — 只有 LVGL API 名稱不同。
+</p>
+
+<h3>程式碼證據</h3>
+<div class="code-block">
+  <div class="code-header">widgets/LVGLButton.cpp:7-30</div>
+<pre>// widgets/LVGLButton.cpp
+class LVGLPropertyButtonState : public LVGLPropertyEnum {
+    QString name() const { return "State"; }
+    QStringList function(LVGLObject *obj) const {
+        return QStringList() &lt;&lt; QString("lv_btn_set_state(%1, %2);")
+            .arg(obj-&gt;codeName()).arg(m_values.at(get(obj)));
+    }
+    int get(LVGLObject *obj) const { return lv_btn_get_state(obj-&gt;obj()); }
+    void set(LVGLObject *obj, int index) { lv_btn_set_state(obj-&gt;obj(), index &amp; 0xff); }
+};</pre>
+</div>
+
+<div class="code-block">
+  <div class="code-header">widgets/LVGLLabel.cpp:7-28 — 相同模式，不同 API</div>
+<pre>// widgets/LVGLLabel.cpp — identical pattern, different API
+class LVGLPropertyLabelAlign : public LVGLPropertyEnum {
+    QString name() const { return "Align"; }
+    QStringList function(LVGLObject *obj) const {
+        return QStringList() &lt;&lt; QString("lv_label_set_align(%1, %2);")
+            .arg(obj-&gt;codeName()).arg(m_values.at(get(obj)));
+    }
+    int get(LVGLObject *obj) const { return lv_label_get_align(obj-&gt;obj()); }
+    void set(LVGLObject *obj, int index) { lv_label_set_align(obj-&gt;obj(), index &amp; 0xff); }
+};</pre>
+</div>
+
+<h3>影響</h3>
+<ul>
+  <li>新增一個 Widget 需要複製約 80 行樣板程式碼</li>
+  <li>模式中的 bug 必須在 20 個以上的檔案中逐一修復</li>
+  <li>位於 Widget <code>.cpp</code> 檔案內的屬性類別無法被其他地方重用</li>
+</ul>
+
+<h3>建議解決方案</h3>
+<ul>
+  <li><strong>方案 A：</strong>建立一個通用屬性模板，以 LVGL getter/setter 函式指標作為參數。</li>
+  <li><strong>方案 B：</strong>將所有屬性類別定義從 <code>widgets/*.cpp</code> 移到 <code>properties/</code> 目錄，使其可被發現和重用。</li>
+</ul>
+
+<!-- Section 10: Problem 7 -->
+<h2>問題 7：循環依賴與職責不清<span class="badge badge-low">低</span></h2>
+
+<h3>問題描述</h3>
+<p>
+  <code>LVGLObject</code> 包含 <code>LVGLCore.h</code> 並直接呼叫 LVGL C 函式（<code>lv_obj_del()</code>），而 <code>LVGLCore</code> 儲存並管理 <code>LVGLObject*</code> 實例。這形成了雙向依賴。
+</p>
+
+<h3>程式碼證據</h3>
+<div class="code-block">
+  <div class="code-header">LVGLObject.cpp:3</div>
+<pre>#include "LVGLCore.h"</pre>
+</div>
+
+<div class="code-block">
+  <div class="code-header">LVGLObject.cpp:43-50 — 繞過 LVGLCore 直接呼叫 LVGL</div>
+<pre>LVGLObject::~LVGLObject() {
+    lv_obj_del(m_obj);
+}</pre>
+</div>
+
+<div class="code-block">
+  <div class="code-header">LVGLCore.h:125 — 儲存 LVGLObject 指標</div>
+<pre>QList&lt;LVGLObject *&gt; m_objects;</pre>
+</div>
+
+<h3>影響</h3>
+<ul>
+  <li>不清楚誰擁有 <code>lv_obj_t</code> 的生命週期管理權</li>
+  <li>無法獨立編譯 LVGLObject 進行測試</li>
+  <li>重構任一類別都需要同時理解兩者</li>
+</ul>
+
+<h3>建議解決方案</h3>
+<ul>
+  <li><strong>方案 A：</strong>建立明確的所有權規則：ObjectManager 擁有並刪除物件。LVGLObject 永遠不直接呼叫 LVGL 生命週期函式。</li>
+  <li><strong>方案 B：</strong>使用前向宣告打破標頭檔的循環依賴。</li>
+</ul>
+
+<!-- Section 11: Refactoring Benefits Summary -->
+<h2>重構效益總結</h2>
+
+<table>
+  <tr>
+    <th>問題</th>
+    <th>現狀</th>
+    <th>重構後</th>
+  </tr>
+  <tr>
+    <td>上帝類別</td>
+    <td class="current-state">1 個類別，818 行，8 項職責</td>
+    <td class="future-state">5-6 個專注類別，每個 &lt;200 行</td>
+  </tr>
+  <tr>
+    <td>全域單例</td>
+    <td class="current-state">24 個檔案耦合於全域變數</td>
+    <td class="future-state">服務可透過建構函式注入；現有呼叫端透過 facade 維持相容性<br><span style="font-size:13px;color:#888;">※ 未來值得全面導入依賴注入（DI），但目前階段若同時進行將大幅增加複雜度，且影響同事從 fork 移植功能的難度</span></td>
+  </tr>
+  <tr>
+    <td>零測試</td>
+    <td class="current-state">0 個測試，不可測試的架構</td>
+    <td class="future-state">每個服務可獨立測試</td>
+  </tr>
+  <tr>
+    <td>職責混雜</td>
+    <td class="current-state">業務邏輯在 UI 事件處理器中</td>
+    <td class="future-state">無狀態操作可不需 GUI 即可測試</td>
+  </tr>
+  <tr>
+    <td>記憶體管理</td>
+    <td class="current-state">原始 new/delete 鏈，洩漏風險</td>
+    <td class="future-state">明確的服務所有權，各服務自行管理資源生命週期<br><span style="font-size:13px;color:#888;">※ 未來值得對 LVGLFontData 等高風險區域引入 RAII/智慧指標，但目前階段若同時進行將擴大重構範圍，建議待測試覆蓋率建立後再逐步導入</span></td>
+  </tr>
+  <tr>
+    <td>Widget 樣板</td>
+    <td class="current-state">跨 20+ 檔案的複製貼上</td>
+    <td class="future-state">共享模板，修改集中在一處</td>
+  </tr>
+  <tr>
+    <td>循環依賴</td>
+    <td class="current-state">雙向耦合</td>
+    <td class="future-state">明確所有權，單向依賴</td>
+  </tr>
+</table>
+
+<h3>額外效益</h3>
+<ul>
+  <li><strong>新人上手：</strong>理解一個 200 行的服務 vs. 理解一個 818 行的上帝類別</li>
+  <li><strong>功能開發速度：</strong>變更局限於單一模組</li>
+  <li><strong>Bug 隔離：</strong>字型管理的 bug 不會破壞圖片管理</li>
+  <li><strong>新功能整合：</strong>乾淨的介面有利於從 fork 移植功能</li>
+</ul>
+
+<!-- Section 12: Risks of Not Refactoring -->
+<h2>不重構的風險</h2>
+
+<div class="risk-item">每新增一個功能，耦合程度進一步加深</div>
+<div class="risk-item">上帝類別朝 1,000 行以上成長</div>
+<div class="risk-item">沒有測試的情況下，手動驗證時間隨功能數量線性增長</div>
+<div class="risk-item">記憶體管理問題隨著更多 Widget 類型的加入而複合累積</div>
+<div class="risk-item">團隊規模擴展變得不切實際</div>
+
+</body>
+</html>
