@@ -2,38 +2,8 @@
 
 #include <QIcon>
 #include "LVGLObject.h"
-#include "properties/LVGLPropertyRange.h"
-
-class LVGLPropertyBarValue : public LVGLPropertyInt
-{
-public:
-	LVGLPropertyBarValue() : LVGLPropertyInt(INT16_MIN, INT16_MAX) {}
-
-	QString name() const { return "Value"; }
-
-	QStringList function(LVGLObject *obj) const {
-		return QStringList() << QString("lv_bar_set_value(%1, %2, LV_ANIM_ON);").arg(obj->codeName()).arg(get(obj));
-	}
-
-protected:
-	int get(LVGLObject *obj) const { return lv_bar_get_value(obj->obj()); }
-	void set(LVGLObject *obj, int value) { lv_bar_set_value(obj->obj(), static_cast<int16_t>(value), LV_ANIM_OFF); }
-};
-
-class LVGLPropertyBarRange : public LVGLPropertyRange
-{
-public:
-	QStringList function(LVGLObject *obj) const {
-		return { QString("lv_bar_set_range(%1, %2, %2);").arg(obj->codeName()).arg(getMin(obj)).arg(getMax(obj)) };
-	}
-
-protected:
-	int getMin(LVGLObject *obj) const { return lv_bar_get_min_value(obj->obj()); }
-	int getMax(LVGLObject *obj) const { return lv_bar_get_max_value(obj->obj()); }
-	void set(LVGLObject *obj, int min, int max) {
-		lv_bar_set_range(obj->obj(), static_cast<int16_t>(min), static_cast<int16_t>(max));
-	}
-};
+#include "properties/LVGLPropertyBarValue.h"
+#include "properties/LVGLPropertyBarRange.h"
 
 LVGLBar::LVGLBar()
 {
