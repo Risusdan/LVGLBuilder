@@ -119,3 +119,4 @@ endfunction()
 # Test registrations
 # ---------------------------------------------------------------------------
 # add_lvgl_test(tst_example tst_example.cpp)
+add_lvgl_test(tst_lvglproject tst_lvglproject/tst_lvglproject.cpp)
