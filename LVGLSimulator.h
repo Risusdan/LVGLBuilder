@@ -11,6 +11,8 @@ class LVGLObject;
 class LVGLItem;
 class LVGLObjectModel;
 class LVGLPropertyModel;
+class QTimer;
+class QThread;
 
 class LVGLScene : public QGraphicsScene {
   Q_OBJECT
@@ -89,6 +91,8 @@ class LVGLSimulator : public QGraphicsView {
   LVGLObjectModel *m_objectModel;
   lv_obj_t *m_parent;
   LVGLPropertyModel *m_propertyModel;
+  QThread *m_thread;
+  QTimer *m_timer;
 };
 
 class LVGLKeyPressEventFilter : public QObject {

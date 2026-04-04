@@ -87,18 +87,24 @@ LVGLSimulator::LVGLSimulator(QWidget *parent)
   setScene(m_scene);
   m_scene->addItem(m_item);
 
-  QThread *thread = new QThread;
+  m_thread = new QThread;
+  m_timer = new QTimer;
   LVGLSimulator *self = this;
-  connect(thread, &QThread::started, [=]() {
+  connect(m_thread, &QThread::started, [=]() {
     qInfo() << "LVGL Thread started";
-    QTimer *timer = new QTimer;
-    connect(timer, &QTimer::timeout, self, &LVGLSimulator::update);
-    timer->start(20);
+    connect(m_timer, &QTimer::timeout, self, &LVGLSimulator::update);
+    m_timer->start(20);
   });
-  thread->start();
+  m_thread->start();
 }
 
-LVGLSimulator::~LVGLSimulator() {}
+LVGLSimulator::~LVGLSimulator() {
+  m_timer->stop();
+  m_thread->quit();
+  m_thread->wait();
+  delete m_timer;
+  delete m_thread;
+}
 
 void LVGLSimulator::setSelectedObject(LVGLObject *obj) {
   if (m_selectedObject == obj) return;
