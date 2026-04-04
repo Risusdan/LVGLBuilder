@@ -17,6 +17,11 @@ LVGLStyleModel::LVGLStyleModel(QObject *parent)
 {
 }
 
+LVGLStyleModel::~LVGLStyleModel()
+{
+	delete m_styleBase;
+}
+
 QVariant LVGLStyleModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
 	if ((orientation != Qt::Horizontal) || (role != Qt::DisplayRole))

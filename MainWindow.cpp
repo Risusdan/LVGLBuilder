@@ -56,7 +56,7 @@ MainWindow::MainWindow(QWidget *parent)
           &QTreeView::expandAll);
 
   m_ui->property_tree->setModel(m_propertyModel);
-  m_ui->property_tree->setItemDelegate(new LVGLPropertyDelegate);
+  m_ui->property_tree->setItemDelegate(new LVGLPropertyDelegate(this));
 
   m_objectModel = new LVGLObjectModel(this);
   connect(m_simulator, &LVGLSimulator::objectSelected, m_objectModel,
@@ -69,7 +69,7 @@ MainWindow::MainWindow(QWidget *parent)
   m_simulator->setObjectModel(m_objectModel);
   m_simulator->setPropertyModel(m_propertyModel);
 
-  LVGLWidgetModel *widgetModel = new LVGLWidgetModel;
+  LVGLWidgetModel *widgetModel = new LVGLWidgetModel(this);
   QSortFilterProxyModel *proxyModel = new QSortFilterProxyModel(this);
   proxyModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
   connect(m_ui->edit_filter, &QLineEdit::textChanged, proxyModel,
@@ -85,7 +85,7 @@ MainWindow::MainWindow(QWidget *parent)
           &MainWindow::styleChanged);
   m_ui->style_tree->setModel(m_styleModel);
   m_ui->style_tree->setItemDelegate(
-      new LVGLStyleDelegate(m_styleModel->styleBase()));
+      new LVGLStyleDelegate(m_styleModel->styleBase(), this));
   m_ui->style_tree->expandAll();
 
   // recent configurations
