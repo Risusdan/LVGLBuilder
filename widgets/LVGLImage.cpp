@@ -47,7 +47,7 @@ public:
 	}
 
 	inline void setValue(LVGLObject *obj, QVariant value) override {
-		if (value.type() == QVariant::Map) {
+		if (value.typeId() == QMetaType::QVariantMap) {
 			QVariantMap map = value.toMap();
 			m_x->set(obj, static_cast<lv_coord_t>(map["X"].toInt()));
 			m_y->set(obj, static_cast<lv_coord_t>(map["Y"].toInt()));

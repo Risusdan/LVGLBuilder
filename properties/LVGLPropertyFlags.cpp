@@ -79,7 +79,7 @@ QString LVGLPropertyFlags::codeValue(LVGLObject *obj) const
 
 void LVGLPropertyFlags::setValue(LVGLObject *obj, QVariant value)
 {
-	if (value.type() == QVariant::String) {
+	if (value.typeId() == QMetaType::QString) {
 		QStringList flags = value.toString().split(" | ");
 		int mask = 0;
 		auto it = flags.begin();

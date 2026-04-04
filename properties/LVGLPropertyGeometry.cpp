@@ -76,7 +76,7 @@ QVariant LVGLPropertyGeometry::value(LVGLObject *obj) const
 
 void LVGLPropertyGeometry::setValue(LVGLObject *obj, QVariant value)
 {
-	if (value.type() == QVariant::Map) {
+	if (value.typeId() == QMetaType::QVariantMap) {
 		QVariantMap map = value.toMap();
 		obj->setGeometry(QRect(map["x"].toInt(), map["y"].toInt(),
 									  map["width"].toInt(), map["height"].toInt()));

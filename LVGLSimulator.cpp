@@ -130,7 +130,7 @@ void LVGLSimulator::changeResolution(QSize size) {
 }
 
 void LVGLSimulator::mousePressEvent(QMouseEvent *event) {
-  const QPoint pos = mapToScene(event->pos()).toPoint();
+  const QPoint pos = mapToScene(event->position().toPoint()).toPoint();
   if (m_mouseEnabled) {
     lvgl.sendMouseEvent(pos.x(), pos.y(), event->buttons() & Qt::LeftButton);
   } else {
@@ -147,7 +147,7 @@ void LVGLSimulator::mousePressEvent(QMouseEvent *event) {
         QAction *mfore = menu.addAction("Move foreground");
         QAction *mback = menu.addAction("Move background");
         scolor = menu.addAction("Set screen color ...");
-        sel = menu.exec(mapToGlobal(event->pos()));
+        sel = menu.exec(mapToGlobal(event->position().toPoint()));
         if ((sel == lock) && locked) {
           obj->setLocked(false);
         } else if ((sel == lock) && !locked) {
@@ -164,7 +164,7 @@ void LVGLSimulator::mousePressEvent(QMouseEvent *event) {
       } else {
         QMenu menu(this);
         scolor = menu.addAction("Set screen color ...");
-        sel = menu.exec(mapToGlobal(event->pos()));
+        sel = menu.exec(mapToGlobal(event->position().toPoint()));
       }
 
       if (sel == scolor) {
@@ -183,7 +183,7 @@ void LVGLSimulator::mousePressEvent(QMouseEvent *event) {
 
 void LVGLSimulator::mouseDoubleClickEvent(QMouseEvent *event) {
   if (!m_item->isManipolating() && !m_mouseEnabled) {
-    const QPoint pos = mapToScene(event->pos()).toPoint();
+    const QPoint pos = mapToScene(event->position().toPoint()).toPoint();
     auto obj = selectObject(objectsUnderCoords(pos, false), true);
     if (obj == nullptr)
       setSelectedObject(nullptr);
@@ -195,7 +195,7 @@ void LVGLSimulator::mouseDoubleClickEvent(QMouseEvent *event) {
 
 void LVGLSimulator::mouseReleaseEvent(QMouseEvent *event) {
   if (m_mouseEnabled) {
-    const QPoint pos = mapToScene(event->pos()).toPoint();
+    const QPoint pos = mapToScene(event->position().toPoint()).toPoint();
     lvgl.sendMouseEvent(pos.x(), pos.y(), false);
   }
   QGraphicsView::mouseReleaseEvent(event);
@@ -203,7 +203,7 @@ void LVGLSimulator::mouseReleaseEvent(QMouseEvent *event) {
 
 void LVGLSimulator::mouseMoveEvent(QMouseEvent *event) {
   if (m_mouseEnabled) {
-    const QPoint pos = mapToScene(event->pos()).toPoint();
+    const QPoint pos = mapToScene(event->position().toPoint()).toPoint();
     lvgl.sendMouseEvent(pos.x(), pos.y(), event->buttons() & Qt::LeftButton);
   }
   QGraphicsView::mouseMoveEvent(event);
@@ -226,7 +226,7 @@ void LVGLSimulator::dropEvent(QDropEvent *event) {
     LVGLObject *newObj = nullptr;
 
     // check if moved into another widget
-    QPoint pos = mapToScene(event->pos()).toPoint();
+    QPoint pos = mapToScene(event->position().toPoint()).toPoint();
     auto parent = selectObject(objectsUnderCoords(pos, true), false);
 
     // create new widget
@@ -260,7 +260,7 @@ void LVGLSimulator::dropEvent(QDropEvent *event) {
 void LVGLSimulator::dragMoveEvent(QDragMoveEvent *event) {
   if (m_mouseEnabled) return;
 
-  const QPoint pos = mapToScene(event->pos()).toPoint();
+  const QPoint pos = mapToScene(event->position().toPoint()).toPoint();
   auto sel = selectObject(objectsUnderCoords(pos, true), false);
   m_scene->setHoverObject(sel);
 

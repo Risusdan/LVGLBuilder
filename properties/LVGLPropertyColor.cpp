@@ -46,7 +46,7 @@ QVariant LVGLPropertyColor::value(LVGLObject *obj) const
 
 void LVGLPropertyColor::setValue(LVGLObject *obj, QVariant value)
 {
-	if (value.type() == QVariant::Map) {
+	if (value.typeId() == QMetaType::QVariantMap) {
 		QVariantMap map = value.toMap();
 #if LV_COLOR_DEPTH == 32
 		lv_color_t c;

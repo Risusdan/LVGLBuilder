@@ -56,7 +56,7 @@ QVariant LVGLPropertyRange::value(LVGLObject *obj) const
 
 void LVGLPropertyRange::setValue(LVGLObject *obj, QVariant value)
 {
-	if (value.type() == QVariant::Map) {
+	if (value.typeId() == QMetaType::QVariantMap) {
 		QVariantMap map = value.toMap();
 		set(obj, map["min"].toInt(), map["max"].toInt());
 	}

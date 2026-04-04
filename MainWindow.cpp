@@ -107,8 +107,8 @@ MainWindow::MainWindow(QWidget *parent)
   // add font editor dock to image dock and show the image dock
   tabifyDockWidget(m_ui->ImageEditor, m_ui->FontEditor);
   m_ui->ImageEditor->raise();
-  connect(m_ui->tabWidget, SIGNAL(currentChanged(int)), this,
-          SLOT(tabchanged(int)));
+  connect(m_ui->tabWidget, &QTabWidget::currentChanged, this,
+          &MainWindow::tabchanged);
 }
 
 MainWindow::~MainWindow() {
@@ -504,5 +504,5 @@ void MainWindow::tabchanged(int index) {
 void MainWindow::showEvent(QShowEvent *event) {
   QMainWindow::showEvent(event);
   if (m_project == nullptr)
-    QTimer::singleShot(50, this, SLOT(openNewProject()));
+    QTimer::singleShot(50, this, &MainWindow::openNewProject);
 }

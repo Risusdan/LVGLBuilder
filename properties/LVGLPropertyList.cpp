@@ -184,7 +184,7 @@ QVariant LVGLPropertyList::value(LVGLObject *obj) const
 
 void LVGLPropertyList::setValue(LVGLObject *obj, QVariant value)
 {
-	if (value.type() == QVariant::List) {
+	if (value.typeId() == QMetaType::QVariantList) {
 		lv_list_clean(obj->obj());
 #if 0
 		for (const QVariant &v:value.toList())

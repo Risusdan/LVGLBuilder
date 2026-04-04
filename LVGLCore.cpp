@@ -574,7 +574,7 @@ lv_color_t LVGLCore::fromColor(QColor c) const {
 }
 
 lv_color_t LVGLCore::fromColor(QVariant v) const {
-  if (v.type() == QVariant::Map) {
+  if (v.typeId() == QMetaType::QVariantMap) {
     QVariantMap map = v.toMap();
 #if LV_COLOR_DEPTH == 32
     lv_color_t c;

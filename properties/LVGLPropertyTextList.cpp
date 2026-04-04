@@ -107,11 +107,11 @@ QVariant LVGLPropertyTextList::value(LVGLObject *obj) const
 
 void LVGLPropertyTextList::setValue(LVGLObject *obj, QVariant value)
 {
-	if (value.type() == QVariant::List) {
+	if (value.typeId() == QMetaType::QVariantList) {
 		QVariantList list = value.toList();
 		QStringList items;
 		for (const QVariant &p:list) {
-			if (p.type() == QVariant::String)
+			if (p.typeId() == QMetaType::QString)
 				items << p.toString();
 		}
 		set(obj, items);

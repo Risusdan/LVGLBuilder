@@ -76,7 +76,7 @@ QVariant LVGLPropertyModel::data(const QModelIndex &index, int role) const {
       return prop->name();
     } else if (index.column() == 1) {
       QVariant val = prop->value(m_obj);
-      if (val.type() != QVariant::List) return val;
+      if (val.typeId() != QMetaType::QVariantList) return val;
 
       QStringList ret;
       for (const QVariant &v : val.toList()) ret << v.toString();

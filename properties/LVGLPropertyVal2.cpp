@@ -40,7 +40,7 @@ QVariant LVGLPropertyVal2<T>::value(LVGLObject *obj) const
 template<class T>
 void LVGLPropertyVal2<T>::setValue(LVGLObject *obj, QVariant value)
 {
-	if (value.type() == QVariant::Map) {
+	if (value.typeId() == QMetaType::QVariantMap) {
 		QVariantMap map = value.toMap();
 		m_setter(obj->obj(), map[m_item1->name().toLower()].toInt(), map[m_item2->name().toLower()].toInt());
 	}

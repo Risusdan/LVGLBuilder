@@ -140,7 +140,7 @@ QVariant LVGLPropertyPoints::value(LVGLObject *obj) const
 
 void LVGLPropertyPoints::setValue(LVGLObject *obj, QVariant value)
 {
-	if (value.type() == QVariant::List) {
+	if (value.typeId() == QMetaType::QVariantList) {
 		QVariantList list = value.toList();
 		QVector<lv_point_t> points;
 		for (const QVariant &p:list) {

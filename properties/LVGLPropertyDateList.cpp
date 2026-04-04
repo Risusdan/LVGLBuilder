@@ -100,11 +100,11 @@ public:
 
 	inline void set(QVariant value) {
 		m_list->clear();
-		if (value.type() != QVariant::List)
+		if (value.typeId() != QMetaType::QVariantList)
 			return;
 		QVariantList list = value.toList();
 		for (const QVariant &p:list) {
-			if (p.type() != QVariant::Date)
+			if (p.typeId() != QMetaType::QDate)
 				continue;
 			QTreeWidgetItem *item = new QTreeWidgetItem;
 			item->setData(0, Qt::DisplayRole, p);
@@ -177,7 +177,7 @@ QVariant LVGLPropertyDateList::value(LVGLObject *obj) const
 
 void LVGLPropertyDateList::setValue(LVGLObject *obj, QVariant value)
 {
-	if (value.type() != QVariant::List)
+	if (value.typeId() != QMetaType::QVariantList)
 		return;
 	QVariantList list = value.toList();
 	QVector<lv_calendar_date_t> dateVector;

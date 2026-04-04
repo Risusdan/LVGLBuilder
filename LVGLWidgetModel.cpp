@@ -1,5 +1,6 @@
 #include "LVGLWidgetModel.h"
 
+#include <QIODevice>
 #include <QMimeData>
 #include <QDataStream>
 

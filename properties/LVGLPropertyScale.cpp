@@ -76,7 +76,7 @@ QVariant LVGLPropertyScale::value(LVGLObject *obj) const
 
 void LVGLPropertyScale::setValue(LVGLObject *obj, QVariant value)
 {
-	if (value.type() == QVariant::Map) {
+	if (value.typeId() == QMetaType::QVariantMap) {
 		QVariantMap map = value.toMap();
 		lv_gauge_set_scale(obj->obj(), map["angle"].toInt() & 0xfff,
 												 map["lines"].toInt() & 0xff,
