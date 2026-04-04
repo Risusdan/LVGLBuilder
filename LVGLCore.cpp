@@ -20,6 +20,7 @@ LVGLCore::LVGLCore(QObject *parent)
     : QObject(parent),
       m_imageManager(new LVGLImageManager(this)),
       m_fontManager(new LVGLFontManager(this)),
+      m_objectManager(new LVGLObjectManager(this)),
       m_widgetRegistry(new LVGLWidgetRegistry(this)) {
 }
 
@@ -140,11 +141,7 @@ QPixmap LVGLCore::grab(const QRect &region) const {
 }
 
 LVGLObject *LVGLCore::findByName(const QString &name) {
-  if (!m_objects.isEmpty()) {
-    for (auto o : m_objects)
-      if (o->name() == name) return o;
-  }
-  return nullptr;
+  return m_objectManager->findByName(name);
 }
 
 int LVGLCore::width() const {
@@ -387,7 +384,7 @@ void LVGLCore::poll() {
   m_time.restart();
 }
 
-void LVGLCore::objsclear() { m_objects.clear(); }
+void LVGLCore::objsclear() { m_objectManager->clear(); }
 
 void LVGLCore::sendMouseEvent(int x, int y, bool pressed) {
   m_inputData.point.x = static_cast<lv_coord_t>(x);
@@ -417,60 +414,38 @@ QRect LVGLCore::get_object_rect(const lv_obj_t *lv_obj) const {
   return QRect(get_absolute_position(lv_obj), get_object_size(lv_obj));
 }
 
-void LVGLCore::addObject(LVGLObject *object) { m_objects << object; }
+void LVGLCore::addObject(LVGLObject *object) {
+  m_objectManager->addObject(object);
+}
 
 void LVGLCore::removeObject(LVGLObject *object) {
-  auto childs = object->childs();
-  while (!childs.isEmpty()) {
-    removeObject(childs.at(0));
-    childs = object->childs();
-  }
-  if (object->parent()) object->parent()->removeChild(object);
-  m_objects.removeOne(object);
-  delete object;
-  object = nullptr;
+  m_objectManager->removeObject(object);
 }
 
-void LVGLCore::removeAllObjects() {
-  auto objs = m_objects;
-  while (!objs.isEmpty()) {
-    if (objs.at(0) && !objs.at(0)->parent()) removeObject(m_objects.at(0));
-    objs = m_objects;
-  }
+void LVGLCore::removeAllObjects() { m_objectManager->removeAllObjects(); }
+
+void LVGLCore::setAllObjects(QList<LVGLObject *> objs) {
+  m_objectManager->setAllObjects(objs);
 }
 
-QList<LVGLObject *> LVGLCore::allObjects() const { return m_objects; }
+QList<LVGLObject *> LVGLCore::allObjects() const {
+  return m_objectManager->allObjects();
+}
 
 QList<LVGLObject *> LVGLCore::topLevelObjects() const {
-  QList<LVGLObject *> ret;
-  for (LVGLObject *c : m_objects) {
-    if (c->parent() == nullptr) ret << c;
-  }
-  return ret;
+  return m_objectManager->topLevelObjects();
 }
 
 QList<LVGLObject *> LVGLCore::objectsByType(QString className) const {
-  QList<LVGLObject *> ret;
-  for (LVGLObject *c : m_objects) {
-    if (c->widgetClass()->className() == className) ret << c;
-  }
-  return ret;
+  return m_objectManager->objectsByType(className);
 }
 
 LVGLObject *LVGLCore::object(QString name) const {
-  if (name.isEmpty()) return nullptr;
-  for (LVGLObject *c : m_objects) {
-    if (c->name() == name) return c;
-  }
-  return nullptr;
+  return m_objectManager->object(name);
 }
 
 LVGLObject *LVGLCore::object(lv_obj_t *obj) const {
-  if (obj == nullptr) return nullptr;
-  for (LVGLObject *c : m_objects) {
-    if (c->obj() == obj) return c;
-  }
-  return nullptr;
+  return m_objectManager->object(obj);
 }
 
 QColor LVGLCore::toColor(lv_color_t c) const {

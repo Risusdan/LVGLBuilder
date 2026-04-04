@@ -95,6 +95,7 @@ set(APP_SOURCES
     LVGLCore.cpp
     LVGLFontManager.cpp
     LVGLImageManager.cpp
+    LVGLObjectManager.cpp
     LVGLWidgetRegistry.cpp
     LVGLDialog.cpp
     LVGLFontData.cpp

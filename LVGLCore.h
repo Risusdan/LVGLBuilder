@@ -13,6 +13,7 @@
 #include "LVGLImageData.h"
 #include "LVGLImageManager.h"
 #include "LVGLFontManager.h"
+#include "LVGLObjectManager.h"
 #include "LVGLWidgetRegistry.h"
 #include "widgets/LVGLWidget.h"
 
@@ -40,6 +41,7 @@ class LVGLCore : public QObject {
 
   LVGLImageManager *imageManager() const { return m_imageManager; }
   LVGLFontManager *fontManager() const { return m_fontManager; }
+  LVGLObjectManager *objectManager() const { return m_objectManager; }
   LVGLWidgetRegistry *widgetRegistry() const { return m_widgetRegistry; }
 
   LVGLImageData *addImage(QImage image, QString name);
@@ -69,7 +71,7 @@ class LVGLCore : public QObject {
   void removeObject(LVGLObject *object);
   void removeAllObjects();
 
-  void setAllObjects(QList<LVGLObject *> objs) { m_objects = objs; }
+  void setAllObjects(QList<LVGLObject *> objs);
 
   QList<LVGLObject *> allObjects() const;
   QList<LVGLObject *> topLevelObjects() const;
@@ -128,8 +130,8 @@ class LVGLCore : public QObject {
   QElapsedTimer m_time;
   LVGLImageManager *m_imageManager;
   LVGLFontManager *m_fontManager;
+  LVGLObjectManager *m_objectManager;
   LVGLWidgetRegistry *m_widgetRegistry;
-  QList<LVGLObject *> m_objects;
   lv_style_t m_screenStyle;
 
   std::vector<lv_color_t> m_dispFrameBuf;
