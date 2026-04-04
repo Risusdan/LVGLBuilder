@@ -5,56 +5,9 @@
 #include "LVGLCore.h"
 #include "LVGLObject.h"
 #include "properties/LVGLPropertyImage.h"
+#include "properties/LVGLPropertyImgBtnSrc.h"
+#include "properties/LVGLPropertyImgBtnState.h"
 
-class LVGLPropertyImgBtnSrc : public LVGLPropertyImage
-{
-public:
-	LVGLPropertyImgBtnSrc(lv_btn_state_t state, LVGLProperty *parent = nullptr)
-		: LVGLPropertyImage(parent)
-		, m_values({"Released", "Pressed", "Toggled released", "Toggled pressed", "Inactive"})
-		, m_types({"LV_BTN_STATE_REL", "LV_BTN_STATE_PR", "LV_BTN_STATE_TGL_REL", "LV_BTN_STATE_TGL_PR", "LV_BTN_STATE_INA"})
-		, m_state(state)
-	{
-	}
-
-	QString name() const override { return "Source " + m_values.at(m_state); }
-
-	QStringList function(LVGLObject *obj) const override {
-		LVGLImageData *img = lvgl.imageByDesc(get(obj));
-		if (img == nullptr) return QStringList();
-		return QStringList() << QString("lv_imgbtn_set_src(%1, %2, &%3);").arg(obj->codeName()).arg(m_types.at(m_state)).arg(img->codeName());
-	}
-
-protected:
-	QStringList m_values;
-	QStringList m_types;
-	lv_btn_state_t m_state;
-
-	virtual const lv_img_dsc_t *get(LVGLObject *obj) const override { return reinterpret_cast<const lv_img_dsc_t*>(lv_imgbtn_get_src(obj->obj(), m_state)); }
-	virtual void set(LVGLObject *obj, const lv_img_dsc_t *img) override { lv_imgbtn_set_src(obj->obj(), m_state, img); }
-
-};
-
-class LVGLPropertyImgBtnState : public LVGLPropertyEnum
-{
-public:
-	LVGLPropertyImgBtnState()
-		: LVGLPropertyEnum(QStringList() << "Released" << "Pressed" << "Toggled released" << "Toggled pressed" << "Inactive")
-		, m_values({"LV_BTN_STATE_REL", "LV_BTN_STATE_PR", "LV_BTN_STATE_TGL_REL", "LV_BTN_STATE_TGL_PR", "LV_BTN_STATE_INA"})
-	{}
-
-	QString name() const { return "State"; }
-
-	QStringList function(LVGLObject *obj) const {
-		return QStringList() << QString("lv_imgbtn_set_state(%1, %2);").arg(obj->codeName()).arg(m_values.at(get(obj)));
-	}
-
-protected:
-	int get(LVGLObject *obj) const { return lv_imgbtn_get_state(obj->obj()); }
-	void set(LVGLObject *obj, int index) { lv_imgbtn_set_state(obj->obj(), index & 0xff); }
-
-	QStringList m_values;
-};
 
 LVGLImageButton::LVGLImageButton()
 {

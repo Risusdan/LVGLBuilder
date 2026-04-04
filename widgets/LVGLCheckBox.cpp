@@ -3,26 +3,9 @@
 #include <QIcon>
 
 #include "LVGLObject.h"
+#include "properties/LVGLPropertyCBChecked.h"
+#include "properties/LVGLPropertyCBInactive.h"
 
-class LVGLPropertyCBChecked : public LVGLPropertyBool
-{
-public:
-	QString name() const { return "Checked"; }
-
-protected:
-	bool get(LVGLObject *obj) const { return lv_cb_is_checked(obj->obj()); }
-	void set(LVGLObject *obj, bool boolean) { lv_cb_set_checked(obj->obj(), boolean); }
-};
-
-class LVGLPropertyCBInactive : public LVGLPropertyBool
-{
-public:
-	QString name() const { return "Inactive"; }
-
-protected:
-	bool get(LVGLObject *obj) const { return lv_cb_is_inactive(obj->obj()); }
-	void set(LVGLObject *obj, bool boolean) { lv_btn_set_state(obj->obj(), boolean ? LV_BTN_STATE_INA : LV_BTN_STATE_TGL_REL); }
-};
 
 LVGLCheckBox::LVGLCheckBox()
 {

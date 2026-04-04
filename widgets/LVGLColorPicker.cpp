@@ -4,83 +4,13 @@
 #include "properties/LVGLPropertyColor.h"
 
 #include <QIcon>
+#include "properties/LVGLPropertyCPickerType.h"
+#include "properties/LVGLPropertyCPickerHue.h"
+#include "properties/LVGLPropertyCPickerSaturation.h"
+#include "properties/LVGLPropertyCPickerValue.h"
+#include "properties/LVGLPropertyCPickerMode.h"
+#include "properties/LVGLPropertyCPickerColor.h"
 
-class LVGLPropertyCPickerType : public LVGLPropertyEnum
-{
-public:
-	LVGLPropertyCPickerType()
-		: LVGLPropertyEnum(QStringList() << "Rectange" << "Disc")
-	{}
-
-	QString name() const { return "Type"; }
-
-protected:
-	int get(LVGLObject *obj) const {
-		lv_cpicker_ext_t *ext = reinterpret_cast<lv_cpicker_ext_t *>(lv_obj_get_ext_attr(obj->obj()));
-		return ext->type;
-	}
-	void set(LVGLObject *obj, int index) { lv_cpicker_set_type(obj->obj(), index & 0xff); }
-};
-
-class LVGLPropertyCPickerHue : public LVGLPropertyInt
-{
-public:
-	LVGLPropertyCPickerHue() : LVGLPropertyInt(0, 360) {}
-
-	QString name() const { return "Hue"; }
-
-protected:
-	int get(LVGLObject *obj) const { return lv_cpicker_get_hue(obj->obj()); }
-	void set(LVGLObject *obj, int value) { lv_cpicker_set_hue(obj->obj(), static_cast<uint16_t>(value)); }
-};
-
-class LVGLPropertyCPickerSaturation : public LVGLPropertyInt
-{
-public:
-	LVGLPropertyCPickerSaturation() : LVGLPropertyInt(0, 100) {}
-
-	QString name() const { return "Saturation"; }
-
-protected:
-	int get(LVGLObject *obj) const { return lv_cpicker_get_saturation(obj->obj()); }
-	void set(LVGLObject *obj, int value) { lv_cpicker_set_saturation(obj->obj(), static_cast<uint8_t>(value)); }
-};
-
-class LVGLPropertyCPickerValue : public LVGLPropertyInt
-{
-public:
-	LVGLPropertyCPickerValue() : LVGLPropertyInt(0, 100) {}
-
-	QString name() const { return "Value"; }
-
-protected:
-	int get(LVGLObject *obj) const { return lv_cpicker_get_value(obj->obj()); }
-	void set(LVGLObject *obj, int value) { lv_cpicker_set_value(obj->obj(), static_cast<uint8_t>(value)); }
-};
-
-class LVGLPropertyCPickerMode : public LVGLPropertyEnum
-{
-public:
-	LVGLPropertyCPickerMode()
-		: LVGLPropertyEnum(QStringList() << "Hue" << "Saturation" << "Value")
-	{}
-
-	QString name() const { return "Color mode"; }
-
-protected:
-	int get(LVGLObject *obj) const { return lv_cpicker_get_color_mode(obj->obj()); }
-	void set(LVGLObject *obj, int index) { lv_cpicker_set_color_mode(obj->obj(), index & 0xff); }
-};
-
-class LVGLPropertyCPickerColor : public LVGLPropertyColor
-{
-public:
-	QString name() const { return "Color"; }
-
-protected:
-	lv_color_t get(LVGLObject *obj) const { return lv_cpicker_get_color(obj->obj()); }
-	void set(LVGLObject *obj, lv_color_t boolean) { lv_cpicker_set_color(obj->obj(), boolean); }
-};
 
 LVGLColorPicker::LVGLColorPicker()
 {
