@@ -68,7 +68,7 @@ lv_style_t *LVGLPage::style(lv_obj_t *obj, int type) const
 
 void LVGLPage::setStyle(lv_obj_t *obj, int type, lv_style_t *style) const
 {
-	lv_page_set_style(obj, static_cast<lv_btn_style_t>(type), style);
+	lv_page_set_style(obj, static_cast<lv_page_style_t>(type), style);
 }
 
 lv_style_t *LVGLPage::defaultStyle(int type) const

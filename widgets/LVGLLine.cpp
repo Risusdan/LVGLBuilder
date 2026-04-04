@@ -60,7 +60,7 @@ lv_style_t *LVGLLine::style(lv_obj_t *obj, int type) const
 
 void LVGLLine::setStyle(lv_obj_t *obj, int type, lv_style_t *style) const
 {
-	lv_line_set_style(obj, static_cast<lv_bar_style_t>(type), style);
+	lv_line_set_style(obj, static_cast<lv_line_style_t>(type), style);
 }
 
 lv_style_t *LVGLLine::defaultStyle(int type) const

@@ -73,7 +73,7 @@ lv_style_t *LVGLChart::style(lv_obj_t *obj, int type) const
 
 void LVGLChart::setStyle(lv_obj_t *obj, int type, lv_style_t *style) const
 {
-	lv_chart_set_style(obj, static_cast<lv_btn_style_t>(type), style);
+	lv_chart_set_style(obj, static_cast<lv_chart_style_t>(type), style);
 }
 
 lv_style_t *LVGLChart::defaultStyle(int type) const

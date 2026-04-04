@@ -72,7 +72,7 @@ lv_style_t *LVGLDropDownList::style(lv_obj_t *obj, int type) const
 
 void LVGLDropDownList::setStyle(lv_obj_t *obj, int type, lv_style_t *style) const
 {
-	lv_ddlist_set_style(obj, static_cast<lv_btn_style_t>(type), style);
+	lv_ddlist_set_style(obj, static_cast<lv_ddlist_style_t>(type), style);
 }
 
 lv_style_t *LVGLDropDownList::defaultStyle(int type) const

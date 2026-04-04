@@ -59,7 +59,7 @@ lv_style_t *LVGLLED::style(lv_obj_t *obj, int type) const
 
 void LVGLLED::setStyle(lv_obj_t *obj, int type, lv_style_t *style) const
 {
-	lv_led_set_style(obj, static_cast<lv_btn_style_t>(type), style);
+	lv_led_set_style(obj, static_cast<lv_led_style_t>(type), style);
 }
 
 lv_style_t *LVGLLED::defaultStyle(int type) const

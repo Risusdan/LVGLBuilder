@@ -80,7 +80,7 @@ lv_style_t *LVGLCalendar::style(lv_obj_t *obj, int type) const
 
 void LVGLCalendar::setStyle(lv_obj_t *obj, int type, lv_style_t *style) const
 {
-	lv_calendar_set_style(obj, static_cast<lv_bar_style_t>(type), style);
+	lv_calendar_set_style(obj, static_cast<lv_calendar_style_t>(type), style);
 }
 
 lv_style_t *LVGLCalendar::defaultStyle(int type) const

@@ -55,7 +55,7 @@ lv_style_t *LVGLCanvas::style(lv_obj_t *obj, int type) const
 
 void LVGLCanvas::setStyle(lv_obj_t *obj, int type, lv_style_t *style) const
 {
-	lv_canvas_set_style(obj, static_cast<lv_btn_style_t>(type), style);
+	lv_canvas_set_style(obj, static_cast<lv_canvas_style_t>(type), style);
 }
 
 lv_style_t *LVGLCanvas::defaultStyle(int type) const

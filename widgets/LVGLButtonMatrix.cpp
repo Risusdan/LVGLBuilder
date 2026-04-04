@@ -63,7 +63,7 @@ lv_style_t *LVGLButtonMatrix::style(lv_obj_t *obj, int type) const
 
 void LVGLButtonMatrix::setStyle(lv_obj_t *obj, int type, lv_style_t *style) const
 {
-	lv_btnm_set_style(obj, static_cast<lv_btn_style_t>(type), style);
+	lv_btnm_set_style(obj, static_cast<lv_btnm_style_t>(type), style);
 }
 
 lv_style_t *LVGLButtonMatrix::defaultStyle(int type) const
