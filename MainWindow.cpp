@@ -15,6 +15,7 @@
 #include "LVGLObjectModel.h"
 #include "LVGLProject.h"
 #include "LVGLPropertyModel.h"
+#include "ProjectManager.h"
 #include "LVGLSimulator.h"
 #include "LVGLStyleModel.h"
 #include "LVGLTabWidget.h"
@@ -26,7 +27,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
       m_ui(new Ui::MainWindow),
       m_zoom_slider(new QSlider(Qt::Horizontal)),
-      m_project(nullptr),
+      m_projectManager(new ProjectManager(this)),
       m_maxFileNr(5),
       m_firstrun(true),
       m_simulator(new LVGLSimulator(this)),
@@ -125,7 +126,6 @@ MainWindow::~MainWindow() {
     }
   }
   delete m_ui;
-  delete m_project;
 }
 
 LVGLSimulator *MainWindow::simulator() const { return m_simulator; }
@@ -176,8 +176,8 @@ void MainWindow::openNewProject() {
   if (dialog.exec() == QDialog::Accepted) {
     if (m_firstrun) {
       m_firstrun = false;
-      m_project =
-          new LVGLProject(dialog.selectedName(), dialog.selectedResolution());
+      m_projectManager->newProject(dialog.selectedName(),
+                                   dialog.selectedResolution());
       const auto res = dialog.selectedResolution();
       lvgl.changeResolution(res);
       m_simulator->changeResolution(res);
@@ -188,7 +188,7 @@ void MainWindow::openNewProject() {
     m_simulator->setobjParent(tabW->getparent());
     m_ui->tabWidget->addTab(tabW, dialog.selectedName());
     m_ui->tabWidget->setCurrentIndex(m_ui->tabWidget->count() - 1);
-  } else if (m_project == nullptr) {
+  } else if (!m_projectManager->hasProject()) {
     setEnableBuilder(false);
     setWindowTitle("LVGL Builder");
   }
@@ -261,18 +261,17 @@ void MainWindow::adjustForCurrentFile(const QString &fileName) {
 }
 
 void MainWindow::loadProject(const QString &fileName) {
-  delete m_project;
   m_simulator->clear();
-  m_project = LVGLProject::load(fileName);
-  if (m_project == nullptr) {
+  if (!m_projectManager->loadProject(fileName)) {
     QMessageBox::critical(this, "Error", "Could not load lvgl file!");
     setWindowTitle("LVGL Builder");
     setEnableBuilder(false);
   } else {
     adjustForCurrentFile(fileName);
-    setWindowTitle("LVGL Builder - [" + m_project->name() + "]");
-    lvgl.changeResolution(m_project->resolution());
-    m_simulator->changeResolution(m_project->resolution());
+    setWindowTitle("LVGL Builder - [" + m_projectManager->projectName() + "]");
+    const auto res = m_projectManager->project()->resolution();
+    lvgl.changeResolution(res);
+    m_simulator->changeResolution(res);
     setEnableBuilder(true);
   }
   updateImages();
@@ -291,7 +290,7 @@ void MainWindow::setEnableBuilder(bool enable) {
 
 void MainWindow::on_action_load_triggered() {
   QString path;
-  if (m_project != nullptr) path = m_project->fileName();
+  if (m_projectManager->hasProject()) path = m_projectManager->fileName();
   QString fileName =
       QFileDialog::getOpenFileName(this, "Load lvgl", path, "LVGL (*.lvgl)");
   if (fileName.isEmpty()) return;
@@ -300,11 +299,11 @@ void MainWindow::on_action_load_triggered() {
 
 void MainWindow::on_action_save_triggered() {
   QString path;
-  if (m_project != nullptr) path = m_project->fileName();
+  if (m_projectManager->hasProject()) path = m_projectManager->fileName();
   QString fileName =
       QFileDialog::getSaveFileName(this, "Save lvgl", path, "LVGL (*.lvgl)");
   if (fileName.isEmpty()) return;
-  if (!m_project->save(fileName)) {
+  if (!m_projectManager->saveProject(fileName)) {
     QMessageBox::critical(this, "Error", "Could not save lvgl file!");
   } else {
     adjustForCurrentFile(fileName);
@@ -320,20 +319,20 @@ void MainWindow::on_combo_style_currentIndexChanged(int index) {
 
 void MainWindow::on_action_export_c_triggered() {
   QString dir;
-  if (m_project != nullptr) {
-    QFileInfo fi(m_project->fileName());
+  if (m_projectManager->hasProject()) {
+    QFileInfo fi(m_projectManager->fileName());
     dir = fi.absoluteFilePath();
   }
   QString path = QFileDialog::getExistingDirectory(this, "Export C files", dir);
   if (path.isEmpty()) return;
-  if (m_project->exportCode(path))
+  if (m_projectManager->exportCode(path))
     QMessageBox::information(this, "Export", "C project exported!");
 }
 
 void MainWindow::on_button_add_image_clicked() {
   QString dir;
-  if (m_project != nullptr) {
-    QFileInfo fi(m_project->fileName());
+  if (m_projectManager->hasProject()) {
+    QFileInfo fi(m_projectManager->fileName());
     dir = fi.absoluteFilePath();
   }
   QStringList fileNames = QFileDialog::getOpenFileNames(
@@ -491,7 +490,8 @@ void MainWindow::tabchanged(int index) {
   tabw->setSimulator(m_simulator);
   auto objs = tabw->allObject();
   lvgl.setAllObjects(objs);
-  m_project->setName(tabw->getname());
+  if (m_projectManager->hasProject())
+    m_projectManager->project()->setName(tabw->getname());
   for (int i = 0; i < objs.count(); ++i) {
     m_objectModel->beginInsertObject(objs[i]);
     m_objectModel->endInsertObject();
@@ -503,6 +503,6 @@ void MainWindow::tabchanged(int index) {
 
 void MainWindow::showEvent(QShowEvent *event) {
   QMainWindow::showEvent(event);
-  if (m_project == nullptr)
+  if (!m_projectManager->hasProject())
     QTimer::singleShot(50, this, &MainWindow::openNewProject);
 }

@@ -118,6 +118,7 @@ set(APP_SOURCES
     LVGLWorker.cpp
     main.cpp
     MainWindow.cpp
+    ProjectManager.cpp
     properties/LVGLPropertyAssignTextArea.cpp
     properties/LVGLPropertyColor.cpp
     properties/LVGLPropertyDate.cpp

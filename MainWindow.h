@@ -7,9 +7,9 @@
 
 class LVGLSimulator;
 class LVGLObject;
-class LVGLProject;
 class LVGLImageData;
 class LVGLFontData;
+class ProjectManager;
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -68,7 +68,7 @@ class MainWindow : public QMainWindow {
 
   Ui::MainWindow *m_ui;
   QSlider *m_zoom_slider;
-  LVGLProject *m_project;
+  ProjectManager *m_projectManager;
 
   class LVGLPropertyModel *m_propertyModel;
   class LVGLStyleModel *m_styleModel;
