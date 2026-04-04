@@ -93,6 +93,9 @@ class LVGLSimulator : public QGraphicsView {
   LVGLPropertyModel *m_propertyModel;
   QThread *m_thread;
   QTimer *m_timer;
+  bool m_dragging;
+  QPoint m_dragStartPos;
+  QPoint m_dragObjStartPos;
 };
 
 class LVGLKeyPressEventFilter : public QObject {

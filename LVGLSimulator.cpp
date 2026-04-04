@@ -75,7 +75,8 @@ LVGLSimulator::LVGLSimulator(QWidget *parent)
       m_selectedObject(nullptr),
       m_mouseEnabled(false),
       m_item(new LVGLItem),
-      m_objectModel(nullptr) {
+      m_objectModel(nullptr),
+      m_dragging(false) {
   // setMinimumSize(LV_HOR_RES_MAX, LV_VER_RES_MAX);
   // setMaximumSize(LV_HOR_RES_MAX, LV_VER_RES_MAX);
 
@@ -180,8 +181,15 @@ void LVGLSimulator::mousePressEvent(QMouseEvent *event) {
           lvgl.setScreenColor(dialog.selectedColor());
       }
     } else if (event->button() == Qt::LeftButton) {
-      if (!m_item->isManipolating())
-        setSelectedObject(selectObject(objectsUnderCoords(pos, false), false));
+      if (!m_item->isManipolating()) {
+        auto obj = selectObject(objectsUnderCoords(pos, false), false);
+        setSelectedObject(obj);
+        if (obj && obj->isMovable()) {
+          m_dragging = true;
+          m_dragStartPos = pos;
+          m_dragObjStartPos = obj->position();
+        }
+      }
     }
   }
   QGraphicsView::mousePressEvent(event);
@@ -204,6 +212,7 @@ void LVGLSimulator::mouseReleaseEvent(QMouseEvent *event) {
     const QPoint pos = mapToScene(event->position().toPoint()).toPoint();
     lvgl.sendMouseEvent(pos.x(), pos.y(), false);
   }
+  m_dragging = false;
   QGraphicsView::mouseReleaseEvent(event);
 }
 
@@ -211,6 +220,16 @@ void LVGLSimulator::mouseMoveEvent(QMouseEvent *event) {
   if (m_mouseEnabled) {
     const QPoint pos = mapToScene(event->position().toPoint()).toPoint();
     lvgl.sendMouseEvent(pos.x(), pos.y(), event->buttons() & Qt::LeftButton);
+  } else if (m_dragging && m_selectedObject && m_selectedObject->isMovable()) {
+    const QPoint pos = mapToScene(event->position().toPoint()).toPoint();
+    QPoint delta = pos - m_dragStartPos;
+    QPoint newPos = m_dragObjStartPos + delta;
+    newPos.setX(qBound(0, newPos.x(), lvgl.width() - m_selectedObject->width() - 1));
+    newPos.setY(qBound(0, newPos.y(), lvgl.height() - m_selectedObject->height() - 1));
+    m_selectedObject->setPosition(newPos);
+    m_item->updateGeometry();
+    update();
+    return;
   }
   QGraphicsView::mouseMoveEvent(event);
 }

@@ -15,7 +15,6 @@ LVGLItem::LVGLItem(QGraphicsItem *parent)
       m_minimumWidth(20),
       m_minimumHeight(20) {
   setFlag(QGraphicsItem::ItemSendsGeometryChanges);
-  setFlag(QGraphicsItem::ItemIsMovable);
   setAcceptHoverEvents(true);
 
   m_direction.clear();
@@ -243,7 +242,6 @@ void LVGLItem::setObject(LVGLObject *obj) {
   m_direction.clear();
   if (obj) {
     setFlag(QGraphicsItem::ItemSendsGeometryChanges, obj->isMovable());
-    setFlag(QGraphicsItem::ItemIsMovable, obj->isMovable());
     setAcceptHoverEvents(obj->isMovable());
     setPos(obj->absolutePosition());
     connect(m_object, &LVGLObject::positionChanged, this,
