@@ -43,6 +43,11 @@ LVGLProject *LVGLProject::load(const QString &fileName)
 		return nullptr;
 	QJsonDocument doc = QJsonDocument::fromJson(file.readAll());
 	file.close();
+	int version = 0;
+	if (doc.object().contains("version"))
+		version = doc.object()["version"].toInt();
+	if (version > 1)
+		return nullptr;
 	if (!doc.object().contains("lvgl"))
 		return nullptr;
 
@@ -122,7 +127,8 @@ bool LVGLProject::save(const QString &fileName)
 							 });
 	if (lvgl.screenColorChanged())
 		screen.insert("screen color", QVariant(lvgl.screenColor()).toString());
-	QJsonObject lvgl({{"lvgl", screen},
+	QJsonObject lvgl({{"version", 1},
+							{"lvgl", screen},
 							{"images", imageArr},
 							{"fonts", fontArr}
 						  });

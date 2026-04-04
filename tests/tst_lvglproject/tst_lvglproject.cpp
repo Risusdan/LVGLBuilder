@@ -108,6 +108,64 @@ class TestLVGLProject : public QObject {
     QCOMPARE(loaded->resolution(), QSize(800, 600));
     delete loaded;
   }
+
+  void testSaveWritesVersionField() {
+    LVGLProject project("VerTest", QSize(320, 480));
+    QTemporaryFile tmpFile;
+    tmpFile.setAutoRemove(true);
+    QVERIFY(tmpFile.open());
+    QString filePath = tmpFile.fileName();
+    tmpFile.close();
+    QVERIFY(project.save(filePath));
+    QFile file(filePath);
+    QVERIFY(file.open(QIODevice::ReadOnly));
+    QJsonDocument doc = QJsonDocument::fromJson(file.readAll());
+    file.close();
+    QVERIFY(doc.object().contains("version"));
+    QCOMPARE(doc.object()["version"].toInt(), 1);
+  }
+
+  void testLoadLegacyFormatWithoutVersion() {
+    QJsonObject widgets;
+    widgets["widgets"] = QJsonArray();
+    widgets["name"] = "Legacy";
+    widgets["resolution"] = QJsonObject({{"width", 320}, {"height", 480}});
+    QJsonObject root;
+    root["lvgl"] = widgets;
+    root["images"] = QJsonArray();
+    root["fonts"] = QJsonArray();
+    QTemporaryFile tmpFile;
+    tmpFile.setAutoRemove(true);
+    QVERIFY(tmpFile.open());
+    tmpFile.write(QJsonDocument(root).toJson());
+    QString filePath = tmpFile.fileName();
+    tmpFile.close();
+    lvgl.removeAllObjects();
+    LVGLProject *loaded = LVGLProject::load(filePath);
+    QVERIFY(loaded != nullptr);
+    QCOMPARE(loaded->name(), QString("Legacy"));
+    delete loaded;
+  }
+
+  void testLoadUnknownVersionFails() {
+    QJsonObject widgets;
+    widgets["widgets"] = QJsonArray();
+    widgets["name"] = "Future";
+    widgets["resolution"] = QJsonObject({{"width", 320}, {"height", 480}});
+    QJsonObject root;
+    root["version"] = 999;
+    root["lvgl"] = widgets;
+    root["images"] = QJsonArray();
+    root["fonts"] = QJsonArray();
+    QTemporaryFile tmpFile;
+    tmpFile.setAutoRemove(true);
+    QVERIFY(tmpFile.open());
+    tmpFile.write(QJsonDocument(root).toJson());
+    QString filePath = tmpFile.fileName();
+    tmpFile.close();
+    LVGLProject *loaded = LVGLProject::load(filePath);
+    QVERIFY(loaded == nullptr);
+  }
 };
 
 QTEST_MAIN(TestLVGLProject)
