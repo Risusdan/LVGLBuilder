@@ -58,7 +58,7 @@ QStringList LVGLPropertyVal2<T>::function(LVGLObject *obj) const
 {
 	if (m_functionName.isEmpty())
 		return {};
-	return { QString("%1(%2, %3, %3);").arg(m_functionName).arg(obj->codeName()).arg(m_getter1(obj->obj())).arg(m_getter1(obj->obj())) };
+	return { QString("%1(%2, %3, %4);").arg(m_functionName).arg(obj->codeName()).arg(m_getter1(obj->obj())).arg(m_getter2(obj->obj())) };
 }
 
 LVGLPropertyVal2Int16::LVGLPropertyVal2Int16(int16_t min1, int16_t max1, QString value1, std::function<int16_t (lv_obj_t *)> getter1,
