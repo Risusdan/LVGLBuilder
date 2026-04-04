@@ -7,6 +7,7 @@
 
 #include "lvgl/lvgl.h"
 
+class CanvasActions;
 class LVGLObject;
 class LVGLItem;
 class LVGLObjectModel;
@@ -44,6 +45,7 @@ class LVGLSimulator : public QGraphicsView {
   LVGLObject *selectedObject() const;
 
   LVGLItem *item() const;
+  CanvasActions *canvasActions() const;
 
   void moveObject(LVGLObject *obj, int dx, int dy);
   void addObject(LVGLObject *obj);
@@ -85,6 +87,7 @@ class LVGLSimulator : public QGraphicsView {
   // void parseJson(QJsonObject object, LVGLObject *parent = nullptr);
 
   LVGLScene *m_scene;
+  CanvasActions *m_canvasActions;
   LVGLObject *m_selectedObject;
   bool m_mouseEnabled;
   LVGLItem *m_item;

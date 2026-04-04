@@ -16,6 +16,7 @@
 #include <QTextStream>
 #include <QThread>
 
+#include "CanvasActions.h"
 #include "LVGLCore.h"
 #include "LVGLFontData.h"
 #include "LVGLItem.h"
@@ -72,6 +73,7 @@ void LVGLScene::setSelected(LVGLObject *selected) { m_selected = selected; }
 LVGLSimulator::LVGLSimulator(QWidget *parent)
     : QGraphicsView(parent),
       m_scene(new LVGLScene),
+      m_canvasActions(new CanvasActions(this)),
       m_selectedObject(nullptr),
       m_mouseEnabled(false),
       m_item(new LVGLItem),
@@ -162,11 +164,13 @@ void LVGLSimulator::mousePressEvent(QMouseEvent *event) {
           if (obj == m_selectedObject) setSelectedObject(nullptr);
         } else if (sel == remove) {
           if (obj == m_selectedObject) setSelectedObject(nullptr);
-          lvgl.removeObject(obj);
+          if (m_objectModel) m_objectModel->beginRemoveObject(obj);
+          m_canvasActions->deleteObject(obj);
+          if (m_objectModel) m_objectModel->endRemoveObject();
         } else if (sel == mfore) {
-          lv_obj_move_foreground(obj->obj());
+          m_canvasActions->moveForeground(obj);
         } else if (sel == mback) {
-          lv_obj_move_background(obj->obj());
+          m_canvasActions->moveBackground(obj);
         }
       } else {
         QMenu menu(this);
@@ -178,7 +182,7 @@ void LVGLSimulator::mousePressEvent(QMouseEvent *event) {
         QColorDialog dialog(this);
         dialog.setCurrentColor(lvgl.screenColor());
         if (dialog.exec() == QDialog::Accepted)
-          lvgl.setScreenColor(dialog.selectedColor());
+          m_canvasActions->setScreenColor(dialog.selectedColor());
       }
     } else if (event->button() == Qt::LeftButton) {
       if (!m_item->isManipolating()) {
@@ -224,9 +228,7 @@ void LVGLSimulator::mouseMoveEvent(QMouseEvent *event) {
     const QPoint pos = mapToScene(event->position().toPoint()).toPoint();
     QPoint delta = pos - m_dragStartPos;
     QPoint newPos = m_dragObjStartPos + delta;
-    newPos.setX(qBound(0, newPos.x(), lvgl.width() - m_selectedObject->width() - 1));
-    newPos.setY(qBound(0, newPos.y(), lvgl.height() - m_selectedObject->height() - 1));
-    m_selectedObject->setPosition(newPos);
+    m_canvasActions->moveObjectTo(m_selectedObject, newPos, lvgl.size());
     m_item->updateGeometry();
     update();
     return;
@@ -248,33 +250,12 @@ void LVGLSimulator::dropEvent(QDropEvent *event) {
     stream >> cast.i;
     LVGLWidget *widgetClass = cast.ptr;
 
-    LVGLObject *newObj = nullptr;
-
     // check if moved into another widget
     QPoint pos = mapToScene(event->position().toPoint()).toPoint();
     auto parent = selectObject(objectsUnderCoords(pos, true), false);
 
-    // create new widget
-    if (parent) {
-      QPoint parentPos;
-      if (parent->widgetType() == LVGLWidget::TabView) {
-        lv_obj_t *obj = parent->obj();
-        parent = parent->findChildByIndex(lv_tabview_get_tab_act(obj));
-        Q_ASSERT(parent);
-      }
-      newObj = new LVGLObject(widgetClass, "", parent);
-      parentPos = parent->absolutePosition();
-      newObj->setGeometry(QRect(pos - parentPos, widgetClass->minimumSize()));
-    } else {
-      newObj = new LVGLObject(widgetClass, "", m_parent);
-      QSize size(std::min(widgetClass->minimumSize().width(), lvgl.width()),
-                 std::min(widgetClass->minimumSize().height(), lvgl.height()));
-      if (pos.x() + size.width() >= lvgl.width())
-        pos.setX(lvgl.width() - size.width());
-      if (pos.y() + size.height() >= lvgl.height())
-        pos.setY(lvgl.height() - size.height());
-      newObj->setGeometry(QRect(pos, size));
-    }
+    LVGLObject *newObj = m_canvasActions->createObject(
+        widgetClass, parent, m_parent, pos, lvgl.size());
 
     qDebug().noquote() << "Class:" << widgetClass->className()
                        << "Id:" << newObj->name();
@@ -344,16 +325,10 @@ void LVGLSimulator::setobjParent(lv_obj_t *parent) {
 
 LVGLItem *LVGLSimulator::item() const { return m_item; }
 
+CanvasActions *LVGLSimulator::canvasActions() const { return m_canvasActions; }
+
 void LVGLSimulator::moveObject(LVGLObject *obj, int dx, int dy) {
-  if (obj) {
-    if ((dx != 0) && (dy != 0)) {
-      obj->setPosition(obj->position() + QPoint(dx, dy));
-    } else if (dx != 0) {
-      obj->setX(qBound(0, obj->x() + dx, lvgl.width() - obj->width() - 1));
-    } else if (dy != 0) {
-      obj->setY(qBound(0, obj->y() + dy, lvgl.height() - obj->height() - 1));
-    }
-  }
+  m_canvasActions->moveObject(obj, dx, dy, lvgl.size());
 }
 
 void LVGLSimulator::addObject(LVGLObject *obj) {
@@ -376,7 +351,7 @@ void LVGLSimulator::addObject(LVGLObject *obj) {
 void LVGLSimulator::removeObject(LVGLObject *obj) {
   setSelectedObject(nullptr);
   if (m_objectModel) m_objectModel->beginRemoveObject(obj);
-  lvgl.removeObject(obj);
+  m_canvasActions->deleteObject(obj);
   if (m_objectModel) m_objectModel->endRemoveObject();
 }
 
