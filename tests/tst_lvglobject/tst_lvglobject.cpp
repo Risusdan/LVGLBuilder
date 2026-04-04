@@ -21,6 +21,7 @@ class TestLVGLObject : public QObject {
   void testJsonStylesShadowWidthUsesCorrectField();
   void testJsonStylesLineOpaUsesCorrectField();
   void testCodeStyleLineSpaceComparison();
+  void testRemoveChildClearsParentPointer();
 };
 
 void TestLVGLObject::testCodeNameSanitizesSpaces() {
@@ -133,6 +134,25 @@ void TestLVGLObject::testCodeStyleLineSpaceComparison() {
             hasLineSpace = true;
     }
     QVERIFY2(hasLineSpace, "codeStyle() should emit line_space when it differs from default");
+}
+
+void TestLVGLObject::testRemoveChildClearsParentPointer() {
+    const LVGLWidget *btnWidget = lvgl.widget("lv_btn");
+    auto *parent = new LVGLObject(btnWidget, "parent_btn", lv_scr_act());
+    lvgl.addObject(parent);
+
+    // Use the constructor that takes LVGLObject* parent — this adds child to parent's child list
+    auto *child = new LVGLObject(btnWidget, "child_btn", parent);
+    lvgl.addObject(child);
+
+    QCOMPARE(parent->childs().size(), 1);
+    QCOMPARE(child->parent(), parent);
+
+    parent->removeChild(child);
+
+    QCOMPARE(parent->childs().size(), 0);
+    // After removal, child's parent pointer should be null
+    QVERIFY(child->parent() == nullptr);
 }
 
 QTEST_MAIN(TestLVGLObject)

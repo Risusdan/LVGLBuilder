@@ -623,6 +623,8 @@ QList<LVGLObject *> LVGLObject::childs() const
 void LVGLObject::removeChild(LVGLObject *child)
 {
 	m_childs.removeOne(child);
+	if (child)
+		child->m_parent = nullptr;
 }
 
 bool LVGLObject::isAccessible() const
