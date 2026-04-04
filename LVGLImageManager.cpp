@@ -86,6 +86,8 @@ bool LVGLImageManager::removeImage(LVGLImageData *img) {
   for (auto it = m_images.begin(); it != m_images.end(); ++it) {
     if (it.value() == img) {
       m_images.remove(it.key());
+      if (m_default == img)
+        m_default = nullptr;
       delete img;
       return true;
     }
