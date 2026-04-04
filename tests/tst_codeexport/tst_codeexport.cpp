@@ -45,6 +45,52 @@ class TestCodeExport : public QObject {
     QVERIFY2(line.contains("270"),
              qPrintable("Missing end angle in: " + line));
   }
+  void testExportHeaderHasValidIdentifiers() {
+    const LVGLWidget *btnWidget = lvgl.widget("lv_btn");
+    auto *obj = new LVGLObject(btnWidget, "btn-test#1", lv_scr_act());
+    obj->setAccessible(true);
+    lvgl.addObject(obj);
+
+    LVGLProject project("Test App", QSize(320, 480));
+    QTemporaryDir tmpDir;
+    QVERIFY(tmpDir.isValid());
+    QVERIFY(project.exportCode(tmpDir.path()));
+
+    // Read the generated .h file
+    QFile hFile(tmpDir.path() + "/test app.h");
+    QVERIFY(hFile.open(QIODevice::ReadOnly));
+    QString hContent = hFile.readAll();
+    hFile.close();
+
+    // The extern declaration must use a sanitized name
+    QVERIFY(hContent.contains("extern lv_obj_t *btn_test_1;"));
+    // Must NOT contain the raw unsanitized name
+    QVERIFY(!hContent.contains("btn-test#1"));
+  }
+
+  void testExportCFileStructure() {
+    const LVGLWidget *btnWidget = lvgl.widget("lv_btn");
+    auto *obj = new LVGLObject(btnWidget, "my_button", lv_scr_act());
+    lvgl.addObject(obj);
+
+    LVGLProject project("TestApp", QSize(320, 480));
+    QTemporaryDir tmpDir;
+    QVERIFY(tmpDir.isValid());
+    QVERIFY(project.exportCode(tmpDir.path()));
+
+    // Read the generated .c file
+    QFile cFile(tmpDir.path() + "/testapp.c");
+    QVERIFY(cFile.open(QIODevice::ReadOnly));
+    QString cContent = cFile.readAll();
+    cFile.close();
+
+    // Must include the header
+    QVERIFY(cContent.contains("#include \"testapp.h\""));
+    // Must have the create function
+    QVERIFY(cContent.contains("void testapp_create(lv_obj_t *parent)"));
+    // Must have the widget creation call
+    QVERIFY(cContent.contains("lv_btn_create(parent, NULL)"));
+  }
 };
 
 QTEST_MAIN(TestCodeExport)
