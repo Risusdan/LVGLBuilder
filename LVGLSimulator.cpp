@@ -231,7 +231,8 @@ void LVGLSimulator::mouseMoveEvent(QMouseEvent *event) {
   if (m_mouseEnabled) {
     const QPoint pos = mapToScene(event->position().toPoint()).toPoint();
     lvgl.sendMouseEvent(pos.x(), pos.y(), event->buttons() & Qt::LeftButton);
-  } else if (m_dragging && m_selectionManager->selectedObject() &&
+  } else if (m_dragging && !m_item->isManipolating() &&
+             m_selectionManager->selectedObject() &&
              m_selectionManager->selectedObject()->isMovable()) {
     const QPoint pos = mapToScene(event->position().toPoint()).toPoint();
     QPoint delta = pos - m_dragStartPos;
