@@ -8,6 +8,7 @@
 #include "lvgl/lvgl.h"
 
 class CanvasActions;
+class DragDropHandler;
 class LVGLObject;
 class LVGLItem;
 class LVGLObjectModel;
@@ -89,6 +90,7 @@ class LVGLSimulator : public QGraphicsView {
   LVGLScene *m_scene;
   CanvasActions *m_canvasActions;
   SelectionManager *m_selectionManager;
+  DragDropHandler *m_dragDropHandler;
   bool m_mouseEnabled;
   LVGLItem *m_item;
   LVGLObjectModel *m_objectModel;

@@ -17,6 +17,7 @@
 #include <QThread>
 
 #include "CanvasActions.h"
+#include "DragDropHandler.h"
 #include "LVGLCore.h"
 #include "LVGLFontData.h"
 #include "LVGLItem.h"
@@ -76,6 +77,7 @@ LVGLSimulator::LVGLSimulator(QWidget *parent)
       m_scene(new LVGLScene),
       m_canvasActions(new CanvasActions(this)),
       m_selectionManager(new SelectionManager(this)),
+      m_dragDropHandler(new DragDropHandler(m_canvasActions, m_selectionManager, this)),
       m_mouseEnabled(false),
       m_item(new LVGLItem),
       m_objectModel(nullptr),
@@ -246,28 +248,25 @@ void LVGLSimulator::mouseMoveEvent(QMouseEvent *event) {
 void LVGLSimulator::dropEvent(QDropEvent *event) {
   if (m_mouseEnabled) return;
 
-  m_scene->setHoverObject(nullptr);
-
-  LVGLWidgetCast cast;
+  m_selectionManager->setHoverObject(nullptr);
 
   const QMimeData *mimeData = event->mimeData();
   if (mimeData->hasFormat("application/x-widget")) {
+    LVGLWidgetCast cast;
     QByteArray encoded = mimeData->data("application/x-widget");
     QDataStream stream(&encoded, QIODevice::ReadOnly);
     stream >> cast.i;
     LVGLWidget *widgetClass = cast.ptr;
 
-    // check if moved into another widget
     QPoint pos = mapToScene(event->position().toPoint()).toPoint();
-    auto parent = m_selectionManager->selectObject(
-        m_selectionManager->objectsUnderCoords(pos, true), false);
+    LVGLObject *newObj = m_dragDropHandler->handleDrop(
+        pos, widgetClass, m_parent, lvgl.size());
 
-    LVGLObject *newObj = m_canvasActions->createObject(
-        widgetClass, parent, m_parent, pos, lvgl.size());
-
-    qDebug().noquote() << "Class:" << widgetClass->className()
-                       << "Id:" << newObj->name();
-    addObject(newObj);
+    if (newObj) {
+      qDebug().noquote() << "Class:" << widgetClass->className()
+                         << "Id:" << newObj->name();
+      addObject(newObj);
+    }
   }
 }
 
@@ -275,9 +274,7 @@ void LVGLSimulator::dragMoveEvent(QDragMoveEvent *event) {
   if (m_mouseEnabled) return;
 
   const QPoint pos = mapToScene(event->position().toPoint()).toPoint();
-  auto sel = m_selectionManager->selectObject(
-      m_selectionManager->objectsUnderCoords(pos, true), false);
-  m_scene->setHoverObject(sel);
+  m_dragDropHandler->handleDragMove(pos);
 
   event->acceptProposedAction();
 }
