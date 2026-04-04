@@ -7,6 +7,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QMessageBox>
+#include <QRegularExpression>
 
 #include "LVGLCore.h"
 #include "LVGLObject.h"
@@ -149,8 +150,9 @@ bool LVGLProject::exportCode(const QString &path) const
 	QFile file;
 	QTextStream stream;
 	const QString name = m_name.toLower();
-	const QString codeName = m_name.toLower().replace(" ", "_");
-	const QString defName = m_name.toUpper().replace(" ", "_");
+	static const QRegularExpression re("[^a-zA-Z0-9_]");
+	const QString codeName = m_name.toLower().replace(re, "_");
+	const QString defName = m_name.toUpper().replace(re, "_");
 
 	file.setFileName(dir.path() + "/" + name + ".h");
 	if (!file.open(QIODevice::WriteOnly))

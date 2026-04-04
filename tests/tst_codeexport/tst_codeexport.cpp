@@ -68,6 +68,36 @@ class TestCodeExport : public QObject {
     QVERIFY(!hContent.contains("btn-test#1"));
   }
 
+  void testExportSanitizesProjectName() {
+    const LVGLWidget *btnWidget = lvgl.widget("lv_btn");
+    auto *obj = new LVGLObject(btnWidget, "btn1", lv_scr_act());
+    lvgl.addObject(obj);
+
+    LVGLProject project("My App-v2", QSize(320, 480));
+    QTemporaryDir tmpDir;
+    QVERIFY(tmpDir.isValid());
+    QVERIFY(project.exportCode(tmpDir.path()));
+
+    // Read the .c file
+    QFile cFile(tmpDir.path() + "/my app-v2.c");
+    QVERIFY(cFile.open(QIODevice::ReadOnly));
+    QString cContent = cFile.readAll();
+    cFile.close();
+
+    // The function name must use underscores, not spaces or dashes
+    QVERIFY(cContent.contains("void my_app_v2_create(lv_obj_t *parent)"));
+
+    // Read the .h file — check header guard
+    QFile hFile(tmpDir.path() + "/my app-v2.h");
+    QVERIFY(hFile.open(QIODevice::ReadOnly));
+    QString hContent = hFile.readAll();
+    hFile.close();
+
+    // Header guard must be valid C preprocessor identifier
+    QVERIFY(hContent.contains("#ifndef MY_APP_V2_H"));
+    QVERIFY(hContent.contains("#define MY_APP_V2_H"));
+  }
+
   void testExportCFileStructure() {
     const LVGLWidget *btnWidget = lvgl.widget("lv_btn");
     auto *obj = new LVGLObject(btnWidget, "my_button", lv_scr_act());
