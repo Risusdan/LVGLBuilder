@@ -4,6 +4,7 @@
 #include "lvgl/lvgl/src/lv_objx/lv_canvas.h"
 
 #include <QJsonArray>
+#include <QRegularExpression>
 
 LVGLObject::LVGLObject(const LVGLWidget *widgetClass, QString name, LVGLObject *parent)
 	: m_obj(widgetClass->newObject(parent->obj())), m_widgetClass(widgetClass)
@@ -69,7 +70,12 @@ void LVGLObject::setName(const QString &name)
 
 QString LVGLObject::codeName() const
 {
-	return name().toLower().replace(" ", "_");
+	QString result = name().toLower();
+	static const QRegularExpression re("[^a-z0-9_]");
+	result.replace(re, "_");
+	if (!result.isEmpty() && result.at(0).isDigit())
+		result.prepend('_');
+	return result;
 }
 
 bool LVGLObject::isLocked() const
