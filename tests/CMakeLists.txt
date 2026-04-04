@@ -8,6 +8,7 @@ find_package(Qt6 REQUIRED COMPONENTS Test)
 # App sources (same as top-level APP_SOURCES, minus main.cpp)
 # ---------------------------------------------------------------------------
 set(APP_SOURCES_NO_MAIN
+    ${CMAKE_SOURCE_DIR}/AssetManager.cpp
     ${CMAKE_SOURCE_DIR}/LVGLCore.cpp
     ${CMAKE_SOURCE_DIR}/LVGLDisplay.cpp
     ${CMAKE_SOURCE_DIR}/LVGLFontManager.cpp

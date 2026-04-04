@@ -11,6 +11,7 @@ class LVGLImageData;
 class LVGLFontData;
 class ProjectManager;
 class RecentFilesManager;
+class AssetManager;
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -55,18 +56,13 @@ class MainWindow : public QMainWindow {
   void showEvent(QShowEvent *event);
 
  private:
-  void addImage(LVGLImageData *img, QString name);
-  void updateImages();
-
-  void addFont(LVGLFontData *font, QString name);
-  void updateFonts();
-
   void loadProject(const QString &fileName);
   void setEnableBuilder(bool enable);
 
   Ui::MainWindow *m_ui;
   QSlider *m_zoom_slider;
   ProjectManager *m_projectManager;
+  AssetManager *m_assetManager;
 
   class LVGLPropertyModel *m_propertyModel;
   class LVGLStyleModel *m_styleModel;

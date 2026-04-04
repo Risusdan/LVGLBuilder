@@ -7,6 +7,7 @@
 #include <QSettings>
 #include <QSortFilterProxyModel>
 
+#include "AssetManager.h"
 #include "LVGLDialog.h"
 #include "LVGLFontData.h"
 #include "LVGLFontDialog.h"
@@ -95,6 +96,35 @@ MainWindow::MainWindow(QWidget *parent)
   connect(m_recentFilesManager, &RecentFilesManager::fileSelected,
           this, [this](const QString &f) { loadProject(f); });
 
+  // asset manager
+  m_assetManager = new AssetManager(this);
+  connect(m_assetManager, &AssetManager::imageListChanged, this,
+          [this](const QList<LVGLImageData *> &images) {
+            m_ui->list_images->clear();
+            for (LVGLImageData *i : images) {
+              if (i->fileName().isEmpty()) continue;
+              QString name =
+                  QFileInfo(i->fileName()).baseName() +
+                  QString(" [%1x%2]").arg(i->width()).arg(i->height());
+              LVGLImageDataCast cast;
+              cast.ptr = i;
+              QListWidgetItem *item = new QListWidgetItem(i->icon(), name);
+              item->setData(Qt::UserRole + 3, cast.i);
+              m_ui->list_images->addItem(item);
+            }
+          });
+  connect(m_assetManager, &AssetManager::fontListChanged, this,
+          [this](const QList<const LVGLFontData *> &fonts) {
+            m_ui->list_fonts->clear();
+            for (const LVGLFontData *f : fonts) {
+              LVGLFontDataCast cast;
+              cast.ptr = const_cast<LVGLFontData *>(f);
+              QListWidgetItem *item = new QListWidgetItem(f->name());
+              item->setData(Qt::UserRole + 3, cast.i);
+              m_ui->list_fonts->addItem(item);
+            }
+          });
+
   // add style editor dock to property dock and show the property dock
   tabifyDockWidget(m_ui->PropertyEditor, m_ui->StyleEditor);
   m_ui->PropertyEditor->raise();
@@ -182,40 +212,6 @@ void MainWindow::openNewProject() {
   }
 }
 
-void MainWindow::addImage(LVGLImageData *img, QString name) {
-  LVGLImageDataCast cast;
-  cast.ptr = img;
-
-  QListWidgetItem *item = new QListWidgetItem(img->icon(), name);
-  item->setData(Qt::UserRole + 3, cast.i);
-  m_ui->list_images->addItem(item);
-}
-
-void MainWindow::updateImages() {
-  m_ui->list_images->clear();
-  for (LVGLImageData *i : lvgl.images()) {
-    if (i->fileName().isEmpty()) continue;
-    QString name = QFileInfo(i->fileName()).baseName() +
-                   QString(" [%1x%2]").arg(i->width()).arg(i->height());
-    addImage(i, name);
-  }
-}
-
-void MainWindow::addFont(LVGLFontData *font, QString name) {
-  LVGLFontDataCast cast;
-  cast.ptr = font;
-
-  QListWidgetItem *item = new QListWidgetItem(name);
-  item->setData(Qt::UserRole + 3, cast.i);
-  m_ui->list_fonts->addItem(item);
-}
-
-void MainWindow::updateFonts() {
-  m_ui->list_fonts->clear();
-  for (const LVGLFontData *f : lvgl.customFonts())
-    addFont(const_cast<LVGLFontData *>(f), f->name());
-}
-
 void MainWindow::loadProject(const QString &fileName) {
   m_simulator->clear();
   if (!m_projectManager->loadProject(fileName)) {
@@ -230,8 +226,8 @@ void MainWindow::loadProject(const QString &fileName) {
     m_simulator->changeResolution(res);
     setEnableBuilder(true);
   }
-  updateImages();
-  updateFonts();
+  m_assetManager->refreshImageList();
+  m_assetManager->refreshFontList();
 }
 
 void MainWindow::setEnableBuilder(bool enable) {
@@ -304,21 +300,18 @@ void MainWindow::on_button_add_image_clicked() {
     }
 
     QString name = QFileInfo(fileName).baseName();
-    LVGLImageData *i = lvgl.addImage(fileName, name);
-    name += QString(" [%1x%2]").arg(i->width()).arg(i->height());
-    addImage(i, name);
+    m_assetManager->addImageFile(fileName, name);
   }
 }
 
 void MainWindow::on_button_remove_image_clicked() {
   QListWidgetItem *item = m_ui->list_images->currentItem();
   if (item == nullptr) return;
-  const int row = m_ui->list_images->currentRow();
 
   LVGLImageDataCast cast;
   cast.i = item->data(Qt::UserRole + 3).toLongLong();
 
-  if (lvgl.removeImage(cast.ptr)) m_ui->list_images->takeItem(row);
+  m_assetManager->removeImage(cast.ptr);
 }
 
 void MainWindow::on_list_images_customContextMenuRequested(const QPoint &pos) {
@@ -372,22 +365,19 @@ void MainWindow::on_button_add_font_clicked() {
   LVGLFontDialog dialog(this);
   if (dialog.exec() != QDialog::Accepted) return;
   LVGLFontData *f =
-      lvgl.addFont(dialog.selectedFontPath(), dialog.selectedFontSize());
-  if (f)
-    addFont(f, f->name());
-  else
+      m_assetManager->addFont(dialog.selectedFontPath(), dialog.selectedFontSize());
+  if (!f)
     QMessageBox::critical(this, "Error", "Could not load font!");
 }
 
 void MainWindow::on_button_remove_font_clicked() {
   QListWidgetItem *item = m_ui->list_fonts->currentItem();
   if (item == nullptr) return;
-  const int row = m_ui->list_fonts->currentRow();
 
   LVGLFontDataCast cast;
   cast.i = item->data(Qt::UserRole + 3).toLongLong();
 
-  if (lvgl.removeFont(cast.ptr)) m_ui->list_fonts->takeItem(row);
+  m_assetManager->removeFont(cast.ptr);
 }
 
 void MainWindow::on_list_fonts_customContextMenuRequested(const QPoint &pos) {
