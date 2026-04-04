@@ -34,6 +34,7 @@ set(APP_SOURCES_NO_MAIN
     ${CMAKE_SOURCE_DIR}/LVGLWorker.cpp
     ${CMAKE_SOURCE_DIR}/MainWindow.cpp
     ${CMAKE_SOURCE_DIR}/ProjectManager.cpp
+    ${CMAKE_SOURCE_DIR}/RecentFilesManager.cpp
     ${CMAKE_SOURCE_DIR}/properties/LVGLPropertyAssignTextArea.cpp
     ${CMAKE_SOURCE_DIR}/properties/LVGLPropertyColor.cpp
     ${CMAKE_SOURCE_DIR}/properties/LVGLPropertyDate.cpp

@@ -119,6 +119,7 @@ set(APP_SOURCES
     main.cpp
     MainWindow.cpp
     ProjectManager.cpp
+    RecentFilesManager.cpp
     properties/LVGLPropertyAssignTextArea.cpp
     properties/LVGLPropertyColor.cpp
     properties/LVGLPropertyDate.cpp

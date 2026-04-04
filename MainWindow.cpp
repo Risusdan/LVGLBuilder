@@ -16,6 +16,7 @@
 #include "LVGLProject.h"
 #include "LVGLPropertyModel.h"
 #include "ProjectManager.h"
+#include "RecentFilesManager.h"
 #include "LVGLSimulator.h"
 #include "LVGLStyleModel.h"
 #include "LVGLTabWidget.h"
@@ -28,7 +29,6 @@ MainWindow::MainWindow(QWidget *parent)
       m_ui(new Ui::MainWindow),
       m_zoom_slider(new QSlider(Qt::Horizontal)),
       m_projectManager(new ProjectManager(this)),
-      m_maxFileNr(5),
       m_firstrun(true),
       m_simulator(new LVGLSimulator(this)),
       m_lastindex(-1) {
@@ -90,16 +90,10 @@ MainWindow::MainWindow(QWidget *parent)
   m_ui->style_tree->expandAll();
 
   // recent configurations
-  QAction *recentFileAction = nullptr;
-  for (int i = 0; i < m_maxFileNr; i++) {
-    recentFileAction = new QAction(this);
-    recentFileAction->setVisible(false);
-    connect(recentFileAction, &QAction::triggered, this,
-            &MainWindow::loadRecent);
-    m_recentFileActionList.append(recentFileAction);
-    m_ui->menu_resent_filess->addAction(recentFileAction);
-  }
-  updateRecentActionList();
+  m_recentFilesManager = new RecentFilesManager(5, this);
+  m_recentFilesManager->setupMenu(m_ui->menu_resent_filess);
+  connect(m_recentFilesManager, &RecentFilesManager::fileSelected,
+          this, [this](const QString &f) { loadProject(f); });
 
   // add style editor dock to property dock and show the property dock
   tabifyDockWidget(m_ui->PropertyEditor, m_ui->StyleEditor);
@@ -165,12 +159,6 @@ void MainWindow::styleChanged() {
   }
 }
 
-void MainWindow::loadRecent() {
-  QAction *action = qobject_cast<QAction *>(QObject::sender());
-  if (action == nullptr) return;
-  loadProject(action->data().toString());
-}
-
 void MainWindow::openNewProject() {
   LVGLNewDialog dialog(this);
   if (dialog.exec() == QDialog::Accepted) {
@@ -228,38 +216,6 @@ void MainWindow::updateFonts() {
     addFont(const_cast<LVGLFontData *>(f), f->name());
 }
 
-void MainWindow::updateRecentActionList() {
-  QSettings settings("at.fhooe.lvgl", "LVGL Builder");
-  QStringList recentFilePaths;
-  for (const QString &f : settings.value("recentFiles").toStringList()) {
-    if (QFile(f).exists()) recentFilePaths.push_back(f);
-  }
-
-  int itEnd = m_maxFileNr;
-  if (recentFilePaths.size() <= m_maxFileNr) itEnd = recentFilePaths.size();
-
-  for (int i = 0; i < itEnd; i++) {
-    QString strippedName = QFileInfo(recentFilePaths.at(i)).fileName();
-    m_recentFileActionList.at(i)->setText(strippedName);
-    m_recentFileActionList.at(i)->setData(recentFilePaths.at(i));
-    m_recentFileActionList.at(i)->setVisible(true);
-  }
-
-  for (int i = itEnd; i < m_maxFileNr; i++)
-    m_recentFileActionList.at(i)->setVisible(false);
-}
-
-void MainWindow::adjustForCurrentFile(const QString &fileName) {
-  QSettings settings("at.fhooe.lvgl", "LVGL Builder");
-  QStringList recentFilePaths = settings.value("recentFiles").toStringList();
-  recentFilePaths.removeAll(fileName);
-  recentFilePaths.prepend(fileName);
-  while (recentFilePaths.size() > m_maxFileNr) recentFilePaths.removeLast();
-  settings.setValue("recentFiles", recentFilePaths);
-
-  updateRecentActionList();
-}
-
 void MainWindow::loadProject(const QString &fileName) {
   m_simulator->clear();
   if (!m_projectManager->loadProject(fileName)) {
@@ -267,7 +223,7 @@ void MainWindow::loadProject(const QString &fileName) {
     setWindowTitle("LVGL Builder");
     setEnableBuilder(false);
   } else {
-    adjustForCurrentFile(fileName);
+    m_recentFilesManager->addFile(fileName);
     setWindowTitle("LVGL Builder - [" + m_projectManager->projectName() + "]");
     const auto res = m_projectManager->project()->resolution();
     lvgl.changeResolution(res);
@@ -306,7 +262,7 @@ void MainWindow::on_action_save_triggered() {
   if (!m_projectManager->saveProject(fileName)) {
     QMessageBox::critical(this, "Error", "Could not save lvgl file!");
   } else {
-    adjustForCurrentFile(fileName);
+    m_recentFilesManager->addFile(fileName);
   }
 }
 

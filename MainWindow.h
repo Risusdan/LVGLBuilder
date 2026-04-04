@@ -10,6 +10,7 @@ class LVGLObject;
 class LVGLImageData;
 class LVGLFontData;
 class ProjectManager;
+class RecentFilesManager;
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -30,7 +31,6 @@ class MainWindow : public QMainWindow {
   void updateProperty();
   void setCurrentObject(LVGLObject *obj);
   void styleChanged();
-  void loadRecent();
   void openNewProject();
 
   void on_action_load_triggered();
@@ -61,8 +61,6 @@ class MainWindow : public QMainWindow {
   void addFont(LVGLFontData *font, QString name);
   void updateFonts();
 
-  void updateRecentActionList();
-  void adjustForCurrentFile(const QString &fileName);
   void loadProject(const QString &fileName);
   void setEnableBuilder(bool enable);
 
@@ -74,8 +72,7 @@ class MainWindow : public QMainWindow {
   class LVGLStyleModel *m_styleModel;
   class LVGLObjectModel *m_objectModel;
 
-  QList<QAction *> m_recentFileActionList;
-  const int m_maxFileNr;
+  RecentFilesManager *m_recentFilesManager;
   bool m_firstrun;
   LVGLSimulator *m_simulator;
   int m_lastindex;
