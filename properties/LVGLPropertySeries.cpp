@@ -39,7 +39,7 @@ class LVGLPropertySeriesDelegate : public QStyledItemDelegate
 {
 	LVGLPropertySeriesDialog *m_dialog;
 public:
-	LVGLPropertySeriesDelegate(LVGLPropertySeriesDialog *dialog) : m_dialog(dialog) {}
+	LVGLPropertySeriesDelegate(LVGLPropertySeriesDialog *dialog) : QStyledItemDelegate(dialog), m_dialog(dialog) {}
 
 	QWidget *createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const override
 	{

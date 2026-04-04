@@ -18,6 +18,7 @@
 class LVGLPropertyListDelegate : public QStyledItemDelegate
 {
 public:
+	LVGLPropertyListDelegate(QObject *parent = nullptr) : QStyledItemDelegate(parent) {}
 	inline QWidget *createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const override {
 		Q_UNUSED(option)
 		if (!index.isValid())
@@ -69,7 +70,7 @@ LVGLPropertyListDialog::LVGLPropertyListDialog(QWidget *parent)
 	m_list = new QTreeWidget(this);
 	m_list->setColumnCount(2);
 	m_list->setHeaderLabels(QStringList() << "Name" << "Image");
-	m_list->setItemDelegate(new LVGLPropertyListDelegate);
+	m_list->setItemDelegate(new LVGLPropertyListDelegate(this));
 	QDialogButtonBox *box = new QDialogButtonBox(QDialogButtonBox::Ok |
 																QDialogButtonBox::Cancel);
 	QToolButton *add = new QToolButton();

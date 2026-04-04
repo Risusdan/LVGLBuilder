@@ -12,6 +12,11 @@ public:
 	inline QString name() const override { return "Buttons"; }
 	inline ~LVGLPropertyMBoxButtons()
 	{
+		for (auto &entry : m_garbageCollector) {
+			for (int i = 0; i <= entry.second; ++i)
+				delete[] entry.first[i];
+			delete[] entry.first;
+		}
 	}
 
 protected:
@@ -36,9 +41,12 @@ protected:
 		}
 		map[list.size()] = new char[1];
 		map[list.size()][0] = '\0';
+		m_garbageCollector << qMakePair(map, list.size());
 		lv_mbox_add_btns(obj->obj(), const_cast<const char**>(map));
 	}
 
+private:
+	QList<QPair<char**, int>> m_garbageCollector;
 };
 
 LVGLMessageBox::LVGLMessageBox()

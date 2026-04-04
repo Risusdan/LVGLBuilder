@@ -1,6 +1,7 @@
 #include "LVGLObject.h"
 
 #include "LVGLCore.h"
+#include "lvgl/lvgl/src/lv_objx/lv_canvas.h"
 
 #include <QJsonArray>
 
@@ -41,6 +42,10 @@ LVGLObject::LVGLObject(lv_obj_t *obj, const LVGLWidget *widgetClass, LVGLObject 
 
 LVGLObject::~LVGLObject()
 {
+	if (m_widgetClass && m_widgetClass->type() == LVGLWidget::Canvas) {
+		lv_canvas_ext_t *ext = reinterpret_cast<lv_canvas_ext_t*>(lv_obj_get_ext_attr(m_obj));
+		delete[] reinterpret_cast<lv_color_t*>(const_cast<uint8_t*>(ext->dsc.data));
+	}
 	lv_obj_del(m_obj);
 }
 
