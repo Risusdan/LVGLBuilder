@@ -185,34 +185,32 @@ void LVGLItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
 
       if (obj->coords.x1 + delta < bounds.x())
         delta = bounds.x() - obj->coords.x1;
-      if (delta == 0) return;
 
       int newWidth = m_object->width() - delta;
-      if (newWidth < m_minimumWidth) return;
-
-      moveBy(delta, 0);
-      m_object->setWidth(newWidth);
+      if (delta != 0 && newWidth >= m_minimumWidth) {
+        moveBy(delta, 0);
+        m_object->setWidth(newWidth);
+      }
     }
     if (m_direction.vertical == ResizeDirections::Bottom) {
       const QPoint abs = m_object->absolutePosition();
       const auto delta = pos.y() - m_start.y();
       const lv_coord_t newSize =
           static_cast<lv_coord_t>(m_start.height() + delta);
-      const lv_coord_t maximumWidth =
+      const lv_coord_t maximumHeight =
           static_cast<lv_coord_t>(lvgl.height() - abs.y());
-      m_object->setHeight(qBound(m_minimumHeight, newSize, maximumWidth));
+      m_object->setHeight(qBound(m_minimumHeight, newSize, maximumHeight));
     } else if (m_direction.vertical == ResizeDirections::Top) {
       int delta = pos.toPoint().y() - m_start.toRect().y();
 
       if (obj->coords.y1 + delta < bounds.y())
         delta = bounds.y() - obj->coords.y1;
-      if (delta == 0) return;
 
       int newHeight = m_object->height() - delta;
-      if (newHeight < m_minimumHeight) return;
-
-      moveBy(0, delta);
-      m_object->setHeight(newHeight);
+      if (delta != 0 && newHeight >= m_minimumHeight) {
+        moveBy(0, delta);
+        m_object->setHeight(newHeight);
+      }
     }
     emit geometryChanged();
   } else {
