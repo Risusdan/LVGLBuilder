@@ -167,6 +167,7 @@ void LVGLItem::mousePressEvent(QGraphicsSceneMouseEvent *event) {
 
 void LVGLItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
   if (m_direction.any() && m_object && m_object->isMovable()) {
+    prepareGeometryChange();
     lv_obj_t *obj = m_object->obj();
     const QPointF &pos = event->pos();
     QRect bounds = (m_object->parent() ? m_object->parent()->geometry()
@@ -191,7 +192,6 @@ void LVGLItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
 
       moveBy(delta, 0);
       m_object->setWidth(newWidth);
-      emit geometryChanged();
     }
     if (m_direction.vertical == ResizeDirections::Bottom) {
       const QPoint abs = m_object->absolutePosition();
@@ -213,8 +213,8 @@ void LVGLItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
 
       moveBy(0, delta);
       m_object->setHeight(newHeight);
-      emit geometryChanged();
     }
+    emit geometryChanged();
   } else {
     QGraphicsItem::mouseMoveEvent(event);
   }
