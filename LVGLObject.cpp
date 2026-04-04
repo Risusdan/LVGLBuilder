@@ -612,7 +612,7 @@ lv_style_t *LVGLObject::style(int type)
 
 QString LVGLObject::styleCodeName(int type) const
 {
-	return "style" + QString::number(type) + "_" + name().toLower().replace(' ', '_');
+	return "style" + QString::number(type) + "_" + codeName();
 }
 
 QList<LVGLObject *> LVGLObject::childs() const

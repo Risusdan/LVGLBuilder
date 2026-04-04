@@ -1,5 +1,6 @@
 #include <QtTest>
 #include <QJsonArray>
+#include <QRegularExpression>
 
 #include "LVGLCore.h"
 #include "LVGLObject.h"
@@ -22,6 +23,7 @@ class TestLVGLObject : public QObject {
   void testJsonStylesLineOpaUsesCorrectField();
   void testCodeStyleLineSpaceComparison();
   void testRemoveChildClearsParentPointer();
+  void testStyleCodeNameSanitizesSpecialChars();
 };
 
 void TestLVGLObject::testCodeNameSanitizesSpaces() {
@@ -153,6 +155,18 @@ void TestLVGLObject::testRemoveChildClearsParentPointer() {
     QCOMPARE(parent->childs().size(), 0);
     // After removal, child's parent pointer should be null
     QVERIFY(child->parent() == nullptr);
+}
+
+void TestLVGLObject::testStyleCodeNameSanitizesSpecialChars() {
+    const LVGLWidget *btnWidget = lvgl.widget("lv_btn");
+    auto *obj = new LVGLObject(btnWidget, "btn-test#1", lv_scr_act());
+    lvgl.addObject(obj);
+
+    QString styleName = obj->styleCodeName(0);
+    // Must be a valid C identifier
+    QRegularExpression validCIdent("^[a-zA-Z_][a-zA-Z0-9_]*$");
+    QVERIFY2(validCIdent.match(styleName).hasMatch(),
+             qPrintable("styleCodeName produced invalid C identifier: " + styleName));
 }
 
 QTEST_MAIN(TestLVGLObject)
