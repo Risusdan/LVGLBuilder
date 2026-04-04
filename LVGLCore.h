@@ -3,13 +3,12 @@
 
 #include <lvgl/lvgl.h>
 
-#include <QElapsedTimer>
 #include <QHash>
 #include <QList>
 #include <QObject>
 #include <QPixmap>
-#include <QTimer>
 
+#include "LVGLDisplay.h"
 #include "LVGLImageData.h"
 #include "LVGLImageManager.h"
 #include "LVGLFontManager.h"
@@ -39,6 +38,7 @@ class LVGLCore : public QObject {
   int height() const;
   QSize size() const;
 
+  LVGLDisplay *display() const { return m_display; }
   LVGLImageManager *imageManager() const { return m_imageManager; }
   LVGLFontManager *fontManager() const { return m_fontManager; }
   LVGLObjectManager *objectManager() const { return m_objectManager; }
@@ -111,36 +111,14 @@ class LVGLCore : public QObject {
   static const char *DEFAULT_DAYS[7];
   static const char *DEFAULT_MONTHS[12];
 
- private slots:
-  void tick();
-
  private:
   void registerWidget(LVGLWidget *w);
-  void flushHandler(lv_disp_drv_t *disp, const lv_area_t *area,
-                    lv_color_t *color_p);
-  bool inputHandler(lv_indev_drv_t *indev_driver, lv_indev_data_t *data);
 
-  static void flushCb(lv_disp_drv_t *disp, const lv_area_t *area,
-                      lv_color_t *color_p);
-  static bool inputCb(lv_indev_drv_t *indev_driver, lv_indev_data_t *data);
-  static void logCb(lv_log_level_t level, const char *file, uint32_t line,
-                    const char *dsc);
-
-  QTimer m_timer;
-  QElapsedTimer m_time;
+  LVGLDisplay *m_display;
   LVGLImageManager *m_imageManager;
   LVGLFontManager *m_fontManager;
   LVGLObjectManager *m_objectManager;
   LVGLWidgetRegistry *m_widgetRegistry;
-  lv_style_t m_screenStyle;
-
-  std::vector<lv_color_t> m_dispFrameBuf;
-  std::vector<lv_color_t> m_buf1;
-  std::vector<lv_color_t> m_buf2;
-  lv_disp_buf_t m_dispBuf;
-  lv_disp_drv_t m_dispDrv;
-
-  lv_indev_data_t m_inputData;
 };
 
 extern LVGLCore lvgl;

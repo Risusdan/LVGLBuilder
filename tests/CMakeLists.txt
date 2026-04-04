@@ -9,6 +9,7 @@ find_package(Qt6 REQUIRED COMPONENTS Test)
 # ---------------------------------------------------------------------------
 set(APP_SOURCES_NO_MAIN
     ${CMAKE_SOURCE_DIR}/LVGLCore.cpp
+    ${CMAKE_SOURCE_DIR}/LVGLDisplay.cpp
     ${CMAKE_SOURCE_DIR}/LVGLFontManager.cpp
     ${CMAKE_SOURCE_DIR}/LVGLImageManager.cpp
     ${CMAKE_SOURCE_DIR}/LVGLObjectManager.cpp

@@ -93,6 +93,7 @@ target_compile_definitions(freetype PRIVATE
 # ---------------------------------------------------------------------------
 set(APP_SOURCES
     LVGLCore.cpp
+    LVGLDisplay.cpp
     LVGLFontManager.cpp
     LVGLImageManager.cpp
     LVGLObjectManager.cpp
