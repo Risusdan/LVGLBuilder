@@ -295,7 +295,6 @@ void LVGLCore::registerWidget(LVGLWidget *w) {
 
   w->setPreview(
       /*grab(QRect(QPoint(0, 0), size))*/ framebuffer().copy({{0, 0}, size}));
-  w->preview().save(w->name() + ".png");
   lv_obj_del(o);
 
   lv_scr_load(lv_scr_act());
