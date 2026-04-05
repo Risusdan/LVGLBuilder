@@ -173,10 +173,11 @@ LVGLPropertySeriesDialog::LVGLPropertySeriesDialog(QWidget *parent)
 		m_dataList->addItem(item);
 	});
 	connect(rem2, &QPushButton::clicked, [this](bool) {
-		int idx = m_seriesList->currentRow();
-		if (idx > -1) {
-			m_dataList->takeItem(idx);
-			m_series[m_seriesList->currentRow()].points.removeAt(idx);
+		int seriesIdx = m_seriesList->currentRow();
+		int dataIdx = m_dataList->currentRow();
+		if (seriesIdx > -1 && dataIdx > -1) {
+			m_dataList->takeItem(dataIdx);
+			m_series[seriesIdx].points.removeAt(dataIdx);
 		}
 	});
 

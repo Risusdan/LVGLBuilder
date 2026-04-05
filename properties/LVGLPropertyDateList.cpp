@@ -77,6 +77,7 @@ public:
 				item->setFlags(item->flags() | Qt::ItemIsEditable);
 				m_list->addTopLevelItem(item);
 			} else if (b == rem) {
+				if (m_list->currentItem() == nullptr) return;
 				int index = m_list->indexOfTopLevelItem(m_list->currentItem());
 				m_list->takeTopLevelItem(index);
 			}
