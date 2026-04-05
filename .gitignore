@@ -6,4 +6,3 @@ build/
 *.app/
 .claude/
 docs/superpowers/
-docs/testing-strategy.md
