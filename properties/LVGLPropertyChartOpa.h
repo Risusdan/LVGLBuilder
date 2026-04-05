@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYCHARTOPA_H
 #define LVGLPROPERTYCHARTOPA_H
 
+/**
+ * @file LVGLPropertyChartOpa.h
+ * @brief LVGLProperty subclass for lv_chart series opacity.
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

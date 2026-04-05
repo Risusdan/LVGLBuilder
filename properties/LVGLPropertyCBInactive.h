@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYCBINACTIVE_H
 #define LVGLPROPERTYCBINACTIVE_H
 
+/**
+ * @file LVGLPropertyCBInactive.h
+ * @brief LVGLProperty subclass for lv_cb inactive (disabled) state.
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

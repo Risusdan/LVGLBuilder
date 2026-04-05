@@ -6,6 +6,11 @@
 #include <QJsonArray>
 #include <QRegularExpression>
 
+// Constructor variants handle different creation contexts:
+// 1. User drag-drop (LVGLObject parent) — most common path
+// 2. Root object creation (raw lv_obj_t parent) — no LVGLObject parent
+// 3. Explicit LVGL parent diverging from logical parent — currently unused
+// 4. Wrapping pre-existing lv_obj_t — used for TabView page sub-objects
 LVGLObject::LVGLObject(const LVGLWidget *widgetClass, QString name, LVGLObject *parent)
 	: m_obj(widgetClass->newObject(parent->obj())), m_widgetClass(widgetClass)
 	, m_name(name), m_locked(false), m_accessible(false), m_movable(true), m_index(-1), m_parent(parent)
@@ -43,6 +48,8 @@ LVGLObject::LVGLObject(lv_obj_t *obj, const LVGLWidget *widgetClass, LVGLObject 
 
 LVGLObject::~LVGLObject()
 {
+	// Canvas objects allocate a separate pixel buffer that LVGL doesn't
+	// free automatically — we must delete it before lv_obj_del().
 	if (m_widgetClass && m_widgetClass->type() == LVGLWidget::Canvas) {
 		lv_canvas_ext_t *ext = reinterpret_cast<lv_canvas_ext_t*>(lv_obj_get_ext_attr(m_obj));
 		delete[] reinterpret_cast<lv_color_t*>(const_cast<uint8_t*>(ext->dsc.data));

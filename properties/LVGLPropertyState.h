@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYSTATE_H
 #define LVGLPROPERTYSTATE_H
 
+/**
+ * @file LVGLPropertyState.h
+ * @brief LVGLProperty subclass for lv_sw on/off state.
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

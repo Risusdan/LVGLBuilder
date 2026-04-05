@@ -1,6 +1,11 @@
 #ifndef LVGLLIST_H
 #define LVGLLIST_H
 
+/**
+ * @file LVGLList.h
+ * @brief LVGLWidget subclass for lv_list — scrollable list of labeled buttons.
+ */
+
 #include "LVGLWidget.h"
 
 class LVGLList : public LVGLWidget

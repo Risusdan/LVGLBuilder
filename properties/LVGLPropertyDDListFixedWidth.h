@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYDDLISTFIXEDWIDTH_H
 #define LVGLPROPERTYDDLISTFIXEDWIDTH_H
 
+/**
+ * @file LVGLPropertyDDListFixedWidth.h
+ * @brief LVGLProperty subclass for lv_ddlist fixed-width override.
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

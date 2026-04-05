@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYMONTHNAMES_H
 #define LVGLPROPERTYMONTHNAMES_H
 
+/**
+ * @file LVGLPropertyMonthNames.h
+ * @brief LVGLProperty subclass for lv_calendar custom month-name strings.
+ */
+
 #include "LVGLPropertyTextList.h"
 #include "LVGLObject.h"
 #include "LVGLCore.h"

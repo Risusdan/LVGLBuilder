@@ -1,6 +1,11 @@
 #ifndef LVGLCANVAS_H
 #define LVGLCANVAS_H
 
+/**
+ * @file LVGLCanvas.h
+ * @brief LVGLWidget subclass for lv_canvas — bitmap buffer widget for off-screen rendering.
+ */
+
 #include "LVGLWidget.h"
 
 class LVGLCanvas : public LVGLWidget

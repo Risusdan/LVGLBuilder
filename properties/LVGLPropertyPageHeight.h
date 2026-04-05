@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYPAGEHEIGHT_H
 #define LVGLPROPERTYPAGEHEIGHT_H
 
+/**
+ * @file LVGLPropertyPageHeight.h
+ * @brief LVGLProperty subclass for lv_page scrollable-area height.
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

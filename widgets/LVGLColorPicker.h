@@ -1,6 +1,11 @@
 #ifndef LVGLCOLORPICKER_H
 #define LVGLCOLORPICKER_H
 
+/**
+ * @file LVGLColorPicker.h
+ * @brief LVGLWidget subclass for lv_cpicker — color wheel/disc picker.
+ */
+
 #include "LVGLWidget.h"
 
 class LVGLColorPicker : public LVGLWidget

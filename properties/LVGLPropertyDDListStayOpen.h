@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYDDLISTSTAYOPEN_H
 #define LVGLPROPERTYDDLISTSTAYOPEN_H
 
+/**
+ * @file LVGLPropertyDDListStayOpen.h
+ * @brief LVGLProperty subclass for lv_ddlist stay-open toggle.
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

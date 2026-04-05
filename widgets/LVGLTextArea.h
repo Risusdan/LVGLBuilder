@@ -1,6 +1,11 @@
 #ifndef LVGLTEXTAREA_H
 #define LVGLTEXTAREA_H
 
+/**
+ * @file LVGLTextArea.h
+ * @brief LVGLWidget subclass for lv_ta — text input area with single-line and multi-line modes.
+ */
+
 #include "LVGLWidget.h"
 
 class LVGLTextArea : public LVGLWidget

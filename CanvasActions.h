@@ -1,6 +1,11 @@
 #ifndef CANVASACTIONS_H
 #define CANVASACTIONS_H
 
+/**
+ * @file CanvasActions.h
+ * @brief Object manipulation operations — create, delete, move, and z-order for canvas widgets.
+ */
+
 #include <QColor>
 #include <QObject>
 #include <QPoint>
@@ -11,6 +16,13 @@
 class LVGLObject;
 class LVGLWidget;
 
+/**
+ * @class CanvasActions
+ * @brief Provides canvas-level operations on LVGLObjects (create, delete, move, z-order).
+ *
+ * Extracted from LVGLSimulator to keep canvas mutation logic separate from
+ * rendering and event handling concerns.
+ */
 class CanvasActions : public QObject {
   Q_OBJECT
  public:

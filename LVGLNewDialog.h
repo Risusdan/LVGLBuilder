@@ -1,6 +1,11 @@
 #ifndef LVGLNEWDIALOG_H
 #define LVGLNEWDIALOG_H
 
+/**
+ * @file LVGLNewDialog.h
+ * @brief New project dialog for setting project name and display resolution.
+ */
+
 #include <QDialog>
 
 #include "LVGLCore.h"
@@ -9,6 +14,10 @@ namespace Ui {
 class LVGLNewDialog;
 }
 
+/**
+ * @class LVGLNewDialog
+ * @brief Dialog for creating a new project — collects project name and target resolution.
+ */
 class LVGLNewDialog : public QDialog
 {
 	Q_OBJECT

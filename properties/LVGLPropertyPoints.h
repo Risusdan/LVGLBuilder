@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYPOINTS_H
 #define LVGLPROPERTYPOINTS_H
 
+/**
+ * @file LVGLPropertyPoints.h
+ * @brief LVGLProperty base subclass for editable point arrays — provides a table-dialog editor.
+ */
+
 #include "LVGLProperty.h"
 #include <QDialog>
 #include <QStyledItemDelegate>

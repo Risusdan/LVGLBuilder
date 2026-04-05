@@ -1,6 +1,11 @@
 #ifndef LVGLSTYLEMODEL_H
 #define LVGLSTYLEMODEL_H
 
+/**
+ * @file LVGLStyleModel.h
+ * @brief Qt item model, delegate, and body-part dialog for the style editor panel.
+ */
+
 #include <QAbstractItemModel>
 #include <QStyledItemDelegate>
 #include <QDialog>
@@ -9,6 +14,13 @@
 
 class LVGLObject;
 
+/**
+ * @class LVGLStyleModel
+ * @brief QAbstractItemModel that exposes an lv_style_t as an editable tree.
+ *
+ * Wraps an LVGLStyle root item and maps it to Qt's model/view framework for
+ * display in the style editor panel.
+ */
 class LVGLStyleModel : public QAbstractItemModel
 {
 	Q_OBJECT
@@ -50,6 +62,10 @@ private:
 
 };
 
+/**
+ * @class LVGLBodyPartDialog
+ * @brief Dialog for selecting which border parts are active on a style.
+ */
 class LVGLBodyPartDialog : public QDialog
 {
 	Q_OBJECT
@@ -64,6 +80,10 @@ private:
 
 };
 
+/**
+ * @class LVGLStyleDelegate
+ * @brief Custom delegate that creates style-field-specific editors in the style panel.
+ */
 class LVGLStyleDelegate : public QStyledItemDelegate
 {
 public:

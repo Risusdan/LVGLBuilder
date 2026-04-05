@@ -1,12 +1,24 @@
 #ifndef SELECTIONMANAGER_H
 #define SELECTIONMANAGER_H
 
+/**
+ * @file SelectionManager.h
+ * @brief Hit-testing and object selection logic for the canvas.
+ */
+
 #include <QList>
 #include <QObject>
 #include <QPoint>
 
 class LVGLObject;
 
+/**
+ * @class SelectionManager
+ * @brief Tracks the currently selected and hovered LVGLObjects on the canvas.
+ *
+ * Provides hit-testing (objectsUnderCoords) and selection arbitration
+ * (selectObject) used by LVGLSimulator during mouse event handling.
+ */
 class SelectionManager : public QObject {
   Q_OBJECT
  public:

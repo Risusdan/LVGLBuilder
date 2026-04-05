@@ -1,6 +1,11 @@
 #ifndef LVGLWIDGETREGISTRY_H
 #define LVGLWIDGETREGISTRY_H
 
+/**
+ * @file LVGLWidgetRegistry.h
+ * @brief Registry of available widget types (LVGLWidget subclasses).
+ */
+
 #include <QHash>
 #include <QList>
 #include <QObject>
@@ -8,6 +13,10 @@
 
 class LVGLWidget;
 
+/**
+ * @class LVGLWidgetRegistry
+ * @brief Stores and looks up widget type definitions registered at startup.
+ */
 class LVGLWidgetRegistry : public QObject {
   Q_OBJECT
  public:

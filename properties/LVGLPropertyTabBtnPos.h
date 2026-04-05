@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYTABBTNPOS_H
 #define LVGLPROPERTYTABBTNPOS_H
 
+/**
+ * @file LVGLPropertyTabBtnPos.h
+ * @brief LVGLProperty subclass for lv_tabview tab-button position (top/bottom/left/right).
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

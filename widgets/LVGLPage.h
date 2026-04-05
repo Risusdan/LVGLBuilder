@@ -1,6 +1,11 @@
 #ifndef LVGLPAGE_H
 #define LVGLPAGE_H
 
+/**
+ * @file LVGLPage.h
+ * @brief LVGLWidget subclass for lv_page — scrollable container with scrollbar.
+ */
+
 #include "LVGLWidget.h"
 
 class LVGLPage : public LVGLWidget

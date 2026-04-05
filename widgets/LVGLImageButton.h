@@ -1,6 +1,11 @@
 #ifndef LVGLIMAGEBUTTON_H
 #define LVGLIMAGEBUTTON_H
 
+/**
+ * @file LVGLImageButton.h
+ * @brief LVGLWidget subclass for lv_imgbtn — button with separate images per state.
+ */
+
 #include "LVGLWidget.h"
 
 class LVGLImageButton : public LVGLWidget

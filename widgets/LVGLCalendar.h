@@ -1,6 +1,11 @@
 #ifndef LVGLCALENDAR_H
 #define LVGLCALENDAR_H
 
+/**
+ * @file LVGLCalendar.h
+ * @brief LVGLWidget subclass for lv_calendar — date picker with highlighted and today dates.
+ */
+
 #include "LVGLWidget.h"
 
 class LVGLCalendar : public LVGLWidget

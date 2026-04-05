@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYSERIES_H
 #define LVGLPROPERTYSERIES_H
 
+/**
+ * @file LVGLPropertySeries.h
+ * @brief LVGLProperty subclass for lv_chart data series — provides a series-editor dialog.
+ */
+
 // only for lv_chart!
 
 #include "LVGLProperty.h"

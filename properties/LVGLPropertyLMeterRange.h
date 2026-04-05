@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYLMETERRANGE_H
 #define LVGLPROPERTYLMETERRANGE_H
 
+/**
+ * @file LVGLPropertyLMeterRange.h
+ * @brief LVGLProperty subclass for lv_lmeter min/max range.
+ */
+
 #include "LVGLPropertyRange.h"
 #include "LVGLObject.h"
 

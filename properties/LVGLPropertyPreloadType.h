@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYPRELOADTYPE_H
 #define LVGLPROPERTYPRELOADTYPE_H
 
+/**
+ * @file LVGLPropertyPreloadType.h
+ * @brief LVGLProperty subclass for lv_preload animation type (spinning-arc or fill-and-spin).
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

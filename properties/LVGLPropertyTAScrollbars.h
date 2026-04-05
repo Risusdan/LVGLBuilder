@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYTASCROLLBARS_H
 #define LVGLPROPERTYTASCROLLBARS_H
 
+/**
+ * @file LVGLPropertyTAScrollbars.h
+ * @brief LVGLProperty subclass for lv_ta scrollbar visibility mode.
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

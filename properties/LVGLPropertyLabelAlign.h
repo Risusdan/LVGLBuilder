@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYLABELALIGN_H
 #define LVGLPROPERTYLABELALIGN_H
 
+/**
+ * @file LVGLPropertyLabelAlign.h
+ * @brief LVGLProperty subclass for lv_label text alignment.
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

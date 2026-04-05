@@ -22,11 +22,11 @@ Doxygen `/** */` block style. No Doxyfile or HTML generation — purely in-sourc
 ```cpp
 /**
  * @file LVGLCore.h
- * @brief Singleton wrapper for LVGL display drivers, framebuffer, and type registry.
+ * @brief Central wrapper for LVGL display drivers, framebuffer, and type registry.
  *
- * LVGLCore owns the LVGL runtime: it initializes the display/input drivers,
- * renders to a QImage-backed framebuffer, and maintains the registry of all
- * widget types, fonts, and images. Most subsystems access it via the `lvgl` global.
+ * LVGLCore initializes the LVGL runtime and delegates to specialized managers
+ * for display, images, fonts, objects, and widget types. Most subsystems
+ * access it via the `lvgl` global variable.
  */
 ```
 
@@ -35,11 +35,11 @@ Doxygen `/** */` block style. No Doxyfile or HTML generation — purely in-sourc
 ```cpp
 /**
  * @class LVGLCore
- * @brief Central singleton managing the LVGL runtime and asset registries.
+ * @brief Central manager for the LVGL runtime and asset registries.
  *
- * Designed as a singleton because LVGL 6.x uses global state internally —
- * a single LVGLCore instance keeps that state consistent and provides a
- * Qt-friendly interface to it.
+ * Exposed as a global variable (`extern LVGLCore lvgl`). Only one instance
+ * should exist at a time because LVGL 6.x uses internal global state —
+ * multiple instances would conflict.
  */
 ```
 
@@ -47,13 +47,13 @@ Doxygen `/** */` block style. No Doxyfile or HTML generation — purely in-sourc
 
 ```cpp
 /**
- * @brief Renders the current LVGL state into the internal framebuffer.
- * @param elapsedMs Milliseconds since last tick, drives LVGL animations.
- * @return QImage snapshot of the rendered frame.
+ * @brief Advances the LVGL tick and task handler.
  *
- * Called by LVGLSimulator on each paint cycle. Internally calls lv_task_handler().
+ * Called periodically (via timer) to let LVGL process animations,
+ * input events, and pending redraws. After polling, the framebuffer
+ * reflects the updated display state.
  */
-QImage render(uint32_t elapsedMs);
+void poll();
 ```
 
 ### Subclass one-liner
@@ -100,8 +100,8 @@ QImage render(uint32_t elapsedMs);
 ## Design Rationale Policy
 
 **Document "why" when:**
-- The class exists in a non-obvious form (e.g., singleton, template-heavy)
-- A method uses an unexpected approach (e.g., manual mouse event processing instead of Qt drag framework)
+- The class exists in a non-obvious form (e.g., global instance, template-heavy)
+- A method uses an unexpected approach (e.g., manual drag state tracking instead of QDrag)
 - Null checks or guards protect against non-obvious edge cases
 
 **Skip rationale for:**

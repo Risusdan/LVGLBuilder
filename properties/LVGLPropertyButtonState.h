@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYBUTTONSTATE_H
 #define LVGLPROPERTYBUTTONSTATE_H
 
+/**
+ * @file LVGLPropertyButtonState.h
+ * @brief LVGLProperty subclass for lv_btn state enum (released/pressed/toggled/inactive).
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 #include "lvgl/lvgl.h"

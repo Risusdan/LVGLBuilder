@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYLEDBRIGHTNESS_H
 #define LVGLPROPERTYLEDBRIGHTNESS_H
 
+/**
+ * @file LVGLPropertyLEDBrightness.h
+ * @brief LVGLProperty subclass for lv_led brightness (0–255).
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

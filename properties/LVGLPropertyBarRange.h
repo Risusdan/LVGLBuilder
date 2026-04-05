@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYBARRANGE_H
 #define LVGLPROPERTYBARRANGE_H
 
+/**
+ * @file LVGLPropertyBarRange.h
+ * @brief LVGLProperty subclass for lv_bar min/max range.
+ */
+
 #include "LVGLPropertyRange.h"
 #include "LVGLObject.h"
 #include "lvgl/lvgl.h"

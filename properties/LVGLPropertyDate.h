@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYDATE_H
 #define LVGLPROPERTYDATE_H
 
+/**
+ * @file LVGLPropertyDate.h
+ * @brief LVGLProperty subclass for a single lv_calendar date (today or highlighted).
+ */
+
 #include "LVGLProperty.h"
 
 class LVGLPropertyDate : public LVGLProperty

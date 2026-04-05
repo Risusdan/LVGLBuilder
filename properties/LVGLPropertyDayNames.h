@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYDAYNAMES_H
 #define LVGLPROPERTYDAYNAMES_H
 
+/**
+ * @file LVGLPropertyDayNames.h
+ * @brief LVGLProperty subclass for lv_calendar custom day-name strings.
+ */
+
 #include "LVGLPropertyTextList.h"
 #include "LVGLObject.h"
 #include "LVGLCore.h"

@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYMBOXBUTTONS_H
 #define LVGLPROPERTYMBOXBUTTONS_H
 
+/**
+ * @file LVGLPropertyMBoxButtons.h
+ * @brief LVGLProperty subclass for lv_mbox action button labels.
+ */
+
 #include "LVGLPropertyTextList.h"
 #include "LVGLObject.h"
 

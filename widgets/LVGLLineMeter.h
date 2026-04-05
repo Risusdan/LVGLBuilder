@@ -1,6 +1,11 @@
 #ifndef LVGLLINEMETER_H
 #define LVGLLINEMETER_H
 
+/**
+ * @file LVGLLineMeter.h
+ * @brief LVGLWidget subclass for lv_lmeter — circular line meter (like a tachometer).
+ */
+
 #include "LVGLWidget.h"
 
 class LVGLLineMeter : public LVGLWidget

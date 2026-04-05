@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYPRELOADSPINTIME_H
 #define LVGLPROPERTYPRELOADSPINTIME_H
 
+/**
+ * @file LVGLPropertyPreloadSpinTime.h
+ * @brief LVGLProperty subclass for lv_preload one full spin duration (ms).
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

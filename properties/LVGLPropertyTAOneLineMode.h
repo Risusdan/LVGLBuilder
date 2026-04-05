@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYTAONELINEMODE_H
 #define LVGLPROPERTYTAONELINEMODE_H
 
+/**
+ * @file LVGLPropertyTAOneLineMode.h
+ * @brief LVGLProperty subclass for lv_ta single-line mode flag.
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

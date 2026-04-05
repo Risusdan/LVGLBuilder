@@ -1,6 +1,11 @@
 #ifndef LVGLIMAGE_H
 #define LVGLIMAGE_H
 
+/**
+ * @file LVGLImage.h
+ * @brief LVGLWidget subclass for lv_img — displays an image asset.
+ */
+
 #include "LVGLWidget.h"
 
 class LVGLImage : public LVGLWidget

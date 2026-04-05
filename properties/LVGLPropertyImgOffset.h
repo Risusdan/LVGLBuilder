@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYIMGOFFSET_H
 #define LVGLPROPERTYIMGOFFSET_H
 
+/**
+ * @file LVGLPropertyImgOffset.h
+ * @brief LVGLProperty subclass grouping lv_img X and Y scroll offsets.
+ */
+
 #include <QJsonObject>
 #include "LVGLProperty.h"
 #include "LVGLObject.h"

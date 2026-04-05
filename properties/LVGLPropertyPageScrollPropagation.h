@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYPAGESCROLLPROPAGATION_H
 #define LVGLPROPERTYPAGESCROLLPROPAGATION_H
 
+/**
+ * @file LVGLPropertyPageScrollPropagation.h
+ * @brief LVGLProperty subclass for lv_page scroll-propagation flag.
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

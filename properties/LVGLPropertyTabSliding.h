@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYTABSLIDING_H
 #define LVGLPROPERTYTABSLIDING_H
 
+/**
+ * @file LVGLPropertyTabSliding.h
+ * @brief LVGLProperty subclass for lv_tabview sliding (swipe) gesture flag.
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

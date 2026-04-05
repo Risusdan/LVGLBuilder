@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYTABANIMTIME_H
 #define LVGLPROPERTYTABANIMTIME_H
 
+/**
+ * @file LVGLPropertyTabAnimTime.h
+ * @brief LVGLProperty subclass for lv_tabview tab-switch animation duration.
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

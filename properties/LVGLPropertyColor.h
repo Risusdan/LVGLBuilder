@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYCOLOR_H
 #define LVGLPROPERTYCOLOR_H
 
+/**
+ * @file LVGLPropertyColor.h
+ * @brief LVGLProperty base subclass for color values — provides a color picker editor.
+ */
+
 #include "LVGLProperty.h"
 #include <QColor>
 

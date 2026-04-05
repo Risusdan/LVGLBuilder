@@ -1,6 +1,11 @@
 #ifndef LVGLPRELOADER_H
 #define LVGLPRELOADER_H
 
+/**
+ * @file LVGLPreloader.h
+ * @brief LVGLWidget subclass for lv_preload — spinning loading indicator.
+ */
+
 #include "LVGLWidget.h"
 
 class LVGLPreloader : public LVGLWidget

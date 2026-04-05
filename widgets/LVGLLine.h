@@ -1,6 +1,11 @@
 #ifndef LVGLLINE_H
 #define LVGLLINE_H
 
+/**
+ * @file LVGLLine.h
+ * @brief LVGLWidget subclass for lv_line — draws connected line segments from a point array.
+ */
+
 #include "LVGLWidget.h"
 
 class LVGLLine : public LVGLWidget

@@ -1,3 +1,8 @@
+/**
+ * @file MainWindow.h
+ * @brief Main application window coordinating all UI panels and project operations.
+ */
+
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
@@ -19,6 +24,21 @@ class MainWindow;
 }
 QT_END_NAMESPACE
 
+/**
+ * @class MainWindow
+ * @brief Top-level window that assembles the builder UI and wires components together.
+ *
+ * Owns and coordinates:
+ * - Widget palette (left panel, driven by LVGLWidgetModel)
+ * - Canvas simulator (center, LVGLSimulator)
+ * - Property inspector (right panel, driven by LVGLPropertyModel)
+ * - Object tree (right panel, driven by LVGLObjectModel)
+ * - Style editor (right panel, driven by LVGLStyleModel)
+ * - Image and font asset lists (right panel tabs)
+ *
+ * Also manages project-level operations (new, load, save, export) via
+ * ProjectManager and tracks recent files via RecentFilesManager.
+ */
 class MainWindow : public QMainWindow {
   Q_OBJECT
 
@@ -26,12 +46,17 @@ class MainWindow : public QMainWindow {
   MainWindow(QWidget *parent = nullptr);
   ~MainWindow();
 
+  /** @brief Returns the canvas simulator widget. */
   LVGLSimulator *simulator() const;
 
  private slots:
+  /** @brief Updates the property inspector when a property value changes. */
   void updateProperty();
+  /** @brief Handles object selection — updates inspector, style editor, and object tree. */
   void setCurrentObject(LVGLObject *obj);
+  /** @brief Refreshes the style editor when style values change. */
   void styleChanged();
+  /** @brief Creates a new empty project with a resolution dialog. */
   void openNewProject();
 
   void on_action_load_triggered();
@@ -56,7 +81,12 @@ class MainWindow : public QMainWindow {
   void showEvent(QShowEvent *event);
 
  private:
+  /**
+   * @brief Loads a project from a JSON file.
+   * @param fileName Path to the .json project file.
+   */
   void loadProject(const QString &fileName);
+  /** @brief Enables or disables the builder UI panels (disabled during run mode). */
   void setEnableBuilder(bool enable);
 
   Ui::MainWindow *m_ui;

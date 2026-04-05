@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYTABBTNHIDE_H
 #define LVGLPROPERTYTABBTNHIDE_H
 
+/**
+ * @file LVGLPropertyTabBtnHide.h
+ * @brief LVGLProperty subclass for lv_tabview tab-button hide flag.
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

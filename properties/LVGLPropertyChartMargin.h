@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYCHARTMARGIN_H
 #define LVGLPROPERTYCHARTMARGIN_H
 
+/**
+ * @file LVGLPropertyChartMargin.h
+ * @brief LVGLProperty subclass for lv_chart margin around the chart area.
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

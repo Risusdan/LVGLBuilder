@@ -1,12 +1,21 @@
 #ifndef PROJECTMANAGER_H
 #define PROJECTMANAGER_H
 
+/**
+ * @file ProjectManager.h
+ * @brief Manages project lifecycle — new, open, save, save-as, export operations.
+ */
+
 #include <QObject>
 #include <QSize>
 #include <QString>
 
 class LVGLProject;
 
+/**
+ * @class ProjectManager
+ * @brief Coordinates project file operations and emits signals on state changes.
+ */
 class ProjectManager : public QObject {
   Q_OBJECT
 

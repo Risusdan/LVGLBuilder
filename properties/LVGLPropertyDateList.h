@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYDATELIST_H
 #define LVGLPROPERTYDATELIST_H
 
+/**
+ * @file LVGLPropertyDateList.h
+ * @brief LVGLProperty subclass for a list of lv_calendar highlighted dates.
+ */
+
 #include "LVGLProperty.h"
 
 class LVGLPropertyDateList : public LVGLProperty

@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYNAME_H
 #define LVGLPROPERTYNAME_H
 
+/**
+ * @file LVGLPropertyName.h
+ * @brief LVGLProperty subclass for the widget's identifier name.
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

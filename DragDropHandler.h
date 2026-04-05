@@ -1,6 +1,11 @@
 #ifndef DRAGDROPHANDLER_H
 #define DRAGDROPHANDLER_H
 
+/**
+ * @file DragDropHandler.h
+ * @brief Processes drag-and-drop events from the widget palette onto the canvas.
+ */
+
 #include <QObject>
 #include <QPoint>
 #include <QSize>
@@ -13,6 +18,10 @@ class SelectionManager;
 class LVGLObject;
 class LVGLWidget;
 
+/**
+ * @class DragDropHandler
+ * @brief Handles drop events on the canvas — creates the widget and updates selection.
+ */
 class DragDropHandler : public QObject {
   Q_OBJECT
  public:

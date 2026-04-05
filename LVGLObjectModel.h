@@ -1,10 +1,22 @@
 #ifndef LVGLOBJECTMODEL_H
 #define LVGLOBJECTMODEL_H
 
+/**
+ * @file LVGLObjectModel.h
+ * @brief Qt item model for the object tree panel showing the widget hierarchy.
+ */
+
 #include <QAbstractItemModel>
 #include "LVGLCore.h"
 #include "LVGLObject.h"
 
+/**
+ * @class LVGLObjectModel
+ * @brief QAbstractItemModel that presents all LVGLObjects as a parent-child tree.
+ *
+ * Supports insert/remove notifications so the tree view stays synchronized
+ * as widgets are added or deleted on the canvas.
+ */
 class LVGLObjectModel : public QAbstractItemModel
 {
 	Q_OBJECT

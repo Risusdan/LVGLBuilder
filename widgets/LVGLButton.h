@@ -1,6 +1,11 @@
 #ifndef LVGLBUTTON_H
 #define LVGLBUTTON_H
 
+/**
+ * @file LVGLButton.h
+ * @brief LVGLWidget subclass for lv_btn — push button with toggle support and layout properties.
+ */
+
 #include "LVGLWidget.h"
 
 class LVGLButton : public LVGLWidget

@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYIMGAUTOSIZE_H
 #define LVGLPROPERTYIMGAUTOSIZE_H
 
+/**
+ * @file LVGLPropertyImgAutoSize.h
+ * @brief LVGLProperty subclass for lv_img auto-size flag.
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYLOCKED_H
 #define LVGLPROPERTYLOCKED_H
 
+/**
+ * @file LVGLPropertyLocked.h
+ * @brief LVGLProperty subclass controlling per-object lock flag (prevents drag/resize).
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

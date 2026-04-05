@@ -1,6 +1,11 @@
 #ifndef LVGLTABVIEW_H
 #define LVGLTABVIEW_H
 
+/**
+ * @file LVGLTabview.h
+ * @brief LVGLWidget subclass for lv_tabview — tabbed container with switchable pages.
+ */
+
 #include "LVGLWidget.h"
 
 class LVGLTabview : public LVGLWidget

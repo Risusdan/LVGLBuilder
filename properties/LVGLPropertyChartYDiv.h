@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYCHARTYDIV_H
 #define LVGLPROPERTYCHARTYDIV_H
 
+/**
+ * @file LVGLPropertyChartYDiv.h
+ * @brief LVGLProperty subclass for lv_chart number of horizontal division lines.
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

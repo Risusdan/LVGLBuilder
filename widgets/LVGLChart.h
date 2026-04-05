@@ -1,6 +1,11 @@
 #ifndef LVGLCHART_H
 #define LVGLCHART_H
 
+/**
+ * @file LVGLChart.h
+ * @brief LVGLWidget subclass for lv_chart — data visualization with line/bar/point series.
+ */
+
 #include "LVGLWidget.h"
 
 class LVGLChart : public LVGLWidget

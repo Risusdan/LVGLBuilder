@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYTATEXT_H
 #define LVGLPROPERTYTATEXT_H
 
+/**
+ * @file LVGLPropertyTAText.h
+ * @brief LVGLProperty subclass for lv_ta content text.
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYTACURSORTYPE_H
 #define LVGLPROPERTYTACURSORTYPE_H
 
+/**
+ * @file LVGLPropertyTACursorType.h
+ * @brief LVGLProperty subclass for lv_ta cursor style (line/block/outline/underline).
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

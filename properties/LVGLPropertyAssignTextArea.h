@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYASSIGNTEXTAREA_H
 #define LVGLPROPERTYASSIGNTEXTAREA_H
 
+/**
+ * @file LVGLPropertyAssignTextArea.h
+ * @brief LVGLProperty subclass for assigning a text area to a keyboard widget.
+ */
+
 #include "LVGLProperty.h"
 
 class LVGLPropertyAssignTextArea : public LVGLProperty

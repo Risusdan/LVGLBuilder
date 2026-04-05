@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYTABS_H
 #define LVGLPROPERTYTABS_H
 
+/**
+ * @file LVGLPropertyTabs.h
+ * @brief LVGLProperty subclass for lv_tabview tab-name list.
+ */
+
 #include "LVGLPropertyTextList.h"
 #include "LVGLObject.h"
 #include "LVGLCore.h"

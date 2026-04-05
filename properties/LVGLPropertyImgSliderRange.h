@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYIMGSLIDERRANGE_H
 #define LVGLPROPERTYIMGSLIDERRANGE_H
 
+/**
+ * @file LVGLPropertyImgSliderRange.h
+ * @brief LVGLProperty subclass for image-slider min/max range.
+ */
+
 #include "LVGLPropertyRange.h"
 #include "LVGLObject.h"
 

@@ -1,6 +1,11 @@
 #ifndef LVGLMESSAGEBOX_H
 #define LVGLMESSAGEBOX_H
 
+/**
+ * @file LVGLMessageBox.h
+ * @brief LVGLWidget subclass for lv_mbox — message box with text and action buttons.
+ */
+
 #include "LVGLWidget.h"
 
 class LVGLMessageBox : public LVGLWidget

@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYGAUGECRITICALVALUE_H
 #define LVGLPROPERTYGAUGECRITICALVALUE_H
 
+/**
+ * @file LVGLPropertyGaugeCriticalValue.h
+ * @brief LVGLProperty subclass for lv_gauge critical threshold value.
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

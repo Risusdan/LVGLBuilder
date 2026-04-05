@@ -1,6 +1,11 @@
 #ifndef LVGLGAUGE_H
 #define LVGLGAUGE_H
 
+/**
+ * @file LVGLGauge.h
+ * @brief LVGLWidget subclass for lv_gauge — radial gauge with needle and scale.
+ */
+
 #include "LVGLWidget.h"
 
 class LVGLGauge : public LVGLWidget

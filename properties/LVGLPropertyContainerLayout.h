@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYCONTAINERLAYOUT_H
 #define LVGLPROPERTYCONTAINERLAYOUT_H
 
+/**
+ * @file LVGLPropertyContainerLayout.h
+ * @brief LVGLProperty subclass for lv_cont child layout mode.
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

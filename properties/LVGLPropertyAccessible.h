@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYACCESSIBLE_H
 #define LVGLPROPERTYACCESSIBLE_H
 
+/**
+ * @file LVGLPropertyAccessible.h
+ * @brief LVGLProperty subclass controlling per-object accessibility flag.
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

@@ -13,6 +13,13 @@
 #include "LVGLObject.h"
 #include "LVGLFontData.h"
 
+/**
+ * @brief Checks if an object is a page inside a TabView widget.
+ *
+ * TabView pages need special handling during code generation — they are
+ * created via lv_tabview_add_tab() rather than the normal create pattern.
+ * This macro identifies them by checking type, index, and parent type.
+ */
 #define IS_PAGE_OF_TABVIEW(o) ((o->widgetType() == LVGLWidget::Page) && (o->index() >= 0) && o->parent() && (o->parent()->widgetType() == LVGLWidget::TabView))
 
 LVGLProject::LVGLProject()
@@ -239,6 +246,8 @@ bool LVGLProject::exportCode(const QString &path) const
 		stream << "\tlv_obj_set_style(parent, &style_screen);\n";
 	}
 	stream << "\n";
+	// Each widget is wrapped in an #if LV_USE_xxx guard so the generated
+	// code compiles even if some widget types are disabled in lv_conf.h.
 	for (LVGLObject *o:objects) {
 		QString ifdef = o->widgetClass()->className().toUpper().insert(3, "USE_");
 		stream << "#if " << ifdef <<"\n";

@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYCHARTRANGE_H
 #define LVGLPROPERTYCHARTRANGE_H
 
+/**
+ * @file LVGLPropertyChartRange.h
+ * @brief LVGLProperty subclass for lv_chart Y-axis min/max range.
+ */
+
 #include "LVGLPropertyRange.h"
 #include "LVGLObject.h"
 

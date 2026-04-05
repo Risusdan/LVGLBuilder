@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYIMAGE_H
 #define LVGLPROPERTYIMAGE_H
 
+/**
+ * @file LVGLPropertyImage.h
+ * @brief LVGLProperty base subclass for image-asset selection — provides a combo-box editor.
+ */
+
 #include "LVGLProperty.h"
 
 class LVGLPropertyImage: public LVGLProperty

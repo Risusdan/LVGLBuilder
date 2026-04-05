@@ -1,6 +1,15 @@
 #ifndef LVGLSTYLE_H
 #define LVGLSTYLE_H
 
+/**
+ * @file LVGLStyle.h
+ * @brief LVGL style data model for the style editor panel.
+ *
+ * Defines the LVGLStyleItem tree structure that maps LVGL's flat style struct
+ * (lv_style_t) into a hierarchical model (Body > Border > Width, Color, etc.)
+ * suitable for display in a QTreeView.
+ */
+
 #include <QString>
 #include <QList>
 #include <QVariant>
@@ -25,6 +34,14 @@ Q_DECLARE_FLAGS(StyleParts, StylePart)
 }
 Q_DECLARE_OPERATORS_FOR_FLAGS(LVGL::StyleParts)
 
+/**
+ * @class LVGLStyleItem
+ * @brief A node in the style property tree representing one editable style field.
+ *
+ * Each item knows its type (Color, Coord, Opacity, etc.) and its byte offset
+ * into the lv_style_t struct, enabling direct read/write of style fields
+ * without per-field getter/setter functions.
+ */
 class LVGLStyleItem {
 public:
 	enum Type {
@@ -66,6 +83,13 @@ protected:
 
 };
 
+/**
+ * @class LVGLStyle
+ * @brief Root of the style item tree with read/write access to a live lv_style_t.
+ *
+ * Wraps a pointer to an lv_style_t and provides get/set operations that
+ * use the child LVGLStyleItem's offset to read/write the correct field.
+ */
 class LVGLStyle : public LVGLStyleItem
 {
 public:

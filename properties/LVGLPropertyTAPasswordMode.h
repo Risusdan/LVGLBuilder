@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYTAPASSWORDMODE_H
 #define LVGLPROPERTYTAPASSWORDMODE_H
 
+/**
+ * @file LVGLPropertyTAPasswordMode.h
+ * @brief LVGLProperty subclass for lv_ta password (obscured text) mode flag.
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

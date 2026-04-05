@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYCHARTSERIES_H
 #define LVGLPROPERTYCHARTSERIES_H
 
+/**
+ * @file LVGLPropertyChartSeries.h
+ * @brief LVGLProperty subclass grouping lv_chart series appearance (width, opacity, darking).
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLPropertyChartWidth.h"
 #include "LVGLPropertyChartOpa.h"

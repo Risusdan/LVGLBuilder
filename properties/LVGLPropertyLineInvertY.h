@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYLINEINVERTY_H
 #define LVGLPROPERTYLINEINVERTY_H
 
+/**
+ * @file LVGLPropertyLineInvertY.h
+ * @brief LVGLProperty subclass for lv_line Y-axis inversion flag.
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

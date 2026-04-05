@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYKBMODE_H
 #define LVGLPROPERTYKBMODE_H
 
+/**
+ * @file LVGLPropertyKBMode.h
+ * @brief LVGLProperty subclass for lv_kb keyboard mode (text/number/uppercase).
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

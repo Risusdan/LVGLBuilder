@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYSCALE_H
 #define LVGLPROPERTYSCALE_H
 
+/**
+ * @file LVGLPropertyScale.h
+ * @brief LVGLProperty subclass for lv_lmeter/gauge scale angle and line count.
+ */
+
 #include "LVGLProperty.h"
 
 class LVGLPropertyScale : public LVGLProperty

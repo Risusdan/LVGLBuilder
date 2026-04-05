@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYDDLISTFIXEDHEIGHT_H
 #define LVGLPROPERTYDDLISTFIXEDHEIGHT_H
 
+/**
+ * @file LVGLPropertyDDListFixedHeight.h
+ * @brief LVGLProperty subclass for lv_ddlist fixed-height override.
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

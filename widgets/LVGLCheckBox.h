@@ -1,6 +1,11 @@
 #ifndef LVGLCHECKBOX_H
 #define LVGLCHECKBOX_H
 
+/**
+ * @file LVGLCheckBox.h
+ * @brief LVGLWidget subclass for lv_cb — checkbox with text label.
+ */
+
 #include "LVGLWidget.h"
 
 class LVGLCheckBox : public LVGLWidget

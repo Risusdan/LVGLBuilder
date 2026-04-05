@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYTATEXTALIGN_H
 #define LVGLPROPERTYTATEXTALIGN_H
 
+/**
+ * @file LVGLPropertyTATextAlign.h
+ * @brief LVGLProperty subclass for lv_ta text alignment.
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

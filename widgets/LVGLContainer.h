@@ -1,6 +1,11 @@
 #ifndef LVGLCONTAINER_H
 #define LVGLCONTAINER_H
 
+/**
+ * @file LVGLContainer.h
+ * @brief LVGLWidget subclass for lv_cont — layout container with auto-arrangement modes.
+ */
+
 #include "LVGLWidget.h"
 
 class LVGLContainer : public LVGLWidget

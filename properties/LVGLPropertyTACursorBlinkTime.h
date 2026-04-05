@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYTACURSORBLINKTIME_H
 #define LVGLPROPERTYTACURSORBLINKTIME_H
 
+/**
+ * @file LVGLPropertyTACursorBlinkTime.h
+ * @brief LVGLProperty subclass for lv_ta cursor blink interval (ms).
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

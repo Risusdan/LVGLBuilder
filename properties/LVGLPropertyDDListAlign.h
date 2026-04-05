@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYDDLISTALIGN_H
 #define LVGLPROPERTYDDLISTALIGN_H
 
+/**
+ * @file LVGLPropertyDDListAlign.h
+ * @brief LVGLProperty subclass for lv_ddlist text alignment (left/center/right).
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

@@ -1,6 +1,11 @@
 #ifndef LVGLTABWIDGET_H
 #define LVGLTABWIDGET_H
 
+/**
+ * @file LVGLTabWidget.h
+ * @brief Container for a single screen's LVGL parent object and widget instances.
+ */
+
 #include <QWidget>
 
 #include "lvgl/lvgl.h"
@@ -10,6 +15,10 @@ class LVGLObject;
 class LVGLFontData;
 class LVGLSimulator;
 
+/**
+ * @class LVGLTabWidget
+ * @brief Holds the root lv_obj_t and LVGLObject list for one screen tab in the builder.
+ */
 class LVGLTabWidget : public QWidget {
   Q_OBJECT
  public:

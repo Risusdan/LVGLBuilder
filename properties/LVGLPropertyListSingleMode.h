@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYLISTSINGLEMODE_H
 #define LVGLPROPERTYLISTSINGLEMODE_H
 
+/**
+ * @file LVGLPropertyListSingleMode.h
+ * @brief LVGLProperty subclass for lv_list single-selection mode flag.
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

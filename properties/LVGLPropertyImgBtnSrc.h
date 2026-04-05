@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYIMGBTNSRC_H
 #define LVGLPROPERTYIMGBTNSRC_H
 
+/**
+ * @file LVGLPropertyImgBtnSrc.h
+ * @brief LVGLProperty subclass for an lv_imgbtn per-state image source.
+ */
+
 #include "LVGLPropertyImage.h"
 #include "LVGLObject.h"
 #include "LVGLCore.h"

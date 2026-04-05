@@ -1,12 +1,25 @@
 #ifndef LVGLFONTDATA_H
 #define LVGLFONTDATA_H
 
+/**
+ * @file LVGLFontData.h
+ * @brief Font asset wrapper — loads TTF via FreeType, serializes to JSON and C code.
+ */
+
 #include <lvgl/lvgl.h>
 #include <QString>
 #include <QJsonObject>
 
 struct FT_LibraryRec_;
 
+/**
+ * @class LVGLFontData
+ * @brief Represents a single font asset (built-in or user-loaded).
+ *
+ * Wraps an lv_font_t and provides serialization for project save/load (JSON)
+ * and C code export. Custom fonts are loaded from TTF files via FreeType;
+ * built-in fonts reference LVGL's compiled-in font data.
+ */
 class LVGLFontData
 {
 public:

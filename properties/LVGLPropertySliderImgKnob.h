@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYSLIDERIMGKNOB_H
 #define LVGLPROPERTYSLIDERIMGKNOB_H
 
+/**
+ * @file LVGLPropertySliderImgKnob.h
+ * @brief LVGLProperty subclass for image-slider knob image source.
+ */
+
 #include "LVGLPropertyImage.h"
 #include "LVGLObject.h"
 #include "LVGLCore.h"

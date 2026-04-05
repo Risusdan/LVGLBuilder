@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYBUTTONLAYOUT_H
 #define LVGLPROPERTYBUTTONLAYOUT_H
 
+/**
+ * @file LVGLPropertyButtonLayout.h
+ * @brief LVGLProperty subclass for lv_btn child layout mode.
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 #include "lvgl/lvgl.h"

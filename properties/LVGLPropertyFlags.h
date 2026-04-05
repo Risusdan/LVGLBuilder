@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYFLAGS_H
 #define LVGLPROPERTYFLAGS_H
 
+/**
+ * @file LVGLPropertyFlags.h
+ * @brief LVGLProperty base subclass for bitmask flag sets — provides a checkbox-list editor.
+ */
+
 #include "LVGLProperty.h"
 
 class LVGLPropertyFlags : public LVGLProperty

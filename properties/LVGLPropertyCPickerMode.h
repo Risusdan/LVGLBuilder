@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYCPICKERMODE_H
 #define LVGLPROPERTYCPICKERMODE_H
 
+/**
+ * @file LVGLPropertyCPickerMode.h
+ * @brief LVGLProperty subclass for lv_cpicker color channel mode (hue/saturation/value).
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYLIST_H
 #define LVGLPROPERTYLIST_H
 
+/**
+ * @file LVGLPropertyList.h
+ * @brief LVGLProperty subclass for lv_list button items — provides a dialog editor.
+ */
+
 #include "LVGLProperty.h"
 #include <QObject>
 #include <QDialog>

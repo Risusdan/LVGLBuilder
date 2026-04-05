@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYTABSCROLLBARS_H
 #define LVGLPROPERTYTABSCROLLBARS_H
 
+/**
+ * @file LVGLPropertyTabScrollbars.h
+ * @brief LVGLProperty subclass for lv_tabview per-page scrollbar mode.
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

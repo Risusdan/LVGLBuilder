@@ -1,6 +1,11 @@
 #ifndef LVGLBUTTONMATRIX_H
 #define LVGLBUTTONMATRIX_H
 
+/**
+ * @file LVGLButtonMatrix.h
+ * @brief LVGLWidget subclass for lv_btnm — grid of buttons defined by a string map.
+ */
+
 #include "LVGLWidget.h"
 
 class LVGLButtonMatrix : public LVGLWidget

@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYCHARTWIDTH_H
 #define LVGLPROPERTYCHARTWIDTH_H
 
+/**
+ * @file LVGLPropertyChartWidth.h
+ * @brief LVGLProperty subclass for lv_chart series line/column width.
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYTAMAXLEN_H
 #define LVGLPROPERTYTAMAXLEN_H
 
+/**
+ * @file LVGLPropertyTAMaxLen.h
+ * @brief LVGLProperty subclass for lv_ta maximum text length.
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

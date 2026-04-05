@@ -1,6 +1,11 @@
 #ifndef LVGLLED_H
 #define LVGLLED_H
 
+/**
+ * @file LVGLLED.h
+ * @brief LVGLWidget subclass for lv_led — LED indicator with adjustable brightness.
+ */
+
 #include "LVGLWidget.h"
 
 class LVGLLED : public LVGLWidget

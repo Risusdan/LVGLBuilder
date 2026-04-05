@@ -1,6 +1,11 @@
 #ifndef LVGLDROPDOWNLIST_H
 #define LVGLDROPDOWNLIST_H
 
+/**
+ * @file LVGLDropDownList.h
+ * @brief LVGLWidget subclass for lv_ddlist — drop-down selection list.
+ */
+
 #include "LVGLWidget.h"
 
 class LVGLDropDownList : public LVGLWidget

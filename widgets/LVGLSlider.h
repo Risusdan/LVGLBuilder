@@ -1,6 +1,11 @@
 #ifndef LVGLSLIDER_H
 #define LVGLSLIDER_H
 
+/**
+ * @file LVGLSlider.h
+ * @brief LVGLWidget subclass for lv_slider — draggable slider with min/max range and knob.
+ */
+
 #include "LVGLWidget.h"
 
 class LVGLSlider : public LVGLWidget

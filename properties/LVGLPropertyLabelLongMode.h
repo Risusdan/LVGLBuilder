@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYLABELLONGMODE_H
 #define LVGLPROPERTYLABELLONGMODE_H
 
+/**
+ * @file LVGLPropertyLabelLongMode.h
+ * @brief LVGLProperty subclass for lv_label long-text overflow mode.
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

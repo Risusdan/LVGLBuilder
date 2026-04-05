@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYDDLISTSCROLLBARS_H
 #define LVGLPROPERTYDDLISTSCROLLBARS_H
 
+/**
+ * @file LVGLPropertyDDListScrollbars.h
+ * @brief LVGLProperty subclass for lv_ddlist scrollbar mode.
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

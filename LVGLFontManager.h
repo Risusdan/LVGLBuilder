@@ -1,6 +1,11 @@
 #ifndef LVGLFONTMANAGER_H
 #define LVGLFONTMANAGER_H
 
+/**
+ * @file LVGLFontManager.h
+ * @brief Manages built-in and custom fonts available to the builder.
+ */
+
 #include <QList>
 #include <QObject>
 #include <QString>
@@ -11,6 +16,10 @@
 class LVGLFontData;
 struct FT_LibraryRec_;
 
+/**
+ * @class LVGLFontManager
+ * @brief Registry for font assets — initializes built-in fonts, loads custom TTF fonts.
+ */
 class LVGLFontManager : public QObject {
   Q_OBJECT
  public:

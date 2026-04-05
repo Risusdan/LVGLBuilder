@@ -1,10 +1,22 @@
 #ifndef LVGLWIDGETMODEL_H
 #define LVGLWIDGETMODEL_H
 
+/**
+ * @file LVGLWidgetModel.h
+ * @brief Qt list model for the widget palette panel.
+ */
+
 #include <QAbstractListModel>
 
 class LVGLWidget;
 
+/**
+ * @class LVGLWidgetModel
+ * @brief QAbstractListModel that lists available widget types for drag-and-drop creation.
+ *
+ * Provides mime data encoding so that dragging a widget type from the palette
+ * and dropping it on the canvas triggers widget creation in LVGLSimulator.
+ */
 class LVGLWidgetModel : public QAbstractListModel
 {
 	Q_OBJECT

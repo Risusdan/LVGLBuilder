@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYCBCHECKED_H
 #define LVGLPROPERTYCBCHECKED_H
 
+/**
+ * @file LVGLPropertyCBChecked.h
+ * @brief LVGLProperty subclass for lv_cb checked state.
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYPAGESCROLLBARS_H
 #define LVGLPROPERTYPAGESCROLLBARS_H
 
+/**
+ * @file LVGLPropertyPageScrollbars.h
+ * @brief LVGLProperty subclass for lv_page scrollbar visibility mode.
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

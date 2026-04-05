@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYLISTEDGEFLASH_H
 #define LVGLPROPERTYLISTEDGEFLASH_H
 
+/**
+ * @file LVGLPropertyListEdgeFlash.h
+ * @brief LVGLProperty subclass for lv_list edge-flash animation flag.
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

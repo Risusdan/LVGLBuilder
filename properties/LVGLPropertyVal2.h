@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYVAL2_H
 #define LVGLPROPERTYVAL2_H
 
+/**
+ * @file LVGLPropertyVal2.h
+ * @brief LVGLProperty template subclass for paired numeric values with a shared setter function.
+ */
+
 #include "LVGLProperty.h"
 
 template<class T>

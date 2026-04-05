@@ -1,6 +1,11 @@
 #ifndef LVGLDISPLAY_H
 #define LVGLDISPLAY_H
 
+/**
+ * @file LVGLDisplay.h
+ * @brief LVGL display driver wrapper managing the framebuffer and input driver.
+ */
+
 #include <lvgl/lvgl.h>
 
 #include <QColor>
@@ -11,6 +16,16 @@
 #include <QTimer>
 #include <vector>
 
+/**
+ * @class LVGLDisplay
+ * @brief Owns the LVGL display buffer, input driver, and low-level display operations.
+ *
+ * Manages the lv_color_t framebuffer that LVGL renders into (converted to
+ * QPixmap on demand via framebuffer()), the display and input driver
+ * registration, resolution changes, screen color, color conversions between
+ * Qt and LVGL formats, and symbol name lookups. Extracted from LVGLCore to
+ * isolate display concerns.
+ */
 class LVGLDisplay : public QObject {
   Q_OBJECT
  public:

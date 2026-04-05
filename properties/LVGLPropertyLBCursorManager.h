@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYLBCURSORMANAGER_H
 #define LVGLPROPERTYLBCURSORMANAGER_H
 
+/**
+ * @file LVGLPropertyLBCursorManager.h
+ * @brief LVGLProperty subclass for lv_kb cursor-manager enable flag.
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

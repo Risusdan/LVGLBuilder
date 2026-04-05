@@ -1,6 +1,11 @@
 #ifndef LVGLLABEL_H
 #define LVGLLABEL_H
 
+/**
+ * @file LVGLLabel.h
+ * @brief LVGLWidget subclass for lv_label — text display with alignment and long-text modes.
+ */
+
 #include "LVGLWidget.h"
 
 class LVGLLabel : public LVGLWidget

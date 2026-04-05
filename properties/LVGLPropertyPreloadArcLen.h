@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYPRELOADARCLEN_H
 #define LVGLPROPERTYPRELOADARCLEN_H
 
+/**
+ * @file LVGLPropertyPreloadArcLen.h
+ * @brief LVGLProperty subclass for lv_preload spinning arc length (degrees).
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

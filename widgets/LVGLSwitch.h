@@ -1,6 +1,11 @@
 #ifndef LVGLSWITCH_H
 #define LVGLSWITCH_H
 
+/**
+ * @file LVGLSwitch.h
+ * @brief LVGLWidget subclass for lv_sw — on/off toggle switch.
+ */
+
 #include "LVGLWidget.h"
 
 class LVGLSwitch : public LVGLWidget

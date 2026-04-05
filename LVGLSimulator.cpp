@@ -140,6 +140,11 @@ void LVGLSimulator::changeResolution(QSize size) {
   m_scene->setSceneRect(0, 0, size.width(), size.height());
 }
 
+// Mouse events serve two modes:
+// - Design mode (m_mouseEnabled == false): Qt-side hit-testing via
+//   SelectionManager for widget selection and dragging.
+// - Run mode (m_mouseEnabled == true): coordinates forwarded to LVGL
+//   via sendMouseEvent() for real device simulation.
 void LVGLSimulator::mousePressEvent(QMouseEvent *event) {
   const QPoint pos = mapToScene(event->position().toPoint()).toPoint();
   if (m_mouseEnabled) {

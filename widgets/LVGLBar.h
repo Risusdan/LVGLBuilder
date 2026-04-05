@@ -1,6 +1,11 @@
 #ifndef LVGLBAR_H
 #define LVGLBAR_H
 
+/**
+ * @file LVGLBar.h
+ * @brief LVGLWidget subclass for lv_bar — progress bar with min/max range.
+ */
+
 #include "LVGLWidget.h"
 
 class LVGLBar : public LVGLWidget

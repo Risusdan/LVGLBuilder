@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYRANGE_H
 #define LVGLPROPERTYRANGE_H
 
+/**
+ * @file LVGLPropertyRange.h
+ * @brief LVGLProperty base subclass for min/max range pairs — groups Min and Max child properties.
+ */
+
 #include "LVGLProperty.h"
 
 // forward declaration

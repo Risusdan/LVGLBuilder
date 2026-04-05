@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYDDLISTANIMATIONTIME_H
 #define LVGLPROPERTYDDLISTANIMATIONTIME_H
 
+/**
+ * @file LVGLPropertyDDListAnimationTime.h
+ * @brief LVGLProperty subclass for lv_ddlist open/close animation duration.
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

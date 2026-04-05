@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYPAGEEDGEFLASH_H
 #define LVGLPROPERTYPAGEEDGEFLASH_H
 
+/**
+ * @file LVGLPropertyPageEdgeFlash.h
+ * @brief LVGLProperty subclass for lv_page edge-flash animation flag.
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYDDLISTDRAWARROW_H
 #define LVGLPROPERTYDDLISTDRAWARROW_H
 
+/**
+ * @file LVGLPropertyDDListDrawArrow.h
+ * @brief LVGLProperty subclass for lv_ddlist decoration arrow visibility.
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

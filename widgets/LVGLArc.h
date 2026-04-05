@@ -1,6 +1,11 @@
 #ifndef LVGLARC_H
 #define LVGLARC_H
 
+/**
+ * @file LVGLArc.h
+ * @brief LVGLWidget subclass for lv_arc — circular arc indicator with configurable angles.
+ */
+
 #include "LVGLWidget.h"
 
 class LVGLArc : public LVGLWidget

@@ -1,6 +1,11 @@
 #ifndef LVGLIMAGESLIDER_H
 #define LVGLIMAGESLIDER_H
 
+/**
+ * @file LVGLImageSlider.h
+ * @brief LVGLWidget subclass for the custom image-based slider widget.
+ */
+
 #include "LVGLWidget.h"
 
 class LVGLImageSlider : public LVGLWidget

@@ -1,12 +1,21 @@
 #ifndef LVGLFONTDIALOG_H
 #define LVGLFONTDIALOG_H
 
+/**
+ * @file LVGLFontDialog.h
+ * @brief Dialog for loading custom fonts with size and BPP (bits per pixel) selection.
+ */
+
 #include <QDialog>
 
 namespace Ui {
 class LVGLFontDialog;
 }
 
+/**
+ * @class LVGLFontDialog
+ * @brief Dialog that lets the user browse for a TTF file and choose font size and BPP.
+ */
 class LVGLFontDialog : public QDialog
 {
 	Q_OBJECT

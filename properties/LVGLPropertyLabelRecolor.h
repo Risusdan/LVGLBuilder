@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYLABELRECOLOR_H
 #define LVGLPROPERTYLABELRECOLOR_H
 
+/**
+ * @file LVGLPropertyLabelRecolor.h
+ * @brief LVGLProperty subclass for lv_label inline color-recolor enable flag.
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

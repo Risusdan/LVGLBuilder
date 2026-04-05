@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYPRELOADDIR_H
 #define LVGLPROPERTYPRELOADDIR_H
 
+/**
+ * @file LVGLPropertyPreloadDir.h
+ * @brief LVGLProperty subclass for lv_preload spin direction (forward/backward).
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

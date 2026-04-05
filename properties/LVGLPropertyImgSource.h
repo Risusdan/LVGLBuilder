@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYIMGSOURCE_H
 #define LVGLPROPERTYIMGSOURCE_H
 
+/**
+ * @file LVGLPropertyImgSource.h
+ * @brief LVGLProperty subclass for lv_img image source asset.
+ */
+
 #include "LVGLPropertyImage.h"
 #include "LVGLObject.h"
 #include "LVGLCore.h"

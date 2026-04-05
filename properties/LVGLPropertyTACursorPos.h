@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYTACURSORPOS_H
 #define LVGLPROPERTYTACURSORPOS_H
 
+/**
+ * @file LVGLPropertyTACursorPos.h
+ * @brief LVGLProperty subclass for lv_ta cursor position.
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

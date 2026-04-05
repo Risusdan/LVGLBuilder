@@ -1,12 +1,21 @@
 #ifndef RECENTFILESMANAGER_H
 #define RECENTFILESMANAGER_H
 
+/**
+ * @file RecentFilesManager.h
+ * @brief Tracks and displays recently opened project files in the File menu.
+ */
+
 #include <QAction>
 #include <QList>
 #include <QMenu>
 #include <QObject>
 #include <QString>
 
+/**
+ * @class RecentFilesManager
+ * @brief Maintains a bounded list of recently used file paths and populates a QMenu.
+ */
 class RecentFilesManager : public QObject {
   Q_OBJECT
 

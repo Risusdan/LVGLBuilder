@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYGAUGEVAL_H
 #define LVGLPROPERTYGAUGEVAL_H
 
+/**
+ * @file LVGLPropertyGaugeVal.h
+ * @brief LVGLProperty subclass for lv_gauge needle value.
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

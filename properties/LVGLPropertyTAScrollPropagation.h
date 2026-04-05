@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYTASCROLLPROPAGATION_H
 #define LVGLPROPERTYTASCROLLPROPAGATION_H
 
+/**
+ * @file LVGLPropertyTAScrollPropagation.h
+ * @brief LVGLProperty subclass for lv_ta scroll-propagation flag.
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

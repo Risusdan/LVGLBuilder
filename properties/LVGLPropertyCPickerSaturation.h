@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYCPICKERSATURATION_H
 #define LVGLPROPERTYCPICKERSATURATION_H
 
+/**
+ * @file LVGLPropertyCPickerSaturation.h
+ * @brief LVGLProperty subclass for lv_cpicker saturation value (0–100).
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

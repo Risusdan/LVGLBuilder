@@ -1,6 +1,11 @@
 #ifndef LVGLKEYBOARD_H
 #define LVGLKEYBOARD_H
 
+/**
+ * @file LVGLKeyboard.h
+ * @brief LVGLWidget subclass for lv_kb — on-screen keyboard for text input.
+ */
+
 #include "LVGLWidget.h"
 
 class LVGLKeyboard : public LVGLWidget

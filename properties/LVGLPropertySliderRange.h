@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYSLIDERRANGE_H
 #define LVGLPROPERTYSLIDERRANGE_H
 
+/**
+ * @file LVGLPropertySliderRange.h
+ * @brief LVGLProperty subclass for lv_slider min/max range.
+ */
+
 #include "LVGLPropertyRange.h"
 #include "LVGLObject.h"
 

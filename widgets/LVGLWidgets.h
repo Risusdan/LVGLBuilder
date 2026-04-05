@@ -1,6 +1,11 @@
 #ifndef LVGLWIDGETS_H
 #define LVGLWIDGETS_H
 
+/**
+ * @file LVGLWidgets.h
+ * @brief Aggregate include header for all widget type definitions.
+ */
+
 #include "LVGLWidget.h"
 
 #include "LVGLArc.h"

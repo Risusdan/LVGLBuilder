@@ -1,12 +1,25 @@
 #ifndef LVGLIMAGEDATA_H
 #define LVGLIMAGEDATA_H
 
+/**
+ * @file LVGLImageData.h
+ * @brief Image asset wrapper — loads images, converts to LVGL format, exports as C code.
+ */
+
 #include <QImage>
 #include <QIcon>
 #include <QJsonObject>
 #include <QJsonValue>
 #include <lvgl/lvgl.h>
 
+/**
+ * @class LVGLImageData
+ * @brief Represents a single image asset in the builder.
+ *
+ * Converts Qt images to LVGL's internal format (lv_img_dsc_t) and supports
+ * multiple color depths. Can serialize to JSON (for project save) and to
+ * C source code (for export).
+ */
 class LVGLImageData
 {
 public:

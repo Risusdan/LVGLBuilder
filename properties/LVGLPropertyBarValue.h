@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYBARVALUE_H
 #define LVGLPROPERTYBARVALUE_H
 
+/**
+ * @file LVGLPropertyBarValue.h
+ * @brief LVGLProperty subclass for lv_bar current value.
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 #include "lvgl/lvgl.h"

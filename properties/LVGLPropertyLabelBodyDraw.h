@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYLABELBODYDRAW_H
 #define LVGLPROPERTYLABELBODYDRAW_H
 
+/**
+ * @file LVGLPropertyLabelBodyDraw.h
+ * @brief LVGLProperty subclass for lv_label body-draw (background fill) flag.
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

@@ -1,6 +1,11 @@
 #ifndef LVGLOBJECTMANAGER_H
 #define LVGLOBJECTMANAGER_H
 
+/**
+ * @file LVGLObjectManager.h
+ * @brief Tracks all LVGLObject instances in the current project.
+ */
+
 #include <QList>
 #include <QObject>
 #include <QString>
@@ -9,6 +14,10 @@
 
 class LVGLObject;
 
+/**
+ * @class LVGLObjectManager
+ * @brief Registry for widget instances — add, remove, and query by name, type, or lv_obj_t.
+ */
 class LVGLObjectManager : public QObject {
   Q_OBJECT
  public:

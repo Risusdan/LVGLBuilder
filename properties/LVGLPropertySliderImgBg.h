@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYSLIDERIMGBG_H
 #define LVGLPROPERTYSLIDERIMGBG_H
 
+/**
+ * @file LVGLPropertySliderImgBg.h
+ * @brief LVGLProperty subclass for image-slider background image source.
+ */
+
 #include "LVGLPropertyImage.h"
 #include "LVGLObject.h"
 #include "LVGLCore.h"

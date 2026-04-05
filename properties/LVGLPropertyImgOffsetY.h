@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYIMGOFFSETY_H
 #define LVGLPROPERTYIMGOFFSETY_H
 
+/**
+ * @file LVGLPropertyImgOffsetY.h
+ * @brief LVGLProperty subclass for lv_img vertical scroll offset.
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

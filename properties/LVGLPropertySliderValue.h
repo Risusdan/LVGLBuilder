@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYSLIDERVALUE_H
 #define LVGLPROPERTYSLIDERVALUE_H
 
+/**
+ * @file LVGLPropertySliderValue.h
+ * @brief LVGLProperty subclass for lv_slider current value.
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

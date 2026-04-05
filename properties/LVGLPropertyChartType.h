@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYCHARTTYPE_H
 #define LVGLPROPERTYCHARTTYPE_H
 
+/**
+ * @file LVGLPropertyChartType.h
+ * @brief LVGLProperty subclass for lv_chart draw type flags (line, column, point, area).
+ */
+
 #include "LVGLPropertyFlags.h"
 #include "LVGLObject.h"
 

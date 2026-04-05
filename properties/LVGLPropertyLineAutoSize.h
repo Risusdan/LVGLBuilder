@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYLINEAUTOSIZE_H
 #define LVGLPROPERTYLINEAUTOSIZE_H
 
+/**
+ * @file LVGLPropertyLineAutoSize.h
+ * @brief LVGLProperty subclass for lv_line auto-size (fit bounding box to points) flag.
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

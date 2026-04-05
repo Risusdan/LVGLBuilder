@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYSLIDERIMGINDIC_H
 #define LVGLPROPERTYSLIDERIMGINDIC_H
 
+/**
+ * @file LVGLPropertySliderImgIndic.h
+ * @brief LVGLProperty subclass for image-slider indicator image source.
+ */
+
 #include "LVGLPropertyImage.h"
 #include "LVGLObject.h"
 #include "LVGLCore.h"

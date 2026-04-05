@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYIMGBTNSTATE_H
 #define LVGLPROPERTYIMGBTNSTATE_H
 
+/**
+ * @file LVGLPropertyImgBtnState.h
+ * @brief LVGLProperty subclass for lv_imgbtn active button state.
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

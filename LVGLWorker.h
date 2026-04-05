@@ -1,6 +1,11 @@
 #ifndef LVGLWORKER_H
 #define LVGLWORKER_H
 
+/**
+ * @file LVGLWorker.h
+ * @brief Stub QThread subclass — declared but not implemented or used.
+ */
+
 #include <QThread>
 #include <QTimer>
 

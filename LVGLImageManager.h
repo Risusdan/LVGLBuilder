@@ -1,6 +1,11 @@
 #ifndef LVGLIMAGEMANAGER_H
 #define LVGLIMAGEMANAGER_H
 
+/**
+ * @file LVGLImageManager.h
+ * @brief Manages the collection of image assets available to the builder.
+ */
+
 #include <QHash>
 #include <QList>
 #include <QObject>
@@ -9,6 +14,10 @@
 
 #include "LVGLImageData.h"
 
+/**
+ * @class LVGLImageManager
+ * @brief Registry for image assets — add, remove, and look up images by name or descriptor.
+ */
 class LVGLImageManager : public QObject {
   Q_OBJECT
  public:

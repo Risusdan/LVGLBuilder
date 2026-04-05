@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYTEXTLIST_H
 #define LVGLPROPERTYTEXTLIST_H
 
+/**
+ * @file LVGLPropertyTextList.h
+ * @brief LVGLProperty base subclass for editable string lists — provides an add/remove list editor.
+ */
+
 #include "LVGLProperty.h"
 
 class LVGLPropertyTextList : public LVGLProperty

@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYLINEPOINTS_H
 #define LVGLPROPERTYLINEPOINTS_H
 
+/**
+ * @file LVGLPropertyLinePoints.h
+ * @brief LVGLProperty subclass for lv_line point array.
+ */
+
 #include "LVGLPropertyPoints.h"
 #include "LVGLObject.h"
 

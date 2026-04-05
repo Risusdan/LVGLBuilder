@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYBTNSTATE_H
 #define LVGLPROPERTYBTNSTATE_H
 
+/**
+ * @file LVGLPropertyBtnState.h
+ * @brief LVGLProperty subclass for generic button state (released, pressed, etc.).
+ */
+
 #include "LVGLProperty.h"
 
 class QComboBox;

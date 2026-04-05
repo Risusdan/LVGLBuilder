@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYCPICKERCOLOR_H
 #define LVGLPROPERTYCPICKERCOLOR_H
 
+/**
+ * @file LVGLPropertyCPickerColor.h
+ * @brief LVGLProperty subclass for lv_cpicker selected color.
+ */
+
 #include "LVGLPropertyColor.h"
 #include "LVGLObject.h"
 

@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYIMGSLIDEROFFSET_H
 #define LVGLPROPERTYIMGSLIDEROFFSET_H
 
+/**
+ * @file LVGLPropertyImgSliderOffset.h
+ * @brief LVGLProperty subclass grouping image-slider knob X and Y offsets.
+ */
+
 #include <QJsonObject>
 #include "LVGLProperty.h"
 #include "LVGLObject.h"

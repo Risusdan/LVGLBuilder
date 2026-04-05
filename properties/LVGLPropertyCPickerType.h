@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYCPICKERTYPE_H
 #define LVGLPROPERTYCPICKERTYPE_H
 
+/**
+ * @file LVGLPropertyCPickerType.h
+ * @brief LVGLProperty subclass for lv_cpicker visual type (rectangle or disc).
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

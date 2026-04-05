@@ -1,6 +1,11 @@
 #ifndef ASSETMANAGER_H
 #define ASSETMANAGER_H
 
+/**
+ * @file AssetManager.h
+ * @brief Coordinates image and font asset UI panels (add, remove, list display).
+ */
+
 #include <QList>
 #include <QObject>
 #include <QString>
@@ -8,6 +13,13 @@
 class LVGLImageData;
 class LVGLFontData;
 
+/**
+ * @class AssetManager
+ * @brief Facade over LVGLImageManager and LVGLFontManager for UI-driven asset operations.
+ *
+ * Emits signals when the image or font list changes so connected UI panels
+ * (lists, combo boxes) can refresh automatically.
+ */
 class AssetManager : public QObject {
   Q_OBJECT
 

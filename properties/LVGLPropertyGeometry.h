@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYGEOMETRY_H
 #define LVGLPROPERTYGEOMETRY_H
 
+/**
+ * @file LVGLPropertyGeometry.h
+ * @brief LVGLProperty subclass for widget geometry (x, y, width, height).
+ */
+
 #include "LVGLProperty.h"
 
 class LVGLPropertyGeometry : public LVGLProperty

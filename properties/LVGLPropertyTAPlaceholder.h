@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYTAPLACEHOLDER_H
 #define LVGLPROPERTYTAPLACEHOLDER_H
 
+/**
+ * @file LVGLPropertyTAPlaceholder.h
+ * @brief LVGLProperty subclass for lv_ta placeholder text.
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

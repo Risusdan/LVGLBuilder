@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYTABCURRENT_H
 #define LVGLPROPERTYTABCURRENT_H
 
+/**
+ * @file LVGLPropertyTabCurrent.h
+ * @brief LVGLProperty subclass for lv_tabview active tab index.
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

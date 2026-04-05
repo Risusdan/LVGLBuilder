@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYCPICKERHUE_H
 #define LVGLPROPERTYCPICKERHUE_H
 
+/**
+ * @file LVGLPropertyCPickerHue.h
+ * @brief LVGLProperty subclass for lv_cpicker hue value (0–360).
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 

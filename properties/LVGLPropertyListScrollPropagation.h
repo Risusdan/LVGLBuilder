@@ -1,6 +1,11 @@
 #ifndef LVGLPROPERTYLISTSCROLLPROPAGATION_H
 #define LVGLPROPERTYLISTSCROLLPROPAGATION_H
 
+/**
+ * @file LVGLPropertyListScrollPropagation.h
+ * @brief LVGLProperty subclass for lv_list scroll-propagation flag.
+ */
+
 #include "LVGLProperty.h"
 #include "LVGLObject.h"
 
