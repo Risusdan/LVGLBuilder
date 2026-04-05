@@ -3,6 +3,7 @@
 #include <QIcon>
 
 #include "LVGLObject.h"
+#include "lvgl/lvgl/src/lv_objx/lv_mbox.h"
 #include "properties/LVGLPropertyTextList.h"
 #include "properties/LVGLPropertyMBoxButtons.h"
 
@@ -73,6 +74,12 @@ lv_style_t *LVGLMessageBox::style(lv_obj_t *obj, int type) const
 
 void LVGLMessageBox::setStyle(lv_obj_t *obj, int type, lv_style_t *style) const
 {
+	// Button styles (1-6) require ext->btnm to exist. When no buttons are
+	// configured, LVGL dereferences NULL and crashes.
+	if (type != LV_MBOX_STYLE_BG) {
+		lv_mbox_ext_t *ext = reinterpret_cast<lv_mbox_ext_t*>(lv_obj_get_ext_attr(obj));
+		if (ext->btnm == nullptr) return;
+	}
 	lv_mbox_set_style(obj, static_cast<lv_mbox_style_t>(type), style);
 }
 

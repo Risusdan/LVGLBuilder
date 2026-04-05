@@ -38,11 +38,6 @@ class TestWidgets : public QObject {
 
       QStringList styleNames = w->styles();
       for (int i = 0; i < styleNames.size(); ++i) {
-        // Skip button sub-object styles for lv_mbox when no buttons are
-        // configured -- LVGL dereferences a NULL btnm pointer internally.
-        if (w->className() == "lv_mbox" && i >= 1)
-          continue;
-
         lv_style_t *s = obj->style(i);
         QVERIFY2(s != nullptr, qPrintable(
             QString("Null style for %1 type %2").arg(w->className()).arg(i)));
