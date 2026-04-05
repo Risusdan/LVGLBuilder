@@ -1,6 +1,7 @@
 #include "LVGLPropertyRange.h"
 
 #include <QJsonObject>
+#include <algorithm>
 
 class LVGLPropertyMin : public LVGLPropertyInt
 {
@@ -14,7 +15,9 @@ public:
 	}
 	inline void set(LVGLObject *obj, int value) override {
 		LVGLPropertyRange *r = reinterpret_cast<LVGLPropertyRange *>(const_cast<LVGLProperty*>(m_parent));
-		r->set(obj, value, r->getMax(obj));
+		int max = r->getMax(obj);
+		if (value > max) value = max;
+		r->set(obj, value, max);
 	}
 
 };
@@ -31,7 +34,9 @@ public:
 	}
 	inline void set(LVGLObject *obj, int value) override {
 		LVGLPropertyRange *r = reinterpret_cast<LVGLPropertyRange *>(const_cast<LVGLProperty*>(m_parent));
-		r->set(obj, r->getMin(obj), value);
+		int min = r->getMin(obj);
+		if (value < min) value = min;
+		r->set(obj, min, value);
 	}
 
 };
@@ -58,7 +63,10 @@ void LVGLPropertyRange::setValue(LVGLObject *obj, QVariant value)
 {
 	if (value.typeId() == QMetaType::QVariantMap) {
 		QVariantMap map = value.toMap();
-		set(obj, map["min"].toInt(), map["max"].toInt());
+		int min = map["min"].toInt();
+		int max = map["max"].toInt();
+		if (min > max) std::swap(min, max);
+		set(obj, min, max);
 	}
 }
 
