@@ -20,43 +20,8 @@ Tests use QTest, run with `ctest --test-dir build`.
 
 ## Architecture
 
-### Core Classes
+See [docs/02-Architecture.md](docs/02-Architecture.md) for core classes, data flow, and key patterns.
 
-- **LVGLCore** — Singleton (`lvgl` global). Wraps LVGL display/input drivers, manages the framebuffer (renders to QImage), and owns all registered images, fonts, and widget type definitions.
-- **LVGLObject** — Represents a widget instance on the canvas. Wraps `lv_obj_t`, manages properties/styles/children, and handles JSON serialization and C code generation.
-- **LVGLWidget** (abstract base) — Defines a widget *type* (button, label, slider, etc.). Each subclass implements `newObject()` to create the underlying `lv_obj_t` and declares the type's available properties. ~35 subclasses in `widgets/`.
-- **LVGLProperty** (abstract base) — Defines a single editable property. Subclasses provide get/set logic, editor widgets, and JSON serialization. ~15 types in `properties/`.
-- **LVGLSimulator** — QGraphicsView that renders the LVGL framebuffer, handles interactive editing (drag, resize, selection), and processes drag-drop widget creation from the palette.
-- **LVGLItem** — QGraphicsItem that wraps an LVGLObject for canvas display with resize handles.
-- **MainWindow** — Coordinates the UI: widget palette, property inspector, object tree, style editor, and project operations (save/load/export).
-- **LVGLProject** — Project metadata (name, resolution). Handles JSON save/load and C code export by traversing the object tree.
+See [docs/05-Source-Layout.md](docs/05-Source-Layout.md) for directory structure and file descriptions.
 
-### Data Flow
-
-Widget creation: User drags from palette -> LVGLSimulator -> LVGLWidget.newObject() creates lv_obj_t -> LVGLObject wraps it -> LVGLItem added to scene -> LVGLObjectModel updated.
-
-Property editing: User selects widget -> LVGLPropertyModel populates inspector -> user edits -> LVGLProperty.set() updates lv_obj_t -> LVGLCore re-renders framebuffer.
-
-### Key Patterns
-
-- **Model-View**: LVGLPropertyModel/LVGLPropertyDelegate for the property inspector, LVGLObjectModel for the object tree, LVGLWidgetModel for the widget palette.
-- **Type Registry**: Widget types (LVGLWidget subclasses) are registered with LVGLCore at startup and looked up by type enum.
-- **Qt Resource System**: Icons and images bundled via `resources/res.qrc`.
-
-### Source Layout
-
-- Root `.cpp/.h` files: Core application classes (MainWindow, LVGLCore, LVGLSimulator, LVGLObject, etc.)
-- `widgets/`: LVGLWidget subclasses (one per widget type)
-- `properties/`: LVGLProperty subclasses (one per property type)
-- `lvgl/`: Vendored LVGL 6.1 library with `lv_conf.h` configuration
-- `freetype/`: Vendored FreeType library
-
-### Adding a New Widget
-
-1. Create a new LVGLWidget subclass in `widgets/` implementing `newObject()`, property declarations, and style definitions.
-2. Register it in LVGLCore's constructor where other widgets are registered.
-3. Add source files to `CMakeLists.txt` and `tests/CMakeLists.txt`.
-
-### Project File Format
-
-Projects are saved as JSON containing widget tree, properties, image/font assets, and display resolution. C code export generates `.c`/`.h` files with `lv_obj_create()` calls and property setters.
+See [docs/04-How-to-Add-a-Widget.md](docs/04-How-to-Add-a-Widget.md) for a step-by-step widget creation tutorial.
