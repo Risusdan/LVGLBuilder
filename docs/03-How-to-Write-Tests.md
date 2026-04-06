@@ -129,24 +129,70 @@ failure.
 
 ---
 
-## Appendix: Test Strategy and Audit Findings
+## Appendix: Test Strategy
 
 ### Test Suite Priority Order
 
-| # | Suite | What It Catches |
-|---|-------|----------------|
-| 1 | `tst_lvglobject` | Serialization copy-paste bugs, codeName sanitization, child lifecycle |
-| 2 | `tst_codeexport` | C code generation correctness, style code bugs |
-| 3 | `tst_widgets` | Wrong enum casts, defaultStyle gaps, smoke test all widget types |
-| 4 | `tst_lvglitem` | Resize edge cases, small widget handling |
-| 5 | `tst_assetmanagers` | Dangling default pointers, removal lifecycle |
-| 6 | `tst_properties_ext` | Val2 format bug, range validation, color round-trip, null safety |
+The suites are ordered by the severity of bugs they catch. Higher-priority
+suites protect against data corruption and incorrect code generation — bugs
+that silently produce wrong output. Lower-priority suites cover crashes and
+edge cases that are serious but more visible when they happen.
 
-### Sources of Truth (most authoritative first)
+| # | Suite | What It Catches | Why This Priority |
+|---|-------|----------------|-------------------|
+| 1 | `tst_lvglobject` | Serialization copy-paste bugs, codeName sanitization, child lifecycle | LVGLObject is the central data model — a serialization bug silently corrupts every saved project |
+| 2 | `tst_codeexport` | C code generation correctness, style code bugs | Exported C code runs on embedded hardware — a bug here means the device behaves differently from the builder preview |
+| 3 | `tst_widgets` | Wrong enum casts, defaultStyle gaps, smoke test all widget types | 28 widget types with repetitive code — copy-paste errors are common and affect style rendering |
+| 4 | `tst_lvglitem` | Resize edge cases, small widget handling | Resize bugs are user-visible but don't corrupt data |
+| 5 | `tst_assetmanagers` | Dangling default pointers, removal lifecycle | Asset cleanup bugs cause crashes, but only on specific user actions (removing assets) |
+| 6 | `tst_properties_ext` | Val2 format bug, range validation, color round-trip, null safety | Property edge cases are narrow — they affect specific property types, not the whole system |
 
-1. **LVGL 6.1 API contracts** — vendored headers in `lvgl/` are the spec
-2. **C language rules** — generated code must be valid C identifiers
-3. **Round-trip invariants** — save/load/save produces identical JSON
-4. **The code's own intent** — naming reveals spec (e.g., `shadow.width` reading from `border.width` is wrong)
-5. **Defensive invariants** — no crash on null, no use-after-free, cleanup on delete
+### Sources of Truth
+
+When writing a test, you need to know what "correct" means. This project
+has no external spec document, so we derive correctness from these sources,
+listed from most authoritative to least:
+
+**1. LVGL 6.1 API contracts** — The vendored headers in `lvgl/` are the
+ground truth for field names, enum values, and function signatures. If the
+builder uses `lv_btn_set_state()` with the wrong enum type, that's a bug
+regardless of whether it happens to work at runtime. Example: when testing
+that `setStyle()` casts to the right enum, look at the LVGL header for that
+widget to find the correct `lv_xxx_style_t` enum.
+
+**2. C language rules** — The builder exports C code that must compile on
+embedded toolchains. A valid C identifier matches `[a-zA-Z_][a-zA-Z0-9_]*`.
+If `codeName()` produces `"my widget"` (with a space), the exported code
+won't compile. This is an objective, language-level rule — no design
+decision needed. Example: test that `codeName()` sanitizes special
+characters, not just spaces.
+
+**3. Round-trip invariants** — These are mathematical properties that must
+hold regardless of any spec: if you save a project and load it back, the
+result should be identical. No information should be lost or transformed.
+This applies at every level:
+- `save() -> load() -> save()` produces identical JSON
+- `property.set(x) -> property.get()` returns `x`
+- `toJson() -> fromJson() -> toJson()` is stable
+
+Example: create a widget, set properties, serialize to JSON, deserialize,
+re-serialize — the two JSON outputs should match byte-for-byte.
+
+**4. The code's own intent** — When the code names something `shadow.width`
+but reads from `border.width`, the name itself tells you it's wrong. No
+spec needed — the developer who wrote it clearly intended to read the shadow
+width. Similarly, a format string `"%3, %3"` where two different getters
+exist is self-evidently a copy-paste bug (should be `"%3, %4"`). Example:
+when testing serialization, verify that each field name in the JSON matches
+the getter being called.
+
+**5. Defensive invariants** — Universal correctness rules that apply to any
+program:
+- No crash on null input
+- No use-after-free (deleting an object cleans up all references to it)
+- No assertion-only validation (`Q_ASSERT` disappears in Release builds,
+  so code that relies on it for safety is broken in production)
+
+Example: test that deleting a widget also removes it from its parent's
+child list, and that the parent doesn't hold a dangling pointer.
 
