@@ -150,37 +150,3 @@ failure.
 4. **The code's own intent** — naming reveals spec (e.g., `shadow.width` reading from `border.width` is wrong)
 5. **Defensive invariants** — no crash on null, no use-after-free, cleanup on delete
 
-### Key Audit Findings
-
-**Critical — Data Corruption:**
-1. Shadow width serialized as border width
-2. Line opacity serialized as image opacity
-3. Wrong field comparison in codeStyle
-4. LVGLPropertyVal2 outputs `%3, %3` instead of `%3, %4`
-5. 9 widgets cast style type to wrong enum
-6. codeName() only replaced spaces — invalid C identifiers
-7. Tab name not escaped in C export
-
-**High — Crashes & Dangling Pointers:**
-8. Constructor dereferences null parent
-9. Canvas destructor dereferences without null check
-10. Q_ASSERT for style type index — gone in Release builds
-11. findChildByIndex result not null-checked
-12. Delete key handler doesn't check null selection
-13. Image/Font manager defaults not cleared on removal
-14. SelectionManager holds raw pointers to deleted objects
-15. Early return in Left resize breaks corner resize
-16. Series property uses wrong index removing points
-17. DateList crashes on remove from empty list
-
-**Medium — Silent Failures:**
-18. File save truncates before writing — crash = data loss
-19. No JSON doc validation on load
-20. Null font data added to font list
-21. Child not removed from parent list on destruction
-22. removeChild doesn't null child's parent pointer
-23. Color property missing alpha on 16-bit depth
-24. No min<=max validation in range properties
-25. Resize handles break on widgets <12px
-26. Variable maximumWidth used for height
-27. Incomplete defaultStyle in TextArea
