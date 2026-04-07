@@ -333,6 +333,108 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * tabview, const char * name)
     return h;
 }
 
+/**
+ * Remove a tab by index.
+ * @param tabview pointer to Tab view object
+ * @param id index of the tab to remove (0-based). Ignored if tab_cnt <= 1.
+ */
+void lv_tabview_remove_tab(lv_obj_t * tabview, uint16_t id)
+{
+    LV_ASSERT_OBJ(tabview, LV_OBJX_NAME);
+
+    lv_tabview_ext_t * ext = lv_obj_get_ext_attr(tabview);
+
+    if(ext->tab_cnt <= 1) return;   /* refuse to remove the last tab */
+    if(id >= ext->tab_cnt) return;
+
+    /*
+     * 1. Delete the page object.
+     *    Pages are children of ext->content, ordered oldest-first.
+     *    lv_obj_get_child_back iterates oldest-to-newest, so we count
+     *    forward `id` times to find the target page.
+     */
+    lv_obj_t * page = lv_obj_get_child_back(ext->content, NULL);
+    for(uint16_t i = 0; i < id && page != NULL; i++) {
+        page = lv_obj_get_child_back(ext->content, page);
+    }
+    if(page != NULL) {
+        lv_obj_del(page);
+    }
+
+    /*
+     * 2. Free the dynamically-allocated name string and shift the
+     *    name-pointer array.
+     */
+    lv_mem_free((void *)ext->tab_name_ptr[id]);
+
+    ext->tab_cnt--;
+
+    switch(ext->btns_pos) {
+        case LV_TABVIEW_BTNS_POS_TOP:
+        case LV_TABVIEW_BTNS_POS_BOTTOM:
+            /* Array layout: [name0, name1, ..., nameN-1, ""]  (tab_cnt+1 pointers) */
+            for(uint16_t i = id; i < ext->tab_cnt; i++) {
+                ext->tab_name_ptr[i] = ext->tab_name_ptr[i + 1];
+            }
+            ext->tab_name_ptr[ext->tab_cnt] = "";
+            ext->tab_name_ptr = lv_mem_realloc((void *)ext->tab_name_ptr,
+                                               sizeof(char *) * (ext->tab_cnt + 1));
+            break;
+        case LV_TABVIEW_BTNS_POS_LEFT:
+        case LV_TABVIEW_BTNS_POS_RIGHT:
+            /* Array layout: [name0, "\n", name1, "\n", ..., nameN-1, ""]
+             *               = tab_cnt*2 pointers (before decrement it was (tab_cnt+1)*2) */
+            if(ext->tab_cnt == 1) {
+                /* Only one tab left — simple: [name, ""] */
+                ext->tab_name_ptr[0] = (id == 0) ? ext->tab_name_ptr[2] : ext->tab_name_ptr[0];
+                ext->tab_name_ptr[1] = "";
+            } else {
+                /* Remove the name and its preceding or following "\n" separator */
+                uint16_t arr_id;
+                uint16_t remove_count;
+                if(id == 0) {
+                    arr_id = 0;        /* remove [name0, "\n"] */
+                    remove_count = 2;
+                } else {
+                    arr_id = id * 2 - 1; /* remove ["\n", nameN] */
+                    remove_count = 2;
+                }
+                uint16_t old_total = (ext->tab_cnt + 1) * 2;  /* before we decremented tab_cnt */
+                for(uint16_t i = arr_id; i + remove_count < old_total; i++) {
+                    ext->tab_name_ptr[i] = ext->tab_name_ptr[i + remove_count];
+                }
+                /* New total = ext->tab_cnt * 2 */
+            }
+            ext->tab_name_ptr = lv_mem_realloc((void *)ext->tab_name_ptr,
+                                               sizeof(char *) * (ext->tab_cnt * 2));
+            break;
+    }
+
+    /*
+     * 3. Update the button matrix.
+     */
+    lv_btnm_ext_t * btnm_ext = lv_obj_get_ext_attr(ext->btns);
+    btnm_ext->map_p = NULL;
+    lv_btnm_set_map(ext->btns, ext->tab_name_ptr);
+
+    /*
+     * 4. Adjust the active tab index.
+     */
+    if(ext->tab_cur >= ext->tab_cnt) {
+        ext->tab_cur = ext->tab_cnt - 1;
+    } else if(ext->tab_cur > id) {
+        ext->tab_cur--;
+    }
+
+    lv_btnm_set_btn_ctrl(ext->btns, ext->tab_cur, LV_BTNM_CTRL_NO_REPEAT);
+
+    /*
+     * 5. Re-layout everything.
+     */
+    tabview_realign(tabview);
+    lv_tabview_set_tab_act(tabview, ext->tab_cur, LV_ANIM_OFF);
+}
+
 /*=====================
  * Setter functions
  *====================*/
