@@ -20,6 +20,10 @@ void LVGLObjectManager::removeObject(LVGLObject *object) {
   object = nullptr;
 }
 
+void LVGLObjectManager::detachObject(LVGLObject *object) {
+  m_objects.removeOne(object);
+}
+
 void LVGLObjectManager::removeAllObjects() {
   auto objs = m_objects;
   while (!objs.isEmpty()) {

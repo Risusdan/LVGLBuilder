@@ -25,6 +25,7 @@ class LVGLObjectManager : public QObject {
 
   void addObject(LVGLObject *object);
   void removeObject(LVGLObject *object);
+  void detachObject(LVGLObject *object);
   void removeAllObjects();
 
   void setAllObjects(QList<LVGLObject *> objs);

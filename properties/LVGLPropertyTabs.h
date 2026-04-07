@@ -29,7 +29,26 @@ protected:
 
 	inline void set(LVGLObject *obj, QStringList list) {
 		lv_tabview_ext_t * ext = reinterpret_cast<lv_tabview_ext_t*>(lv_obj_get_ext_attr(obj->obj()));
-		// rename
+
+		// --- Phase 1: Remove tabs that are no longer in the list ---
+		// Walk backward so indices stay valid after each removal.
+		for (int i = ext->tab_cnt - 1; i >= static_cast<int>(list.size()); --i) {
+			// Detach + delete the LVGLObject wrapper for this page.
+			// detachLvObj() prevents ~LVGLObject from calling lv_obj_del,
+			// since lv_tabview_remove_tab will delete the page lv_obj.
+			LVGLObject *page = obj->findChildByIndex(i);
+			if (page) {
+				page->detachLvObj();
+				obj->removeChild(page);
+				lvgl.objectManager()->detachObject(page);
+				delete page;
+			}
+			lv_tabview_remove_tab(obj->obj(), static_cast<uint16_t>(i));
+		}
+
+		// --- Phase 2: Rename existing tabs ---
+		// Re-read ext since tab_cnt may have changed
+		ext = reinterpret_cast<lv_tabview_ext_t*>(lv_obj_get_ext_attr(obj->obj()));
 		for (uint16_t i = 0; i < qMin(ext->tab_cnt, static_cast<uint16_t>(list.size())); ++i) {
 			QByteArray name = list.at(i).toLatin1();
 			if (strcmp(ext->tab_name_ptr[i], name.data()) == 0)
@@ -47,9 +66,8 @@ protected:
 			lv_btnm_set_btn_ctrl(ext->btns, ext->tab_cur, LV_BTNM_CTRL_NO_REPEAT);
 		}
 
-		// add new
+		// --- Phase 3: Add new tabs ---
 		for (uint16_t i = ext->tab_cnt; i < list.size(); ++i) {
-			//lv_tabview_add_tab(obj->obj(), qPrintable(list.at(i)));
 			lv_obj_t *page_obj = lv_tabview_add_tab(obj->obj(), qPrintable(list.at(i)));
 			LVGLObject *page = new LVGLObject(page_obj, lvgl.widget("lv_page"), obj, false, i);
 			lvgl.addObject(page);
