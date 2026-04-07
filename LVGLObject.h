@@ -209,6 +209,9 @@ public:
 	/** @brief Returns the sub-object index (used by TabView pages); -1 if not a sub-object. */
 	int index() const;
 
+	/** @brief Detach the underlying lv_obj_t so the destructor won't delete it. */
+	void detachLvObj() { m_obj = nullptr; }
+
 	/** @brief Finds a child by its sub-object index. */
 	LVGLObject *findChildByIndex(int index) const;
 

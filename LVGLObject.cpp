@@ -48,6 +48,7 @@ LVGLObject::LVGLObject(lv_obj_t *obj, const LVGLWidget *widgetClass, LVGLObject 
 
 LVGLObject::~LVGLObject()
 {
+	if (!m_obj) return;  // detached — LVGL object deleted externally
 	// Canvas objects allocate a separate pixel buffer that LVGL doesn't
 	// free automatically — we must delete it before lv_obj_del().
 	if (m_widgetClass && m_widgetClass->type() == LVGLWidget::Canvas) {
