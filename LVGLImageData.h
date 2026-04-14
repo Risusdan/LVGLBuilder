@@ -3,6 +3,8 @@
 
 #include <QImage>
 #include <QIcon>
+#include <QJsonObject>
+#include <QJsonValue>
 #include <lvgl/lvgl.h>
 
 class LVGLImageData

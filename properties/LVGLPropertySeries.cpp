@@ -236,7 +236,7 @@ void LVGLPropertySeries::updateWidget(LVGLObject *obj)
 
 	int maxPoints = 0;
 	for (const auto &s:m_widget->m_series)
-		maxPoints = std::max(maxPoints, s.points.size());
+		maxPoints = std::max(maxPoints, static_cast<int>(s.points.size()));
 
 	// clear the chart series (maybe lvgl should add a function for this)
 	lv_chart_series_t *ser;
@@ -329,7 +329,7 @@ void LVGLPropertySeries::setValue(LVGLObject *obj, QVariant value)
 
 				//lv_chart_set_next(chart, ser, static_cast<lv_coord_t>(v.toInt()));
 			}
-			maxPoints = std::max(maxPoints, item.points.size());
+			maxPoints = std::max(maxPoints, static_cast<int>(item.points.size()));
 			seriesList << item;
 		}
 
