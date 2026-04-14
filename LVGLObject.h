@@ -80,6 +80,23 @@ public:
 
 	LVGLObject *findChildByIndex(int index) const;
 
+	/**
+	 * @brief Detach the underlying lv_obj_t so the destructor won't delete it.
+	 *
+	 * Call this when an external owner (e.g. lv_tabview_remove_tab) will
+	 * delete the lv_obj_t. Sets m_obj to nullptr so ~LVGLObject() is a no-op.
+	 */
+	void detachLvObj();
+
+	/**
+	 * @brief Recursively detach this object and all descendant LVGLObjects.
+	 *
+	 * Use when removing a container (e.g. a tab page) that has child widgets.
+	 * lv_obj_del() on the container recursively frees all LVGL children,
+	 * so every wrapper in the subtree must be detached to prevent double-free.
+	 */
+	void detachLvObjRecursive();
+
 signals:
 	void positionChanged();
 

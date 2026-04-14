@@ -41,7 +41,26 @@ LVGLObject::LVGLObject(lv_obj_t *obj, const LVGLWidget *widgetClass, LVGLObject 
 
 LVGLObject::~LVGLObject()
 {
+	// Guard: if m_obj was detached (set to nullptr), the LVGL object is
+	// being deleted by an external owner (e.g. lv_tabview_remove_tab).
+	// Calling lv_obj_del on a null/freed pointer would crash.
+	if (!m_obj) return;
 	lv_obj_del(m_obj);
+}
+
+void LVGLObject::detachLvObj()
+{
+	m_obj = nullptr;
+}
+
+void LVGLObject::detachLvObjRecursive()
+{
+	// Detach all children first (depth-first), then detach self.
+	// This mirrors lv_obj_del's recursive deletion of LVGL children.
+	for (LVGLObject *child : m_childs) {
+		child->detachLvObjRecursive();
+	}
+	m_obj = nullptr;
 }
 
 lv_obj_t *LVGLObject::obj() const
