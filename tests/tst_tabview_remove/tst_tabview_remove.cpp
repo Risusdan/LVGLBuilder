@@ -124,6 +124,62 @@ class TestTabviewRemove : public QObject {
 
     lv_obj_del(tv);
   }
+
+  // =================================================================
+  // Round 2: LVGLObject detach tests
+  // These test the double-delete prevention mechanism.
+  //
+  // Background: lv_tabview_remove_tab() calls lv_obj_del(page), which
+  // deletes the LVGL page. But ~LVGLObject() also calls lv_obj_del(m_obj).
+  // If both run, the app crashes (double-free). detachLvObj() sets
+  // m_obj = nullptr so the destructor becomes a safe no-op.
+  // =================================================================
+
+  void detachPreventsDoubleDelete() {
+    lv_obj_t *screen = lv_scr_act();
+    lv_obj_t *tv = lv_tabview_create(screen, nullptr);
+    lv_obj_t *page_obj = lv_tabview_add_tab(tv, "Tab1");
+
+    const LVGLWidget *pageWidget = lvgl.widget("lv_page");
+    QVERIFY(pageWidget != nullptr);
+    LVGLObject *pageWrapper = new LVGLObject(page_obj, pageWidget, nullptr, false, 0);
+
+    pageWrapper->detachLvObj();
+    QVERIFY(pageWrapper->obj() == nullptr);
+
+    // This delete should NOT crash — destructor skips lv_obj_del
+    delete pageWrapper;
+
+    lv_obj_del(tv);
+  }
+
+  void detachRecursive() {
+    lv_obj_t *screen = lv_scr_act();
+    lv_obj_t *tv = lv_tabview_create(screen, nullptr);
+    lv_obj_t *page_obj = lv_tabview_add_tab(tv, "Tab1");
+
+    const LVGLWidget *pageWidget = lvgl.widget("lv_page");
+    const LVGLWidget *labelWidget = lvgl.widget("lv_label");
+    QVERIFY(pageWidget != nullptr);
+    QVERIFY(labelWidget != nullptr);
+
+    LVGLObject *pageWrapper = new LVGLObject(page_obj, pageWidget, nullptr, false, 0);
+    lv_obj_t *lbl = lv_label_create(page_obj, nullptr);
+    LVGLObject *lblWrapper = new LVGLObject(lbl, labelWidget, pageWrapper, true, -1);
+
+    QVERIFY(pageWrapper->obj() != nullptr);
+    QVERIFY(lblWrapper->obj() != nullptr);
+
+    pageWrapper->detachLvObjRecursive();
+
+    QVERIFY(pageWrapper->obj() == nullptr);
+    QVERIFY(lblWrapper->obj() == nullptr);
+
+    delete lblWrapper;
+    delete pageWrapper;
+
+    lv_obj_del(tv);
+  }
 };
 
 QTEST_MAIN(TestTabviewRemove)
