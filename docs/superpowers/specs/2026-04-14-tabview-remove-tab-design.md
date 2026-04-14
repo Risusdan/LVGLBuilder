@@ -13,6 +13,21 @@ Two layers of work:
 
 2. **Builder C++/Qt layer** — The existing `LVGLPropertyTabs::set()` gains a removal code-path using a by-name matching algorithm that identifies which specific tabs were removed (rather than trimming from the end). This requires a `detachLvObj` mechanism on `LVGLObject` to prevent double-deletion of LVGL objects.
 
+### End-to-end workflow
+
+```
+User opens TabView's "Tabs" property dialog (LVGLPropertyTextListDialog)
+  → sees current tab names in a QListWidget (e.g. [A, B, C])
+  → deletes "B" using the trash-can button, presses OK
+  → dialog returns new list [A, C]
+
+LVGLPropertyTabs::set() receives oldNames=[A,B,C], newNames=[A,C]
+  → Phase 1: by-name matching detects "B" was removed
+  → Phase 2: surviving tabs [A,C] match positions — no renames
+  → Phase 3: no additions needed
+  → Result: LVGL tabview now has [A, C], C's page content is preserved
+```
+
 ---
 
 ## Component 1: `lv_tabview_remove_tab()`
@@ -21,18 +36,77 @@ Two layers of work:
 
 **Signature:** `void lv_tabview_remove_tab(lv_obj_t * tabview, uint16_t id)`
 
-**Behavior:**
+**Behavior — annotated pseudocode:**
 
-1. **Guard:** Return immediately if `id >= tab_cnt` or `tab_cnt <= 1` (refuse to remove the last tab).
-2. **Delete page:** Find the `id`-th child of `ext->content` via `lv_obj_get_child_back()` traversal, call `lv_obj_del()`.
-3. **Free name string:** `lv_mem_free(ext->tab_name_ptr[id])`.
-4. **Decrement** `ext->tab_cnt`.
-5. **Shift name-pointer array** and realloc smaller. Two formats:
-   - **TOP/BOTTOM:** `[name0, name1, ..., ""]` — shift entries left, terminate with `""`, realloc to `(tab_cnt + 1) * sizeof(char*)`.
-   - **LEFT/RIGHT:** `[name0, "\n", name1, "\n", ..., ""]` — remove the name and its adjacent `"\n"` separator, realloc to `tab_cnt * 2 * sizeof(char*)`.
-6. **Rebuild button matrix:** Invalidate `btnm_ext->map_p = NULL`, then `lv_btnm_set_map(ext->btns, ext->tab_name_ptr)`.
-7. **Adjust `ext->tab_cur`:** Clamp to `tab_cnt - 1` if beyond; decrement if after the removed index.
-8. **Re-layout:** `tabview_realign(tabview)` + `lv_tabview_set_tab_act(tabview, ext->tab_cur, LV_ANIM_OFF)`.
+```c
+void lv_tabview_remove_tab(lv_obj_t * tabview, uint16_t id)
+{
+    lv_tabview_ext_t * ext = lv_obj_get_ext_attr(tabview);
+
+    /* --- Guard: refuse invalid or degenerate removals ---
+     * A tabview with 0 or 1 tab cannot lose its last tab (LVGL has no
+     * "empty tabview" state). Out-of-bounds ids are silently ignored. */
+    if(ext->tab_cnt <= 1) return;
+    if(id >= ext->tab_cnt) return;
+
+    /* --- Step 1: Delete the LVGL page object ---
+     * Tab pages live as children of ext->content (a container with
+     * LV_LAYOUT_ROW_T). lv_obj_get_child_back() iterates oldest-first,
+     * so counting forward `id` times reaches the correct page.
+     * lv_obj_del() recursively frees the page and all widgets on it. */
+    lv_obj_t * page = lv_obj_get_child_back(ext->content, NULL);
+    for(uint16_t i = 0; i < id && page; i++)
+        page = lv_obj_get_child_back(ext->content, page);
+    if(page) lv_obj_del(page);
+
+    /* --- Step 2: Free the dynamically-allocated name string ---
+     * lv_tabview_add_tab() allocates each name via lv_mem_alloc().
+     * We must free it before shifting the array. */
+    lv_mem_free(ext->tab_name_ptr[id]);
+
+    /* --- Step 3: Shrink tab_cnt, then compact the name-pointer array ---
+     *
+     * The array format depends on button position:
+     *
+     * TOP/BOTTOM: [name0, name1, ..., nameN-1, ""]
+     *   → (tab_cnt + 1) pointers. The "" sentinel terminates the btnm map.
+     *   → Shift entries left starting at `id`, re-terminate with "".
+     *
+     * LEFT/RIGHT: [name0, "\n", name1, "\n", ..., nameN-1, ""]
+     *   → (tab_cnt * 2) pointers. "\n" literals (not allocated) separate rows.
+     *   → First tab: remove [name0, "\n"]. Others: remove ["\n", nameN].
+     *   → Special case: if only 1 tab remains, array is just [name, ""].
+     */
+    ext->tab_cnt--;
+    // ... shift + realloc per format (see implementation) ...
+
+    /* --- Step 4: Rebuild the button matrix ---
+     * The old btnm map pointer may have been freed by lv_mem_realloc,
+     * so we must invalidate it before setting the new map. */
+    lv_btnm_ext_t * btnm_ext = lv_obj_get_ext_attr(ext->btns);
+    btnm_ext->map_p = NULL;
+    lv_btnm_set_map(ext->btns, ext->tab_name_ptr);
+
+    /* --- Step 5: Adjust active tab index ---
+     * Three cases:
+     *   tab_cur > id  → decrement (tabs above shifted down)
+     *   tab_cur == id → the active tab was removed; now points to
+     *                    the next tab (same index) or clamps if at end
+     *   tab_cur < id  → unchanged
+     * In all cases, clamp to tab_cnt - 1. */
+    if(ext->tab_cur >= ext->tab_cnt)
+        ext->tab_cur = ext->tab_cnt - 1;
+    else if(ext->tab_cur > id)
+        ext->tab_cur--;
+
+    /* --- Step 6: Re-layout ---
+     * tabview_realign() resizes all page objects, repositions buttons
+     * and indicator. lv_tabview_set_tab_act() scrolls content to the
+     * (possibly new) active tab and updates the toggle highlight. */
+    tabview_realign(tabview);
+    lv_tabview_set_tab_act(tabview, ext->tab_cur, LV_ANIM_OFF);
+}
+```
 
 ---
 
@@ -46,15 +120,42 @@ Two layers of work:
 - `void detachLvObjRecursive()` — calls `detachLvObj()` on self and all descendant `LVGLObject`s recursively. Needed because a tab page can have child widgets, and `lv_obj_del(page)` recursively deletes all LVGL children.
 - **Destructor guard** — `if (!m_obj) return;` at the top of `~LVGLObject()`.
 
-**Removal sequence in the property editor:**
+**Removal sequence — annotated with WHY each step's order matters:**
 
-```
-page->detachLvObjRecursive();   // prevent all wrappers from calling lv_obj_del
-lvgl.removeObject(page);         // clean up wrapper tree (children, parent refs, m_objects, delete)
-lv_tabview_remove_tab(tv, id);   // LVGL handles the actual lv_obj deletion
-```
+```cpp
+// === Removing a tab page from the builder ===
+//
+// There are TWO parallel object trees that must stay in sync:
+//
+//   LVGL tree:    lv_obj_t (tabview) → lv_obj_t (page) → lv_obj_t (child widgets)
+//   Builder tree: LVGLObject (tabview) → LVGLObject (page) → LVGLObject (child widgets)
+//
+// lv_tabview_remove_tab() deletes the LVGL page + all its LVGL children.
+// lvgl.removeObject() deletes the LVGLObject page + all its LVGLObject children.
+// If both run independently, each LVGLObject destructor calls lv_obj_del()
+// on an already-deleted lv_obj_t → crash (double-free).
+//
+// Solution: detach first, so destructors become no-ops.
 
-`lvgl.removeObject()` already handles recursive child cleanup, removal from parent's child list, removal from `m_objects`, and `delete`. With detached `m_obj`s, all destructors are safe no-ops.
+// Step 1: Detach ALL wrappers in the subtree.
+// After this, every LVGLObject under `page` has m_obj == nullptr,
+// so their destructors won't call lv_obj_del().
+page->detachLvObjRecursive();
+
+// Step 2: Clean up the builder-side tree.
+// lvgl.removeObject() recursively:
+//   - removes each child LVGLObject from m_objects list
+//   - removes page from parent's child list
+//   - deletes all LVGLObject wrappers (destructors are safe — m_obj is null)
+// After this, the builder tree is clean. The LVGL tree is still intact.
+lvgl.removeObject(page);
+
+// Step 3: Clean up the LVGL-side tree.
+// lv_tabview_remove_tab() calls lv_obj_del(page) which frees the LVGL
+// page object and all its LVGL children, then rebuilds the button matrix
+// and re-layouts the tabview.
+lv_tabview_remove_tab(tv, id);
+```
 
 ---
 
@@ -64,29 +165,101 @@ lv_tabview_remove_tab(tv, id);   // LVGL handles the actual lv_obj deletion
 
 **Constraint:** LVGL's `lv_tabview_add_tab()` only appends — no insert-at-position. So we can remove any tab by index but can only add at the end.
 
-**New three-phase algorithm:**
+**New three-phase algorithm — annotated pseudocode:**
 
-### Phase 1 — Name-based removal (highest index first)
+```cpp
+void LVGLPropertyTabs::set(LVGLObject *obj, QStringList newNames) {
+    lv_tabview_ext_t *ext = lv_obj_get_ext_attr(obj->obj());
 
-Build a `name → count` map from the new list. Walk the old tab names: if a name has remaining count > 0, it survives (decrement count); otherwise mark for removal.
+    // ================================================================
+    // PHASE 1: Name-based removal — detect which tabs were deleted
+    // ================================================================
+    //
+    // Strategy: use a name→count map to match old tabs against new tabs.
+    //
+    // Example: old=[A, B, C], new=[A, C]
+    //   countMap from new: {A:1, C:1}
+    //   Walk old: A → found (A:0), B → not found → REMOVE, C → found (C:0)
+    //   toRemove = [1]  (index of "B")
+    //
+    // Why a count map instead of a simple set?
+    //   Handles duplicate tab names. If old=[A, A, B] and new=[A, B],
+    //   the first A survives (count 1→0), the second A is removed (count=0).
 
-Process removals from highest index to lowest so indices stay valid:
+    // Build name→count map from newNames
+    QMap<QString, int> countMap;
+    for (const QString &name : newNames)
+        countMap[name]++;
 
+    // Walk old tabs, consume counts to decide survive vs. remove
+    QList<int> toRemove;
+    for (uint16_t i = 0; i < ext->tab_cnt; ++i) {
+        QString oldName(ext->tab_name_ptr[i]);
+        if (countMap.value(oldName, 0) > 0) {
+            countMap[oldName]--;   // this old tab survives
+        } else {
+            toRemove.append(i);   // this old tab was deleted by user
+        }
+    }
+
+    // Process removals from HIGHEST index to LOWEST.
+    // Why reverse order? When we remove index 2, indices 0 and 1 are
+    // unaffected. If we removed index 0 first, all higher indices would
+    // shift down and our stored indices would be wrong.
+    for (int r = toRemove.size() - 1; r >= 0; --r) {
+        int i = toRemove[r];
+        LVGLObject *page = obj->findChildByIndex(i);
+        if (page) {
+            page->detachLvObjRecursive();  // prevent double-delete
+            lvgl.removeObject(page);       // clean up builder wrappers
+        }
+        lv_tabview_remove_tab(obj->obj(), static_cast<uint16_t>(i));
+    }
+
+    // ================================================================
+    // PHASE 2: Positional rename — handle in-place text edits
+    // ================================================================
+    //
+    // After removals, the surviving LVGL tabs are at indices 0..tab_cnt-1.
+    // Compare each with newNames[i]. If they differ, the user edited the
+    // text in the dialog → rename in place.
+    //
+    // Example: old=[A, B, C] → after removing B → LVGL has [A, C]
+    //          new=[A, C] → A=A ok, C=C ok → no renames needed.
+    //
+    // Example: old=[A, B] → no removals → LVGL has [A, B]
+    //          new=[A, X] → A=A ok, B≠X → rename B to X.
+
+    ext = lv_obj_get_ext_attr(obj->obj());  // re-read (tab_cnt changed)
+    for (uint16_t i = 0; i < qMin(ext->tab_cnt, (uint16_t)newNames.size()); ++i) {
+        QByteArray name = newNames.at(i).toLatin1();
+        if (strcmp(ext->tab_name_ptr[i], name.data()) == 0)
+            continue;  // name unchanged, skip
+
+        // Allocate new name string and replace in the array
+        char *name_dm = (char *)lv_mem_alloc(name.size() + 1);
+        memcpy(name_dm, name.constData(), name.size() + 1);
+        ext->tab_name_ptr[i] = name_dm;
+        lv_btnm_set_map(ext->btns, ext->tab_name_ptr);
+    }
+
+    // ================================================================
+    // PHASE 3: Append new tabs — handle additions
+    // ================================================================
+    //
+    // Any newNames entries beyond the current tab_cnt are brand-new tabs.
+    // LVGL only supports appending (no insert-at-position).
+    //
+    // Example: old=[A, C] (after removal), new=[A, C, D]
+    //          → tab_cnt=2, newNames.size()=3 → add "D" at the end.
+
+    for (int i = ext->tab_cnt; i < newNames.size(); ++i) {
+        lv_obj_t *page_obj = lv_tabview_add_tab(obj->obj(), qPrintable(newNames.at(i)));
+        LVGLObject *page = new LVGLObject(page_obj, lvgl.widget("lv_page"), obj, false, i);
+        lvgl.addObject(page);
+    }
+}
 ```
-for each removal index i (descending):
-    page = obj->findChildByIndex(i)
-    page->detachLvObjRecursive()
-    lvgl.removeObject(page)
-    lv_tabview_remove_tab(tv, i)
-```
-
-### Phase 2 — Positional rename
-
-After removals, compare each surviving tab's name with `newNames[i]`. Rename any that differ (handles in-place text edits in the dialog).
-
-### Phase 3 — Append new tabs
-
-For indices beyond `ext->tab_cnt`, call `lv_tabview_add_tab()` and create `LVGLObject` wrappers.
 
 ### Scenario coverage
 
