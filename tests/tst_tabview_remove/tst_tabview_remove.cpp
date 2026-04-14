@@ -30,6 +30,100 @@ class TestTabviewRemove : public QObject {
     QCOMPARE(lv_tabview_get_tab_count(tv), static_cast<uint16_t>(1));
     lv_obj_del(tv);
   }
+
+  // =================================================================
+  // Round 1: LVGL-level removal tests
+  // These test lv_tabview_remove_tab() directly on the LVGL C layer.
+  // =================================================================
+
+  // Remove a middle tab from a 3-tab tabview.
+  void removeSingleTab() {
+    lv_obj_t *screen = lv_scr_act();
+    lv_obj_t *tv = lv_tabview_create(screen, nullptr);
+    lv_tabview_add_tab(tv, "A");
+    lv_tabview_add_tab(tv, "B");
+    lv_tabview_add_tab(tv, "C");
+
+    QCOMPARE(lv_tabview_get_tab_count(tv), static_cast<uint16_t>(3));
+
+    lv_tabview_remove_tab(tv, 1);  // remove "B"
+
+    QCOMPARE(lv_tabview_get_tab_count(tv), static_cast<uint16_t>(2));
+
+    lv_tabview_ext_t *ext = reinterpret_cast<lv_tabview_ext_t *>(
+        lv_obj_get_ext_attr(tv));
+    QCOMPARE(QString(ext->tab_name_ptr[0]), QString("A"));
+    QCOMPARE(QString(ext->tab_name_ptr[1]), QString("C"));
+
+    QCOMPARE(lv_tabview_get_tab_act(tv), static_cast<uint16_t>(0));
+
+    lv_obj_del(tv);
+  }
+
+  // Remove the first tab (index 0).
+  void removeFirstTab() {
+    lv_obj_t *screen = lv_scr_act();
+    lv_obj_t *tv = lv_tabview_create(screen, nullptr);
+    lv_tabview_add_tab(tv, "X");
+    lv_tabview_add_tab(tv, "Y");
+
+    lv_tabview_remove_tab(tv, 0);
+
+    QCOMPARE(lv_tabview_get_tab_count(tv), static_cast<uint16_t>(1));
+    lv_tabview_ext_t *ext = reinterpret_cast<lv_tabview_ext_t *>(
+        lv_obj_get_ext_attr(tv));
+    QCOMPARE(QString(ext->tab_name_ptr[0]), QString("Y"));
+    QCOMPARE(lv_tabview_get_tab_act(tv), static_cast<uint16_t>(0));
+
+    lv_obj_del(tv);
+  }
+
+  // Remove the last tab while it is the active tab.
+  void removeLastTabActive() {
+    lv_obj_t *screen = lv_scr_act();
+    lv_obj_t *tv = lv_tabview_create(screen, nullptr);
+    lv_tabview_add_tab(tv, "P");
+    lv_tabview_add_tab(tv, "Q");
+    lv_tabview_add_tab(tv, "R");
+
+    lv_tabview_set_tab_act(tv, 2, LV_ANIM_OFF);
+    lv_tabview_remove_tab(tv, 2);
+
+    QCOMPARE(lv_tabview_get_tab_count(tv), static_cast<uint16_t>(2));
+    QCOMPARE(lv_tabview_get_tab_act(tv), static_cast<uint16_t>(1));
+
+    lv_obj_del(tv);
+  }
+
+  // Attempt to remove when only 1 tab — should be no-op.
+  void removeIgnoredWhenOnlyOneTab() {
+    lv_obj_t *screen = lv_scr_act();
+    lv_obj_t *tv = lv_tabview_create(screen, nullptr);
+    lv_tabview_add_tab(tv, "Solo");
+
+    lv_tabview_remove_tab(tv, 0);
+
+    QCOMPARE(lv_tabview_get_tab_count(tv), static_cast<uint16_t>(1));
+    lv_tabview_ext_t *ext = reinterpret_cast<lv_tabview_ext_t *>(
+        lv_obj_get_ext_attr(tv));
+    QCOMPARE(QString(ext->tab_name_ptr[0]), QString("Solo"));
+
+    lv_obj_del(tv);
+  }
+
+  // Attempt to remove at out-of-bounds index — should be no-op.
+  void removeOutOfBoundsIgnored() {
+    lv_obj_t *screen = lv_scr_act();
+    lv_obj_t *tv = lv_tabview_create(screen, nullptr);
+    lv_tabview_add_tab(tv, "A");
+    lv_tabview_add_tab(tv, "B");
+
+    lv_tabview_remove_tab(tv, 99);
+
+    QCOMPARE(lv_tabview_get_tab_count(tv), static_cast<uint16_t>(2));
+
+    lv_obj_del(tv);
+  }
 };
 
 QTEST_MAIN(TestTabviewRemove)
