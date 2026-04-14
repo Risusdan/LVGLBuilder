@@ -333,6 +333,140 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * tabview, const char * name)
     return h;
 }
 
+/**
+ * Remove a tab by index.
+ *
+ * Deletes the tab's page object, frees its name string, compacts the
+ * name-pointer array, rebuilds the button matrix, adjusts tab_cur,
+ * and re-layouts the tabview.
+ *
+ * Ignored if tab_cnt <= 1 (LVGL has no "empty tabview" state) or
+ * id >= tab_cnt (out of bounds).
+ *
+ * @param tabview pointer to Tab view object
+ * @param id      index of the tab to remove (0-based)
+ */
+void lv_tabview_remove_tab(lv_obj_t * tabview, uint16_t id)
+{
+    LV_ASSERT_OBJ(tabview, LV_OBJX_NAME);
+
+    lv_tabview_ext_t * ext = lv_obj_get_ext_attr(tabview);
+
+    /* --- Guard: refuse invalid or degenerate removals ---
+     * A tabview with 0 or 1 tab cannot lose its last tab (LVGL has no
+     * "empty tabview" state). Out-of-bounds ids are silently ignored. */
+    if(ext->tab_cnt <= 1) return;
+    if(id >= ext->tab_cnt) return;
+
+    /* --- Step 1: Delete the LVGL page object ---
+     * Tab pages live as children of ext->content (a container with
+     * LV_LAYOUT_ROW_T). lv_obj_get_child_back() iterates oldest-first
+     * (creation order), so counting forward `id` times reaches the
+     * correct page. lv_obj_del() recursively frees the page and all
+     * widgets on it. */
+    lv_obj_t * page = lv_obj_get_child_back(ext->content, NULL);
+    for(uint16_t i = 0; i < id && page != NULL; i++) {
+        page = lv_obj_get_child_back(ext->content, page);
+    }
+    if(page != NULL) {
+        lv_obj_del(page);
+    }
+
+    /* --- Step 2: Free the dynamically-allocated name string ---
+     * lv_tabview_add_tab() allocates each name via lv_mem_alloc().
+     * We must free it before shifting the array. */
+    lv_mem_free((void *)ext->tab_name_ptr[id]);
+
+    /* --- Step 3: Shrink tab_cnt, then compact the name-pointer array ---
+     *
+     * The array format depends on button position:
+     *
+     * TOP/BOTTOM: [name0, name1, ..., nameN-1, ""]
+     *   -> (tab_cnt + 1) pointers. The "" sentinel terminates the btnm map.
+     *   -> Shift entries left starting at `id`, re-terminate with "".
+     *
+     * LEFT/RIGHT: [name0, "\n", name1, "\n", ..., nameN-1, ""]
+     *   -> (old_tab_cnt * 2) pointers. "\n" literals (not allocated)
+     *     separate button rows.
+     *   -> First tab (id==0): remove [name0, "\n"] (indices 0-1).
+     *     Other tabs: remove ["\n", nameN] (the separator before the name).
+     *   -> Special case: if only 1 tab remains, array is just [name, ""].
+     */
+    ext->tab_cnt--;
+
+    switch(ext->btns_pos) {
+        case LV_TABVIEW_BTNS_POS_TOP:
+        case LV_TABVIEW_BTNS_POS_BOTTOM:
+            /* Shift entries left to fill the gap at `id` */
+            for(uint16_t i = id; i < ext->tab_cnt; i++) {
+                ext->tab_name_ptr[i] = ext->tab_name_ptr[i + 1];
+            }
+            ext->tab_name_ptr[ext->tab_cnt] = "";
+            ext->tab_name_ptr = lv_mem_realloc((void *)ext->tab_name_ptr,
+                                               sizeof(char *) * (ext->tab_cnt + 1));
+            break;
+        case LV_TABVIEW_BTNS_POS_LEFT:
+        case LV_TABVIEW_BTNS_POS_RIGHT:
+            if(ext->tab_cnt == 1) {
+                /* Only one tab left -- result is just [survivor_name, ""].
+                 * If we removed id==0, the survivor was at old index 1
+                 * (old array position 2). If we removed id==1, the survivor
+                 * is already at position 0. */
+                if(id == 0) {
+                    ext->tab_name_ptr[0] = ext->tab_name_ptr[2];
+                }
+                ext->tab_name_ptr[1] = "";
+            } else {
+                /* Remove the name and its adjacent "\n" separator.
+                 * First tab (id==0): remove positions [0,1] -> [name0, "\n"].
+                 * Other tabs (id>0): remove positions [id*2-1, id*2] -> ["\n", nameN].
+                 * Then shift the remaining entries left by 2. */
+                uint16_t arr_id;
+                if(id == 0) {
+                    arr_id = 0;        /* remove [name0, "\n"] */
+                } else {
+                    arr_id = id * 2 - 1; /* remove ["\n", nameN] */
+                }
+                /* old total entries = (ext->tab_cnt + 1) * 2  (before decrement) */
+                uint16_t old_total = (ext->tab_cnt + 1) * 2;
+                for(uint16_t i = arr_id; i + 2 < old_total; i++) {
+                    ext->tab_name_ptr[i] = ext->tab_name_ptr[i + 2];
+                }
+            }
+            ext->tab_name_ptr = lv_mem_realloc((void *)ext->tab_name_ptr,
+                                               sizeof(char *) * (ext->tab_cnt * 2));
+            break;
+    }
+
+    /* --- Step 4: Rebuild the button matrix ---
+     * The old btnm map pointer may have been freed by lv_mem_realloc,
+     * so we must invalidate it before setting the new map. */
+    lv_btnm_ext_t * btnm_ext = lv_obj_get_ext_attr(ext->btns);
+    btnm_ext->map_p = NULL;
+    lv_btnm_set_map(ext->btns, ext->tab_name_ptr);
+
+    /* --- Step 5: Adjust active tab index ---
+     * Three cases:
+     *   tab_cur > id  -> decrement (tabs above shifted down)
+     *   tab_cur == id and at end -> clamp to tab_cnt - 1
+     *   tab_cur < id  -> unchanged
+     */
+    if(ext->tab_cur >= ext->tab_cnt) {
+        ext->tab_cur = ext->tab_cnt - 1;
+    } else if(ext->tab_cur > id) {
+        ext->tab_cur--;
+    }
+
+    lv_btnm_set_btn_ctrl(ext->btns, ext->tab_cur, LV_BTNM_CTRL_NO_REPEAT);
+
+    /* --- Step 6: Re-layout ---
+     * tabview_realign() resizes all page objects, repositions buttons
+     * and indicator. lv_tabview_set_tab_act() scrolls content to the
+     * (possibly new) active tab and updates the toggle highlight. */
+    tabview_realign(tabview);
+    lv_tabview_set_tab_act(tabview, ext->tab_cur, LV_ANIM_OFF);
+}
+
 /*=====================
  * Setter functions
  *====================*/

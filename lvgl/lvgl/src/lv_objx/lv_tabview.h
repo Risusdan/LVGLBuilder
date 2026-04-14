@@ -110,6 +110,16 @@ void lv_tabview_clean(lv_obj_t * tabview);
  */
 lv_obj_t * lv_tabview_add_tab(lv_obj_t * tabview, const char * name);
 
+/**
+ * Remove a tab by index.
+ * The tab's page object is deleted, its name string is freed, the button
+ * matrix is rebuilt, and the active-tab index is adjusted.
+ * Ignored if tab_cnt <= 1 (cannot remove the last tab) or id >= tab_cnt.
+ * @param tabview pointer to Tab view object
+ * @param id index of the tab to remove (0-based)
+ */
+void lv_tabview_remove_tab(lv_obj_t * tabview, uint16_t id);
+
 /*=====================
  * Setter functions
  *====================*/
