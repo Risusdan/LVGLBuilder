@@ -180,6 +180,95 @@ class TestTabviewRemove : public QObject {
 
     lv_obj_del(tv);
   }
+
+  // =================================================================
+  // Round 3: Builder property integration tests
+  // These test LVGLPropertyTabs::set() — the by-name matching algorithm
+  // that detects which tabs were removed, renames survivors, and appends
+  // new tabs.
+  // =================================================================
+
+  // Helper: create a tabview with N tabs via the builder property system.
+  LVGLObject *createTabviewWithTabs(QStringList tabNames) {
+    const LVGLWidget *tvWidget = lvgl.widget("lv_tabview");
+    Q_ASSERT(tvWidget != nullptr);
+    lv_obj_t *screen = lv_scr_act();
+    LVGLObject *tvObj = new LVGLObject(tvWidget, "test_tv", screen);
+    lvgl.addObject(tvObj);
+
+    LVGLProperty *tabsProp = tvWidget->property("Tabs");
+    Q_ASSERT(tabsProp != nullptr);
+    QVariantList varList;
+    for (const QString &name : tabNames)
+      varList.append(name);
+    tabsProp->setValue(tvObj, QVariant(varList));
+
+    return tvObj;
+  }
+
+  // Core test: old=[A, B, C], new=[A, C]
+  void propertyRemovesByName() {
+    LVGLObject *tvObj = createTabviewWithTabs({"A", "B", "C"});
+    lv_tabview_ext_t *ext = reinterpret_cast<lv_tabview_ext_t *>(
+        lv_obj_get_ext_attr(tvObj->obj()));
+
+    QCOMPARE(ext->tab_cnt, static_cast<uint16_t>(3));
+    QCOMPARE(tvObj->childs().size(), 3);
+
+    LVGLProperty *tabsProp = lvgl.widget("lv_tabview")->property("Tabs");
+    tabsProp->setValue(tvObj, QVariant(QVariantList{{"A"}, {"C"}}));
+
+    QCOMPARE(ext->tab_cnt, static_cast<uint16_t>(2));
+    QCOMPARE(tvObj->childs().size(), 2);
+    QCOMPARE(QString(ext->tab_name_ptr[0]), QString("A"));
+    QCOMPARE(QString(ext->tab_name_ptr[1]), QString("C"));
+  }
+
+  // Remove + add: old=[A, B, C], new=[A, C, D]
+  void propertyRemoveAndAdd() {
+    LVGLObject *tvObj = createTabviewWithTabs({"A", "B", "C"});
+    lv_tabview_ext_t *ext = reinterpret_cast<lv_tabview_ext_t *>(
+        lv_obj_get_ext_attr(tvObj->obj()));
+
+    LVGLProperty *tabsProp = lvgl.widget("lv_tabview")->property("Tabs");
+    tabsProp->setValue(tvObj, QVariant(QVariantList{{"A"}, {"C"}, {"D"}}));
+
+    QCOMPARE(ext->tab_cnt, static_cast<uint16_t>(3));
+    QCOMPARE(tvObj->childs().size(), 3);
+    QCOMPARE(QString(ext->tab_name_ptr[0]), QString("A"));
+    QCOMPARE(QString(ext->tab_name_ptr[1]), QString("C"));
+    QCOMPARE(QString(ext->tab_name_ptr[2]), QString("D"));
+  }
+
+  // Pure rename: old=[A, B], new=[A, X]
+  void propertyRenameOnly() {
+    LVGLObject *tvObj = createTabviewWithTabs({"A", "B"});
+    lv_tabview_ext_t *ext = reinterpret_cast<lv_tabview_ext_t *>(
+        lv_obj_get_ext_attr(tvObj->obj()));
+
+    LVGLProperty *tabsProp = lvgl.widget("lv_tabview")->property("Tabs");
+    tabsProp->setValue(tvObj, QVariant(QVariantList{{"A"}, {"X"}}));
+
+    QCOMPARE(ext->tab_cnt, static_cast<uint16_t>(2));
+    QCOMPARE(tvObj->childs().size(), 2);
+    QCOMPARE(QString(ext->tab_name_ptr[0]), QString("A"));
+    QCOMPARE(QString(ext->tab_name_ptr[1]), QString("X"));
+  }
+
+  // No-op: old=[A, B], new=[A, B]
+  void propertyNoChange() {
+    LVGLObject *tvObj = createTabviewWithTabs({"A", "B"});
+    lv_tabview_ext_t *ext = reinterpret_cast<lv_tabview_ext_t *>(
+        lv_obj_get_ext_attr(tvObj->obj()));
+
+    LVGLProperty *tabsProp = lvgl.widget("lv_tabview")->property("Tabs");
+    tabsProp->setValue(tvObj, QVariant(QVariantList{{"A"}, {"B"}}));
+
+    QCOMPARE(ext->tab_cnt, static_cast<uint16_t>(2));
+    QCOMPARE(tvObj->childs().size(), 2);
+    QCOMPARE(QString(ext->tab_name_ptr[0]), QString("A"));
+    QCOMPARE(QString(ext->tab_name_ptr[1]), QString("B"));
+  }
 };
 
 QTEST_MAIN(TestTabviewRemove)
