@@ -4,3 +4,13 @@
 Makefile
 build/
 *.app/
+
+# Test build artifacts
+tests/**/*.o
+tests/**/*.moc
+tests/**/moc_*.cpp
+tests/**/moc_*.h
+tests/**/qrc_*.cpp
+tests/**/target_wrapper.sh
+tests/**/ui_*.h
+tests/**/tst_*[!.]
