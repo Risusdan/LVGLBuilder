@@ -42,8 +42,14 @@ protected:
 	inline QStringList get(LVGLObject *obj) const {
 		QStringList ret;
 		lv_tabview_ext_t * ext = reinterpret_cast<lv_tabview_ext_t*>(lv_obj_get_ext_attr(obj->obj()));
+		// tab k's allocated name lives at array index k for TOP/BOTTOM,
+		// and k*2 for LEFT/RIGHT (separated by "\n" literals).
+		const bool sideLayout =
+			(ext->btns_pos == LV_TABVIEW_BTNS_POS_LEFT ||
+			 ext->btns_pos == LV_TABVIEW_BTNS_POS_RIGHT);
+		const uint16_t stride = sideLayout ? 2 : 1;
 		for (uint16_t i = 0; i < ext->tab_cnt; ++i)
-			ret << QString(ext->tab_name_ptr[i]);
+			ret << QString(ext->tab_name_ptr[i * stride]);
 		return ret;
 	}
 
