@@ -492,18 +492,29 @@ QRect LVGLCore::get_object_rect(const lv_obj_t *lv_obj) const {
   return QRect(get_absolute_position(lv_obj), get_object_size(lv_obj));
 }
 
-void LVGLCore::addObject(LVGLObject *object) { m_objects << object; }
+void LVGLCore::addObject(LVGLObject *object) {
+  emit aboutToAddObject(object);
+  m_objects << object;
+  emit objectAdded();
+}
 
 void LVGLCore::removeObject(LVGLObject *object) {
+  // Recursively remove children first (depth-first).
+  // Each recursive call emits its own signals, so the model
+  // gets individual begin/end notifications per child.
   auto childs = object->childs();
   while (!childs.isEmpty()) {
     removeObject(childs.at(0));
     childs = object->childs();
   }
+  // Signal BEFORE removal — model reads the object's parent/row
+  // while the tree is still intact.
+  emit aboutToRemoveObject(object);
   if (object->parent()) object->parent()->removeChild(object);
   m_objects.removeOne(object);
   delete object;
-  object = nullptr;
+  // Signal AFTER removal — model commits the row removal.
+  emit objectRemoved();
 }
 
 void LVGLCore::removeAllObjects() {

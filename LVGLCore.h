@@ -102,6 +102,14 @@ class LVGLCore : public QObject {
   static const char *DEFAULT_DAYS[7];
   static const char *DEFAULT_MONTHS[12];
 
+ signals:
+  // Emitted by addObject() / removeObject() so that any connected model
+  // (e.g. LVGLObjectModel) can call beginInsertRows / beginRemoveRows.
+  void aboutToAddObject(LVGLObject *object);
+  void objectAdded();
+  void aboutToRemoveObject(LVGLObject *object);
+  void objectRemoved();
+
  private slots:
   void tick();
 
