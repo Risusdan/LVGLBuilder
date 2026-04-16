@@ -269,6 +269,59 @@ class TestTabviewRemove : public QObject {
     QCOMPARE(QString(ext->tab_name_ptr[0]), QString("A"));
     QCOMPARE(QString(ext->tab_name_ptr[1]), QString("B"));
   }
+
+  // =================================================================
+  // Round 4: Crash-fix tests
+  // Verify that LVGLCore emits signals on addObject/removeObject,
+  // and that surviving pages get corrected m_index values.
+  // =================================================================
+
+  void coreEmitsRemoveSignals() {
+    lv_obj_t *screen = lv_scr_act();
+    const LVGLWidget *labelWidget = lvgl.widget("lv_label");
+    QVERIFY(labelWidget != nullptr);
+    LVGLObject *obj = new LVGLObject(labelWidget, "signal_test", screen);
+    lvgl.addObject(obj);
+
+    QSignalSpy aboutToRemove(&lvgl, SIGNAL(aboutToRemoveObject(LVGLObject*)));
+    QSignalSpy removed(&lvgl, SIGNAL(objectRemoved()));
+
+    lvgl.removeObject(obj);
+
+    QCOMPARE(aboutToRemove.count(), 1);
+    QCOMPARE(removed.count(), 1);
+  }
+
+  void coreEmitsAddSignals() {
+    lv_obj_t *screen = lv_scr_act();
+    const LVGLWidget *labelWidget = lvgl.widget("lv_label");
+    QVERIFY(labelWidget != nullptr);
+
+    QSignalSpy aboutToAdd(&lvgl, SIGNAL(aboutToAddObject(LVGLObject*)));
+    QSignalSpy added(&lvgl, SIGNAL(objectAdded()));
+
+    LVGLObject *obj = new LVGLObject(labelWidget, "signal_test", screen);
+    lvgl.addObject(obj);
+
+    QCOMPARE(aboutToAdd.count(), 1);
+    QCOMPARE(added.count(), 1);
+  }
+
+  void survivingPageIndexUpdated() {
+    LVGLObject *tvObj = createTabviewWithTabs({"A", "B", "C"});
+    QCOMPARE(tvObj->childs().size(), 3);
+
+    QCOMPARE(tvObj->childs().at(0)->index(), 0);
+    QCOMPARE(tvObj->childs().at(1)->index(), 1);
+    QCOMPARE(tvObj->childs().at(2)->index(), 2);
+
+    LVGLProperty *tabsProp = lvgl.widget("lv_tabview")->property("Tabs");
+    tabsProp->setValue(tvObj, QVariant(QVariantList{{"A"}, {"C"}}));
+
+    QCOMPARE(tvObj->childs().size(), 2);
+    QCOMPARE(tvObj->childs().at(0)->index(), 0);
+    QCOMPARE(tvObj->childs().at(1)->index(), 1);
+  }
 };
 
 QTEST_MAIN(TestTabviewRemove)
