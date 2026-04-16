@@ -374,8 +374,17 @@ void lv_tabview_remove_tab(lv_obj_t * tabview, uint16_t id)
 
     /* --- Step 2: Free the dynamically-allocated name string ---
      * lv_tabview_add_tab() allocates each name via lv_mem_alloc().
-     * We must free it before shifting the array. */
-    lv_mem_free((void *)ext->tab_name_ptr[id]);
+     *
+     * The array-index of the name depends on button position:
+     *   TOP/BOTTOM: [n0, n1, ..., ""]    -> tab `k`'s name lives at index k
+     *   LEFT/RIGHT: [n0, "\n", n1, ...]  -> tab `k`'s name lives at index k*2
+     *
+     * Using the wrong index for LEFT/RIGHT would free the "\n" string
+     * literal, which is undefined behavior. */
+    uint16_t name_idx = (ext->btns_pos == LV_TABVIEW_BTNS_POS_LEFT ||
+                         ext->btns_pos == LV_TABVIEW_BTNS_POS_RIGHT)
+                        ? (uint16_t)(id * 2) : id;
+    lv_mem_free((void *)ext->tab_name_ptr[name_idx]);
 
     /* --- Step 3: Shrink tab_cnt, then compact the name-pointer array ---
      *
@@ -866,8 +875,17 @@ static lv_res_t lv_tabview_signal(lv_obj_t * tabview, lv_signal_t sign, void * p
 
     lv_tabview_ext_t * ext = lv_obj_get_ext_attr(tabview);
     if(sign == LV_SIGNAL_CLEANUP) {
-        uint8_t i;
-        for(i = 0; ext->tab_name_ptr[i][0] != '\0'; i++) lv_mem_free(ext->tab_name_ptr[i]);
+        /* Only the allocated name strings must be freed; the "\n" row
+         * separators (LEFT/RIGHT) are string literals and freeing them
+         * would corrupt the heap (or SIGBUS on read-only literals).
+         * For LEFT/RIGHT, allocated names live at even indices (0, 2, 4, ...).
+         * For TOP/BOTTOM, allocated names live at every index (0, 1, 2, ...). */
+        uint16_t stride =
+            (ext->btns_pos == LV_TABVIEW_BTNS_POS_LEFT ||
+             ext->btns_pos == LV_TABVIEW_BTNS_POS_RIGHT) ? 2 : 1;
+        for(uint16_t i = 0; i < ext->tab_cnt; i++) {
+            lv_mem_free(ext->tab_name_ptr[i * stride]);
+        }
 
         lv_mem_free(ext->tab_name_ptr);
         ext->tab_name_ptr = NULL;
