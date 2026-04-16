@@ -379,6 +379,22 @@ class TestTabviewRemove : public QObject {
     QVariant v = tabsProp->value(tvObj);
     QCOMPARE(v.toString(), QString("A, B, C"));
   }
+
+  void propertyRenameLeft() {
+    lv_obj_t *screen = lv_scr_act();
+    const LVGLWidget *tvWidget = lvgl.widget("lv_tabview");
+    LVGLObject *tvObj = new LVGLObject(tvWidget, "test_rename_left", screen);
+    lvgl.addObject(tvObj);
+    lv_tabview_set_btns_pos(tvObj->obj(), LV_TABVIEW_BTNS_POS_LEFT);
+
+    LVGLProperty *tabsProp = tvWidget->property("Tabs");
+    tabsProp->setValue(tvObj, QVariant(QVariantList{{"A"}, {"B"}, {"C"}}));
+
+    tabsProp->setValue(tvObj, QVariant(QVariantList{{"A"}, {"X"}, {"C"}}));
+
+    QVariant v = tabsProp->value(tvObj);
+    QCOMPARE(v.toString(), QString("A, X, C"));
+  }
 };
 
 QTEST_MAIN(TestTabviewRemove)
