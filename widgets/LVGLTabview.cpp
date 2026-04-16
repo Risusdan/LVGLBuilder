@@ -137,18 +137,29 @@ protected:
 
 		// Re-read ext since tab_cnt may have changed during removals
 		ext = reinterpret_cast<lv_tabview_ext_t*>(lv_obj_get_ext_attr(obj->obj()));
+		// tab k's name lives at array index k for TOP/BOTTOM, k*2 for LEFT/RIGHT
+		const bool sideLayout =
+			(ext->btns_pos == LV_TABVIEW_BTNS_POS_LEFT ||
+			 ext->btns_pos == LV_TABVIEW_BTNS_POS_RIGHT);
+		const uint16_t stride = sideLayout ? 2 : 1;
 		for (uint16_t i = 0; i < qMin(ext->tab_cnt, static_cast<uint16_t>(list.size())); ++i) {
+			const uint16_t arrIdx = i * stride;
 			QByteArray name = list.at(i).toLatin1();
-			if (strcmp(ext->tab_name_ptr[i], name.data()) == 0)
+			if (strcmp(ext->tab_name_ptr[arrIdx], name.data()) == 0)
 				continue;  // name unchanged, skip
 
-			// Allocate new LVGL name string and replace the old one
+			// Allocate new LVGL name string
 			char * name_dm = reinterpret_cast<char*>(lv_mem_alloc(static_cast<uint32_t>(name.size() + 1)));
 			if (name_dm == nullptr)
 				continue;
-
 			memcpy(name_dm, name.constData(), static_cast<size_t>(name.size() + 1));
-			ext->tab_name_ptr[i] = name_dm;
+
+			// FIX (C4): free the old name BEFORE overwriting its slot.
+			// Old name was allocated by lv_tabview_add_tab() or a prior
+			// rename — both use lv_mem_alloc. Without this free, every
+			// rename leaks bytes in LVGL's heap.
+			lv_mem_free((void *)ext->tab_name_ptr[arrIdx]);
+			ext->tab_name_ptr[arrIdx] = name_dm;
 
 			lv_btnm_set_map(ext->btns, ext->tab_name_ptr);
 			lv_btnm_set_btn_ctrl(ext->btns, ext->tab_cur, LV_BTNM_CTRL_NO_REPEAT);
