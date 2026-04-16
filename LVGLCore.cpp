@@ -20,6 +20,10 @@ const char *LVGLCore::DEFAULT_MONTHS[12] = {
     "July",    "August",   "September", "October", "November", "December"};
 
 LVGLCore::LVGLCore(QObject *parent) : QObject(parent), m_defaultFont(nullptr) {
+  // Register LVGLObject* so QSignalSpy and queued-connection use cases
+  // can marshal the pointer across threads. Harmless in single-threaded
+  // direct-connection code but silences QSignalSpy warnings.
+  qRegisterMetaType<LVGLObject*>("LVGLObject*");
   FT_Init_FreeType(&m_ft);
 }
 
