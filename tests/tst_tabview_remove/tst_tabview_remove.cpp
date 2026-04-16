@@ -395,6 +395,25 @@ class TestTabviewRemove : public QObject {
     QVariant v = tabsProp->value(tvObj);
     QCOMPARE(v.toString(), QString("A, X, C"));
   }
+
+  void propertyEmptyListKeepsOneTab() {
+    LVGLObject *tvObj = createTabviewWithTabs({"A", "B", "C"});
+    lv_tabview_ext_t *ext = reinterpret_cast<lv_tabview_ext_t *>(
+        lv_obj_get_ext_attr(tvObj->obj()));
+
+    QCOMPARE(ext->tab_cnt, static_cast<uint16_t>(3));
+    QCOMPARE(tvObj->childs().size(), 3);
+
+    LVGLProperty *tabsProp = lvgl.widget("lv_tabview")->property("Tabs");
+    tabsProp->setValue(tvObj, QVariant(QVariantList{}));
+
+    QVERIFY(ext->tab_cnt >= 1);
+    QCOMPARE(tvObj->childs().size(), static_cast<int>(ext->tab_cnt));
+
+    for (LVGLObject *child : tvObj->childs()) {
+      QVERIFY(child->obj() != nullptr);
+    }
+  }
 };
 
 QTEST_MAIN(TestTabviewRemove)
