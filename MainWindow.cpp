@@ -67,6 +67,19 @@ MainWindow::MainWindow(QWidget *parent)
           });
   m_ui->object_tree->setModel(m_objectModel);
   m_simulator->setObjectModel(m_objectModel);
+
+  // LVGLCore signals -> LVGLObjectModel notifications.
+  // This ensures the object tree QTreeView stays in sync whenever
+  // objects are added/removed, regardless of who does it.
+  connect(&lvgl, &LVGLCore::aboutToAddObject,
+          m_objectModel, &LVGLObjectModel::beginInsertObject);
+  connect(&lvgl, &LVGLCore::objectAdded,
+          m_objectModel, &LVGLObjectModel::endInsertObject);
+  connect(&lvgl, &LVGLCore::aboutToRemoveObject,
+          m_objectModel, &LVGLObjectModel::beginRemoveObject);
+  connect(&lvgl, &LVGLCore::objectRemoved,
+          m_objectModel, &LVGLObjectModel::endRemoveObject);
+
   m_simulator->setPropertyModel(m_propertyModel);
 
   LVGLWidgetModel *widgetModel = new LVGLWidgetModel;

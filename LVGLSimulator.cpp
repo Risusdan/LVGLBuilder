@@ -334,13 +334,9 @@ void LVGLSimulator::moveObject(LVGLObject *obj, int dx, int dy) {
 void LVGLSimulator::addObject(LVGLObject *obj) {
   connect(obj, &LVGLObject::positionChanged, m_item, &LVGLItem::updateGeometry);
 
-  // add to object viewer
-  if (m_objectModel) m_objectModel->beginInsertObject(obj);
-
-  // add object to interal list
+  // Model notification is handled by LVGLCore::addObject() signals,
+  // connected to LVGLObjectModel in MainWindow.
   lvgl.addObject(obj);
-
-  if (m_objectModel) m_objectModel->endInsertObject();
 
   setSelectedObject(obj);
   setFocus();
@@ -350,9 +346,9 @@ void LVGLSimulator::addObject(LVGLObject *obj) {
 
 void LVGLSimulator::removeObject(LVGLObject *obj) {
   setSelectedObject(nullptr);
-  if (m_objectModel) m_objectModel->beginRemoveObject(obj);
+  // Model notification is handled by LVGLCore::removeObject() signals,
+  // connected to LVGLObjectModel in MainWindow.
   lvgl.removeObject(obj);
-  if (m_objectModel) m_objectModel->endRemoveObject();
 }
 
 LVGLObject *LVGLSimulator::selectedObject() const { return m_selectedObject; }
