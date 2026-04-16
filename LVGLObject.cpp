@@ -770,6 +770,11 @@ int LVGLObject::index() const
 	return m_index;
 }
 
+void LVGLObject::setIndex(int index)
+{
+	m_index = index;
+}
+
 LVGLObject *LVGLObject::findChildByIndex(int index) const
 {
 	for (LVGLObject *child:m_childs) {

@@ -77,6 +77,7 @@ public:
 	static LVGLObject *parse(QJsonObject object, LVGLObject *parent);
 
 	int index() const;
+	void setIndex(int index);
 
 	LVGLObject *findChildByIndex(int index) const;
 

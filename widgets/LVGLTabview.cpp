@@ -106,6 +106,18 @@ protected:
 			lv_tabview_remove_tab(obj->obj(), static_cast<uint16_t>(i));
 		}
 
+		// After removals, re-index surviving page wrappers.
+		// Example: removing index 1 from [A(0), B(1), C(2)] leaves
+		// C with m_index=2, but it's now at LVGL position 1.
+		// Without this fix, findChildByIndex() fails for subsequent
+		// operations (widget drop, save/load, further tab edits).
+		{
+			int idx = 0;
+			for (LVGLObject *child : obj->childs()) {
+				child->setIndex(idx++);
+			}
+		}
+
 		// ================================================================
 		// PHASE 2: Positional rename — handle in-place text edits
 		// ================================================================
