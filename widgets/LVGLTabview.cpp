@@ -94,6 +94,15 @@ protected:
 		for (int r = toRemove.size() - 1; r >= 0; --r) {
 			int i = toRemove[r];
 
+			// FIX (C3): LVGL requires tab_cnt >= 1 — refuse to remove the
+			// last tab. Must check BEFORE deleting the builder wrapper,
+			// otherwise lv_tabview_remove_tab silently no-ops but we've
+			// already orphaned the LVGL page from its LVGLObject.
+			lv_tabview_ext_t *curExt =
+				reinterpret_cast<lv_tabview_ext_t*>(lv_obj_get_ext_attr(obj->obj()));
+			if (curExt->tab_cnt <= 1)
+				break;
+
 			// --- Clean up the builder-side wrapper tree ---
 			// There are TWO parallel object trees:
 			//   LVGL tree:    lv_obj_t (tabview) → lv_obj_t (page) → lv_obj_t (children)
